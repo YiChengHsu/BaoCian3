@@ -1,0 +1,37 @@
+{
+  "name": "sorrymywallet",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "dependencies": {
+    "aws-sdk": "^2.1011.0",
+    "bcrypt": "^5.0.1",
+    "crypto": "^1.0.1",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "expresss": "^0.0.0",
+    "jsonwebtoken": "^8.5.1",
+    "lodash": "^4.17.21",
+    "multer": "^1.4.3",
+    "multer-s3": "^2.10.0",
+    "mysql2": "^2.3.2",
+    "mysql2-promise": "^0.1.4",
+    "redis": "^3.1.2",
+    "socket.io": "^4.3.0",
+    "validator": "^13.6.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/YiChengHsu/sorry-my-wallet.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/YiChengHsu/sorry-my-wallet/issues"
+  },
+  "homepage": "https://github.com/YiChengHsu/sorry-my-wallet#readme"
+}

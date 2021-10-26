@@ -1,0 +1,126 @@
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lato&display=swap" rel="stylesheet">
+  <title>Product page</title>
+</head>
+
+  
+  <div class="main-area">
+
+    <form enctype="multipart/form-data" onkeypress="return event.keyCode != 13;">
+      <div>
+        <h1>新增拍賣商品：</h1>
+      </div>
+
+      <div>
+        <span>*商品名稱：</span>
+        <input type="text" id="title" name="title" placeholder="請輸入商品名稱" class="input-value" required>
+      </div>
+
+      <div>
+        <span>*商品類別：</span>
+        <select name="category">
+          <optgroup label="男裝">
+            <option value="man_shirt">上身</option>
+            <option value="man_pants">下身</option>
+            <option value="man_shoes">男鞋</option>
+          </optgroup>
+          <optgroup label="配件">
+            <option value="hat">帽子</option>
+            <option value="watch">手錶</option>
+            <option value="backpack">背包</option>
+          </optgroup>
+        </select>
+      </div>
+
+      <div>
+        <span>商品品牌：</span>
+        <input type="text" id="brand" name="brand" placeholder="請輸入品牌" class="input-value">
+      </div>
+
+      <div>
+        <span>*商品描述：</span>
+        <input type="text" id="description" name="description" placeholder="請輸入品牌" class="input-value">
+      </div>
+
+      <div>
+        <span>商品材質：</span>
+        <input type="text" id="texture" name="texture" placeholder="請輸入材質" class="input-value">
+      </div>
+
+      <div>
+        <span>*商品狀態：</span>
+        <input type="text" id="condition" name="condition" placeholder="例：9成新、輕微磨損" class="input-value">
+      </div>
+
+      <div>
+        <span>*是否有外包裝：</span>
+        <input type="radio" class="original_packaging" name="original_packaging" value="是"> <label> 是 </label>
+        <input type="radio" class="original_packaging" name="original_packaging" value="否"> <label> 否 </label>
+      </div>
+
+      <div>
+        <span>*是否保證書、購買證明：</span>
+        <input type="radio" class="with_papers" name="with_papers" value="保證書"> <label> 保證書 </label>
+        <input type="radio" class="with_papers" name="with_papers" value="購買證明"> <label> 購買證明 </label>
+        <input type="radio" class="with_papers" name="with_papers" value="無"> <label> 無 </label>
+      </div>
+
+      <div>
+        <span> 所在地點：</span>
+        <input type="text" id="place" name="place" placeholder="請輸入您的所在地" class="input-value">
+      </div>
+
+      <div>
+        <span> 商品備註：</span>
+        <input type="text" id="note" name="note" class="input-value">
+      </div>
+
+      <div>
+        <span>*商品簡介：</span>
+        <input type="text" id="story" name="story" class="input-value" placeholder="請輸入商品簡介">
+      </div>
+
+      <div class="picture">
+        <label>*主要圖片(上限1張)：</label>
+        <input type="file" id="main_image" name="main_image" accept="image/png, image/jpeg" class="input-value" required>
+      </div>
+
+      <div class="picture">
+        <label>*其他圖片(上限3張)：</label>
+        <input type="file" name="other_images" multiple accept="image/png, image/jpeg" class="input-value" required>
+      </div>
+
+      <h2>銷售資訊：</h2>
+
+      <div>
+        <span>*起標價格：</span>
+        <input type="number" id="price" name="price" class="input-value" placeholder="請輸入起標">
+      </div>
+
+      <div>
+        <span>*出價增額：</span>
+        <input type="number" id="bid_incr" name="bid_incr" class="input-value" value="100">
+      </div>
+      
+      <div>
+        <span>*起標日期與時間：</span>
+        <input type="datetime-local" id="start_time" name="start_time" min="2021-08-09T08:00" value="2021-08-09T08:00">
+      </div>
+
+      <div>
+        <span>*截標日期與時間：</span>
+        <input type="datetime-local" id="end_time" name="end_time" min="2021-08-09T08:00" value="2021-09-09T08:00">
+      </div>
+      
+      <p>「*」為必填
+      <div>
+        <input type="submit" value="上傳" class="upload">
+      </div>
+    </form>
+  </div>
+</body>
+<script src='../javascript/product_upload.js'></script>

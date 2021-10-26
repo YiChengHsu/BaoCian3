@@ -30,8 +30,7 @@
     var message = document.querySelector('#messages');
 
     form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      if (input.value) {
+      if (input.value && input.value > 0) {
         socket.emit('chat message', input.value);
         input.value = '';
       } else {

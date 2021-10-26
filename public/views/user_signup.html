@@ -1,0 +1,69 @@
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato&display=swap" rel="stylesheet">
+    <title>Sorry My Wallet</title>
+</head>
+<body>
+    <form>
+  
+        <h2>註冊</h2>
+
+        <div class="input">
+          <input
+            class="enter-name"
+            type="text"
+            name="name"
+            placeholder="請輸入姓名"
+          />
+        </div>
+  
+        <div class="input">
+          <input
+            class="enter-email"
+            type="text"
+            name="email"
+            placeholder="請輸入Email"
+          />
+        </div>
+  
+        <div class="input">
+          <input
+            class="enter-password"
+            id="password"
+            type="password"
+            name="password"
+            placeholder="請輸入密碼"
+          />
+          <p>請輸入介於6-16位的密碼</p>
+        </div>
+
+        <div class="input">
+          <input
+            class="enter-password"
+            id="password-2"
+            type="password"
+            placeholder="請再次輸入密碼"
+          />
+          <p id="password-msg"></p>
+        </div>
+
+        <div class="picture">
+          <label>形象圖片(選填)：</label><br>
+          <input type="file" id="avatar" name="avatar" accept="image/png, image/jpeg" class="input-value">
+        </div>
+  
+        <div class="button-area">
+          <input type="submit" class="signup" value="註冊" />
+        </div>
+  
+        <div>
+          <a href="/signup.html">已經是會員了嗎?</a>
+        </div>
+      </form>
+  </div>
+</body>
+    
+  <script src='../javascript/user_signup.js'></script>
