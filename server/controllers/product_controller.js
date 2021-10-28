@@ -1,6 +1,7 @@
 const Product = require('../models/product_model');
 const _ = require('lodash')
 const pageSize = 6;
+const Bid = require('../models/bid_model')
 
 const createProduct = async(req, res) => {
     const body = req.body;
@@ -20,13 +21,12 @@ const createProduct = async(req, res) => {
         seller_id: '1',
         start_time: Date.parse(body.start_time),
         end_time: Date.parse(body.end_time),
-        bid_current_number: body.price,
+        highest_bid: body.price,
         bid_incr: body.bid_incr
     }
 
     product.main_image = req.files.main_image[0].key;
 
-    console.log(product)
 
     const other_images = req.files.other_images.map(
         img => ([img.key])
@@ -81,9 +81,15 @@ const getProducts =  async (req, res) => {
 
     const {products, productCount} = await findProduct(category);
 
-    const productsWithImages = await getProductsImages(products)
+    let productsWithImages = await getProductsImages(products)
+    let productsWithRecords = await getProductBidRecords (products)
+    let productsWithDetails
 
-    console.log(productsWithImages)
+    if (category == 'details') {
+        productsWithDetails = productsWithRecords[0]
+    } else {
+        productsWithDetails = productsWithImages
+    }
 
     if (!products) {
         res.status(400).send({ error: 'Bad Request'});
@@ -101,9 +107,9 @@ const getProducts =  async (req, res) => {
 
     let result;
     if (productCount > (paging + 1) * pageSize) {
-        result = { data: products, next_paging: paging +1}
+        result = { data: productsWithDetails, next_paging: paging +1}
     } else {
-        result = { data: products}
+        result = { data: productsWithDetails}
     }
 
     res.status(200).json(result)
@@ -114,8 +120,6 @@ const getProductsImages = async (products) => {
     const productIds = products.map(e => e.id);
     const images = await Product.getProductsImages(productIds);
     const imagesMap = _.groupBy(images, e => e.product_id)
-    console.log(imagesMap)
-    console.log(products)
 
     const imagePath = 'https://s3.ap-northeast-1.amazonaws.com/node.js-image-bucket/'
 
@@ -123,10 +127,23 @@ const getProductsImages = async (products) => {
         e.main_image = e.main_image ? imagePath + e.main_image : null;
         e.images = e.images ? e.images.split(',').map(img => imagePath + img) : null; 
 
-        console.log(e.images)
-
         e.images = imagesMap[e.id].map(img => imagePath + img.image)
         return e;
+    })
+}
+
+const getProductBidRecords = async(products) => {
+    const productIds = products.map(e => e.id);
+    const records = await Bid.getBidRecords(productIds)
+    const recordsMap = _.groupBy(records, e => e.product_id)
+
+    return products.map((e) => {
+        if (records.length == 0) {
+            e.records = []
+        } else {
+            e.records = recordsMap[e.id] 
+        }
+        return e
     })
 }
 

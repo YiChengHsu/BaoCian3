@@ -16,12 +16,13 @@ const setBidRecord = async (req, res) => {
     const bidRecord = {
         'product_id': bid.productId,
         'user_id': bid.userId,
-        'bid_number': bid.bidNumber,
-        'bid_current_number': bid.currentBid
+        'bid_amount': bid.bidAmount,
+        'bid_time': bid.bidTime,
+        'time_left': bid.timeLeft,
     }
     try {
-        const result = await Bid.setBidRecord(bidRecord)
-        return result;
+        const bidRecordId = await Bid.setBidRecord(bidRecord)
+        return bidRecordId;
     } catch (error) {
         res.status(500).send({error})
     }

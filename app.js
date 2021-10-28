@@ -40,22 +40,8 @@ app.use(function(err, req, res, next) {
     res.status(500).send('Internal Server Error');
 });
 
+
 //Broadcast when a bidder connects
-
-// Listen for bid
-// socket.on('bid', bid => {
-//     currentBid += Number(bid)
-//     const user = socket.id
-//     const bidMsg = {user, currentBid, time: getTimeRemaining(endTime)}
-//     console.log(bidMsg)
-//     io.emit('bid', bidMsg)
-//     // socket.emit('bid', bidMsg)
-// })
-
-// //Broadcast when a bidder leaves
-// socket.on('disconnect' , () => {
-//     socket.broadcast.emit('message', 'A bidder has left the auction!');
-// })
 
 server.listen(3000, () => {
     console.log('listen on 3000') ;   
@@ -63,60 +49,38 @@ server.listen(3000, () => {
 
 
 io.on('connection', socket => {
-    socket.on('joinRoom', async (id) =>{
-        socket.join(id)
-    
-        io.to(id).emit('message', '有買家進來血流成河了唷！');
-
-        const product = await Product.getProductById(id)
-        console.log(product)
-
-        // console.log(product)
-
-        //Broadcast counter
-        let highestUser;
-        let endTime
-
-        let highestBid = product[0].bid_current_number
-        const winnerCountDown = setInterval( async () => {
-            const product = await Product.getProductById(id)
-            endTime = product[0].end_time
-            const counter = getTimeRemaining(endTime);
-
-            io.to(id).emit(`counter${id}`, counter);
-            if ( Date.now() == endTime) {
-                socket.emit('message', "Happy New Years");
-                clearInterval;
-            }
-        }, 1000);
+    socket.on('join', async ([productId, userId]) => {
+        socket.join(productId)
         
-                // Listen for bid
-        socket.on('bid', async (bid) => {
-            userBid = Number(bid.bidNumber) + Number(bid.currentNumber)
-            if (userBid > highestBid) {
-                // endTime += 30000
-                const time = getTimeRemaining(endTime)
-                const bidMsg = {
-                    product_id: bid.id,
-                    user_id: bid.userId,
-                    bid_number: bid.bidNumber,
-                    bid_current_number: userBid,
-                    time_hours: time.hours,
-                    time_minutes: time.minutes,
-                    time_seconds: time.seconds
-                }
-                try {
-                    const result = await Bid.setBidRecord(bidMsg)
-                    io.to(id).emit('bid', bidMsg)
-                    socket.emit('message', `${bid.userId}買家出價，時間延長30秒！`)
-                } catch (error) {
-                    console.log(error)
-                    socket.emit('message', '無效的出價，請在試一次！')
-                }
-            } else {
-                socket.emit('message', '無效的出價，請在試一次！')
+        if (userId != null) {
+            socket.broadcast.to(productId).emit('message', `買家ID進來血流成河了！`);
+        };
+
+        // Listen for bid
+        socket.on('bid', async (userBid) => {
+            const bidTime = Date.now() + 28800*1000
+            const timeLeft = userBid.endTime - bidTime
+            const bidRecord = {
+                product_id: userBid.productId,
+                user_id: userBid.userId,
+                bid_amount: userBid.userBidAmount,
+                bid_time: bidTime,
+                time_left: timeLeft
             }
-            // socket.broadcast.to(id).emit('bid', bidMsg)
+
+            const result = await Bid.setBidRecord(bidRecord)
+
+            if (result < 0) {
+                console.log('err')
+                socket.emit('bidFail', bidRecord)
+            }
+
+            io.to(productId).emit('bidRefresh', bidRecord)
+            socket.emit('bidSuccess', bidRecord)
+        })
+
+        socket.on('disconnect' , () => {
+            io.to(productId).emit('message', '有人撐不住啦~');
         })
     })
 
@@ -149,9 +113,6 @@ io.on('connection', socket => {
     // })
 
     //Broadcast when a bidder leaves
-    socket.on('disconnect' , () => {
-        socket.broadcast.emit('message', '有人撐不住啦~');
-    })
 })
 
     //Broadcast when a bidder connects

@@ -4,37 +4,40 @@ const setBidRecord = async (bidRecord) => {
     const conn = await pool.getConnection();
     try {
         await conn.query('START TRANSACTION');
-        await conn.query('SELECT * FROM bid_record FOR UPDATE')
+        const [hightestBid] = await conn.query('SELECT highest_bid from product where id = ? FOR UPDATE', bidRecord.product_id)
+
+        if (bidRecord.bid_amount <= hightestBid[0].highest_bid) {
+            await conn.query('COMMIT')
+            return false;
+        }
+
         await conn.query('INSERT INTO bid_record SET ?', bidRecord);
-        await conn.query('UPDATE product SET bid_current_number = ?, bid_time = bid_time + 1, end_time = end_time + 30000 WHERE id = ?', [bidRecord.bid_current_number, bidRecord.product_id])
+        await conn.query('UPDATE product SET highest_bid = ?, bid_times = bid_times + 1, end_time = end_time + 30000, highest_user_id = ? WHERE id = ?', [bidRecord.bid_amount, bidRecord.user_id, bidRecord.product_id])
         await conn.query('COMMIT');
-        return true;
+        return 1;
     } catch(error) {
         await conn.query('ROLLBACK');
         console.log(error)
-        return {error};
+        return -1;
     } finally {
         conn.release();
     }
 };
 
-const getBidRecords = async (productId) => {
+const getBidRecords = async (productIds) => {
     try {
-        const [bidRecords] = await pool.query('SELECT * FROM bid_record WHERE product_id = (?) ORDER by bid_current_number DESC LIMIT 5' , [productId]);
+        const queryStr = 'SELECT * FROM bid_record WHERE product_id in (?) ORDER by bid_amount DESC LIMIT 5 ';
+        const bindings = [productIds]
+        const [bidRecords] = await pool.query(queryStr, bindings);
         return bidRecords;
     } catch (error) {
-        return {error: "Database error"}
+        console.log(error)
     }
 }
 
 const getUserBidRecords = async (productId, userId) => {
-    try {
-        const [userBidRecords] = await pool.query('SELECT * FROM bid_record WHERE product_id = ? AND user_id = ?', [productId, userId])
-        return userBidRecords;  
-    }catch (err) {
-        console.log(err)
-    }
-
+    const [userBidRecords] = await pool.query('SELECT * FROM bid_record WHERE product_id = ? AND user_id = ?', [productId, userId])
+    return userBidRecords; 
 }
 
 const getHotProducts = async () => {

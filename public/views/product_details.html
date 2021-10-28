@@ -33,10 +33,10 @@
                 </div>
 
                 <div id="highest-bid-container">
-                    <h2 class='bid-number'>目前出價：<span class="current-bid"></h1>
+                    <h2 class='bid-number'>目前出價：<span class="highest-bid"></h1>
                 </div>
 
-                <div class="message-container"></div>
+                <div class="server-message"></div>
                 
                 <div class="bid-form-container">
                     <form id="bid-form">
@@ -49,7 +49,10 @@
                 </div>
 
 
-                <div class="bid-room"></div>
+                <div class="bid-records-container">
+                    <h2>出價紀錄：</h2>
+                    <div class="bid-records"></div>
+                </div>
             </div>
 
         </div>
@@ -66,7 +69,6 @@
 
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qs/6.10.1/qs.js" integrity="sha512-DkxSbrm2xe6jcerSwLA4vS8WV7UarP44UjrS+Yp2MRFE2md2qPLpZVTyoxHrM2mvZ2Ft2zhPUMplV20zNFXriQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="../javascript/product_details.js"></script>
     <script src="/socket.io/socket.io.js"></script>
-    <script src="../javascript/bid_server.js"></script>
+    <script src="../javascript/product_details.js"></script>
 </body>

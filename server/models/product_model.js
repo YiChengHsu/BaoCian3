@@ -11,9 +11,9 @@ const createProduct = async (product, other_images) => {
         await conn.query('INSERT INTO product_images (product_id, image) VALUES ? ', [images]);
         await conn.query('COMMIT'); 
         return result.insertId;
-    } catch (err) {
+    } catch (error) {
         await conn.query('ROLLBACK');
-        console.log(err)
+        console.log(error)
         return -1;
     } finally {
         await conn.release();
@@ -76,10 +76,14 @@ const getProducts = async (pageSize, paging = 0, filterId=[] ,requirement = {}) 
 }
 
 const getProductsImages = async (productIds) => {
-    const queryStr = 'SELECT * FROM product_images WHERE product_id in (?)';
-    const bindings = [productIds];
-    const [images] = await pool.query(queryStr, bindings)
-    return images;
+    try {
+        const queryStr = 'SELECT * FROM product_images WHERE product_id in (?) ';
+        const bindings = [productIds];
+        const [images] = await pool.query(queryStr, bindings)
+        return images;
+    } catch(error) {
+        console.log(error)
+    }
 }
 
 const getProductById = async (productIds) => {
