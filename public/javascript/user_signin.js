@@ -1,13 +1,12 @@
-const button = document.querySelector('.signin')
 const form = document.querySelector('form')
 
-button.addEventListener('click', (e) => {
+form.addEventListener('submit', (e) => {
     e.preventDefault();
 
     const user = {
         provider: 'native',
-        email: document.querySelector(".enter-email").value,
-        password: document.querySelector(".enter-password").value,
+        email: document.querySelector(".my-email").value,
+        password: document.querySelector(".my-password").value,
     };
 
     fetch('/api/1.0/user/signin', {
@@ -22,10 +21,12 @@ button.addEventListener('click', (e) => {
             alert("登入成功")
             self.location.href = "/user/profile"
             return res.json()
+        } else if (res.status == 403) {
+            alert("帳號密碼錯誤、請再試一次！")
+            return
         } else {
-            console.log(res)
-            alert("請在試一次")
-            return error
+            alert('伺服器忙碌中，請稍後再試。')
+            return
         }
     })
     .then((res) => {
@@ -36,6 +37,5 @@ button.addEventListener('click', (e) => {
     })
     .catch((err) => {
         console.log(err)
-        alert('伺服器忙碌中，請稍後再試。')
     })
 })

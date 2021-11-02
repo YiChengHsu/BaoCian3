@@ -1,0 +1,23 @@
+.my-img {
+    width: 440px;
+    height: 440px;
+    background-position: center center;
+    background-size: cover;
+}
+
+.my-other-img {
+    width: 145px;
+    height: 145px;
+    padding: 0px;
+    margin: 0px;
+    background-position: center center;
+    background-size: cover;
+}
+
+.my-option-row {
+    padding: 12px;
+}
+
+.my-input {
+    height: 58px;
+}

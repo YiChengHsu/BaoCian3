@@ -4,7 +4,11 @@ const User = require('../models/user_model')
 
 const signUp = async (req ,res) => {
     let body = req.body;
-    const avatar = req.files.avatar[0].key
+    let avatar;
+
+    if (req.file) {
+        avatar = req.files.avatar[0].key
+    }
 
     if (!body.name || !body.email || !body.password) {
         res.status(400).send({error: 'Request Error: Name, email, or password can not be empty'})
@@ -55,6 +59,7 @@ const signIn = async (req, res) => {
     console.log(body)
 
     let result;
+
     switch (body.provider) {
         case 'native':
             result = await User.nativeSignIn(body.email, body.password);
@@ -64,13 +69,14 @@ const signIn = async (req, res) => {
         //     break;
         default:
             res.status(403).send({error: "Request Error: Wrong Request"})
-    }
+    }       
 
-    console.log(result)
     const user = result.user;
     if (!user) {
-        res.status(500).send({error: 'Database Error'});
+        res.status(403).send({error: 'Forbidden'});
     }
+
+    console.log(!user)
 
     res.status(200).send({
         data:{

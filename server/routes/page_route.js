@@ -1,35 +1,40 @@
 const router = require('express').Router();
 const path = require('path')
 
+router.route('/')
+    .get((req, res) => {
+        res.redirect('/product/all')
+});
+
 router.route('/product/details')
     .get((req, res) => {
-        res.sendFile(path.join(__dirname, '../../public/views/product_details.html'))
+        res.render('product_details')
 });
 
 router.route('/product/:params')
     .get((req, res) => {
-        res.sendFile(path.join(__dirname, '../../public/views/product_index.html'))
+        res.render('product_index')
 });
 
 router.route('/user/upload')
     .get((req, res) => {
-        res.sendFile(path.join(__dirname, '../../public/views/product_upload.html'))
+        res.render('product_upload')
     })
 
 router.route('/user/signin')
     .get((req, res) => {
-    res.sendFile(path.join(__dirname, '../../public/views/user_signin.html'))
+    res.render('user_signin')
     })
 
 router.route('/user/signup')
     .get((req, res) => {
-    res.sendFile(path.join(__dirname, '../../public/views/user_signup.html'))
-    })
+    res.render('user_signup')
+})
 
 router.route('/user/profile')
     .get((req, res) => {
-    res.sendFile(path.join(__dirname, '../../public/views/user_profile.html'))
-    })
+    res.render('user_profile')
+})
 
 
 

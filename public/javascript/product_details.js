@@ -8,6 +8,7 @@ const socket = io();
 let leastBid;
 let highestBidTimes;
 let endTime;
+let bidTimes;
 
 //Fetch the product details
 
@@ -19,27 +20,23 @@ fetch(detailsUrl)
     .then(res =>  res.data)
     .then((data) => {
 
+        console.log(data)
+
         if (data == null) {
             self.location.href = '/404.html'
         }
 
-
-        category = document.querySelector('#category')
-        const categoryHref = document.createElement('a')
-        categoryHref.href = `/product/${data.category}`
+        category = document.querySelector('.my-category')
+        category.href = `/product/${data.category}`
         category.textContent = data.category
-        category.appendChild(categoryHref)
 
-        const productIdTitle = document.querySelector('#product-id')
+        const productIdTitle = document.querySelector('.product-id')
         productIdTitle.textContent = "Lot: " + data.id
 
-        const productTitle = document.querySelector('#product-title')
+        const productTitle = document.querySelector('.my-product-title')
         productTitle.textContent = data.title
 
-        const brand = document.querySelector('#brand')
-        brand.textContent = data.brand
-
-        const mainImage = document.querySelector('#main-image')
+        const mainImage = document.querySelector('.main-image')
         mainImage.src = data.main_image
 
         endTime = data.end_time
@@ -48,21 +45,23 @@ fetch(detailsUrl)
         const currentNumber = document.querySelector('.highest-bid')
         currentNumber.textContent = data.highest_bid
 
-        const bidEnter = document.querySelector('#bid-enter')
-        bidEnter.value = data.bid_incr
+        const bidEnter = document.querySelector('#my-bid-number')
+        bidEnter.placeholder = `$${data.bid_incr}`
 
         const bidIncr = document.querySelector('#bid-incr')
-        bidIncr.textContent = `最低出價： ${data.bid_incr}`
+        bidIncr.textContent = `最低出價增額： ${data.bid_incr}`
         leastBid = data.bid_incr;
 
-        const bidTimes = document.querySelector('#bid-times')
-        bidTimes.textContent = `出價次數： ${data.bid_times}`
+        const bidTimesDiv = document.querySelector('#bid-times')
+        highestBidTimes = data.bid_times
+        bidTimesDiv.textContent = `出價次數： ${highestBidTimes}`
 
         const sellerId = document.querySelector('#seller-id')
-        sellerId.textContent = `拍賣賣家： ${data.seller_id}`
+        sellerId.textContent = `賣家編號： ${data.seller_id}`
 
-        const bidRecords = document.querySelector('.bid-records')
-        data.records.map((e) => {
+        const bidRecords = document.querySelector('.my-bid-record')
+        const recordsData = data.records || [];
+        recordsData.reverse().map((e) => {
             renderBidRecord(e)
         })
 
@@ -84,19 +83,7 @@ fetch(detailsUrl)
         const place = document.querySelector('#place')
         place.textContent = `商品所在地點： ${data.place}`
 
-        const note = document.querySelector('#note')
-        note.textContent = ` 商品備註： ${data.note}`
-
-        const story = document.querySelector('#story')
-        story.textContent = `商品簡介： ${data.story}`
-
-        const otherImages = document.querySelector('.images-container')
-        data.images.map((e) => {
-            const img = document.createElement('img')
-            img.className = 'other-images'
-            img.src = e
-            otherImages.appendChild(img)
-        })
+        renderImagesSlide(data.images)
 
 
     })
@@ -111,9 +98,9 @@ socket.emit('join', [productId, userId])
 
 //Send bid message to socket.io server
 const form = document.querySelector('#bid-form')
-const input = document.querySelector('#bid-enter')
+const input = document.querySelector('#my-bid-number')
 const highestBid = document.querySelector('.highest-bid')
-const bidRecords = document.querySelector('.bid-records')
+const bidRecords = document.querySelector('.my-bid-record')
 
 form.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -139,46 +126,25 @@ form.addEventListener('submit', (e) => {
     }
 
     const userBidAmount = Number(highestBid.textContent.replace("$","")) + userBidIncr;
-    socket.emit('bid', { productId, userId, userBidAmount, endTime})
+    socket.emit('bid', { productId, userId, userBidAmount, endTime, highestBidTimes})
     input.value = '';
 })
 
-//Get the bid message from server
-socket.on('bid', bidMsg => {
-    outputBid(bidMsg)
-    const bidTimes = document.querySelector('#bid-times')
-    highestBidTimes += 1
-    bidTimes.textContent = `出價次數： ${highestBidTimes}`
-    window.scrollTo(0, 0, 'smooth')
-});
-
 //Get message from server
-socket.on('bidRefresh', bidRecord => {
+socket.on(`refresh_${productId}`, bidRecord => {
 
     console.log(bidRecord)
 
-    fetch(detailsUrl)
-        .then(res => res.json())
-        .then(res =>  res.data)
-        .then((data) => {
+    const highestBid = document.querySelector('.highest-bid')
+    highestBid.textContent = bidRecord.bid_amount
 
-            endTime = data.end_time
-            resetCountDownTimer(endTime)
+    const bidTimesDiv = document.querySelector('#bid-times')
+    highestBidTimes = bidRecord.highest_bid_times
+    bidTimesDiv.textContent = `出價次數： ${highestBidTimes}`
 
-            const currentNumber = document.querySelector('.highest-bid')
-            currentNumber.textContent = data.highest_bid
-
-            const bidTimes = document.querySelector('#bid-times')
-            bidTimes.textContent = `出價次數： ${data.bid_times}`
-
-            data.records.map((e) => {
-                renderBidRecord(e)
-            })
-
-            console.log("done")
-
-        })
-        .catch(e => console.log(e))
+    endTime = bidRecord.end_time
+    resetCountDownTimer()
+    renderBidRecord(bidRecord)
 
 })
 
@@ -186,38 +152,93 @@ socket.on('bidFail', bidRecord => {
     alert('出價失敗')
 })
 
-
-
-socket.on('bidFail', error => console.log(error))
+socket.on('bidSuccess', bidRecord => {
+    alert('出價成功')
+})
 
 //Output bid message to DOM
 const renderBidRecord = (record) => {
-    const bidTime = transMilToDate(record.bid_time)
+    const bidTime = transMilToDate(record.bid_time + 8*60*60*1000)
     const timeLeft = transMilToDate(record.time_left)
 
-    const div = document.createElement('div')
-    div.classList.add('record-message')
+    let recordLi = document.createElement('li')
+    recordLi.className = "list-group-item d-flex justify-content-between align-items-start record-message"
 
-    div.innerHTML = `<div><h3 class="bidder">${record.user_id} 賣家出價 <h2>$${record.bid_amount}</h2></h3></div><div>出價時間： ${bidTime.hours}: ${bidTime.min}: ${bidTime.sec}</div><div>剩餘時間： ${timeLeft.hours}: ${timeLeft.min}: ${timeLeft.sec}</div>`
-    bidRecords.append(div);
+    let recordDiv = document.createElement('div')
+    recordDiv.className = "ms-2 me-auto"
+    recordDiv.textContent =  `$${record.bid_amount}`
+    
+    let subDiv = document.createElement('div')
+    subDiv.className = 'fw-bold fs-6'
+    subDiv.textContent = `${record.user_id}號買家舉起了號碼牌`
+    
+    
+    let recordSpan = document.createElement('span')
+    recordSpan.className = "badge bg-secondary rounded-pill fs-6"
+    recordSpan.textContent = `${bidTime.hours}: ${bidTime.min}: ${bidTime.sec}`
 
-    const messages = document.querySelectorAll('record-message')
+    recordDiv.appendChild(subDiv)
+    recordLi.appendChild(recordDiv)
+    recordLi.appendChild(recordSpan)
+    bidRecords.prepend(recordLi)
 
-    if(messages.length > 4) {
-        bidRecords.removeChild(messages[4])
+    const messages = document.querySelectorAll('.record-message')
+
+    messages.forEach(e => e.classList.remove('fs-2'))
+    messages[0].classList.add('fs-2')
+
+    if(messages.length > 5) {
+        bidRecords.removeChild(messages[5])
     }
-    bidRecords.prepend(div)
 }
+
+//Output other image with bootstrap Carousel
+const renderImagesSlide = (otherImages) => {
+    
+    let indicators = document.querySelector('.carousel-indicators')
+    let carousel = document.querySelector('.carousel-inner')
+
+    otherImages.forEach((e, i) => {
+
+        indicators.innerHTML += `<button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="${(i+1)}" aria-label="Slide ${(i+2)}"></button>`
+
+        carouselItem = document.createElement('div')
+        carouselItem.className = "carousel-item"
+
+        carouselImg = document.createElement('img')
+        carouselImg.className = "d-block w-100"
+        carouselImg.src = e
+
+        carouselItem.appendChild(carouselImg)
+        carousel.appendChild(carouselItem)
+
+        console.log(carousel.innerHTML)
+    })
+} 
 
 
 const setCountDownTimer = () => {
     setInterval(() => {
+        let start = Date.now();
+
         let totalMilSec = (endTime) - Date.now();
+        const countDown = document.querySelector('#count-down-number')
+
+        if (totalMilSec <= 0) {
+            countDown.textContent = "時間到，競標結束！"
+            const bidButton = document.querySelector('.my-bid-button')
+            const bidInput = document.querySelector('.my-bid-input')
+            bidButton.disable = true;
+            bidInput.readOnly = true;
+            bidButton.style.background = '#DC3545'
+            bidButton.textContent = "競標結束";
+            return
+        }
+
         let time = transMilToDate(totalMilSec)
 
-        const countDown = document.querySelector('#count-down-number')
         countDown.textContent = `${time.days}:${time.hours}:${time.min}:${time.sec} `
-    },100)
+    },500)
 }
 
 const resetCountDownTimer = () => {

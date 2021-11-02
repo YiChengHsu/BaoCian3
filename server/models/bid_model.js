@@ -3,12 +3,17 @@ const { pool } = require('./mysqlcon');
 const setBidRecord = async (bidRecord) => {
     const conn = await pool.getConnection();
     try {
+
+        console.log(bidRecord)
+        
         await conn.query('START TRANSACTION');
-        const [hightestBid] = await conn.query('SELECT highest_bid from product where id = ? FOR UPDATE', bidRecord.product_id)
+        const [hightestBid] = await conn.query('SELECT highest_bid FROM product WHERE id in (?) FOR UPDATE', [bidRecord.product_id])
+
+        console.log(hightestBid)
 
         if (bidRecord.bid_amount <= hightestBid[0].highest_bid) {
             await conn.query('COMMIT')
-            return false;
+            return {error:"Bid amount is lower than current highest bid"};
         }
 
         await conn.query('INSERT INTO bid_record SET ?', bidRecord);

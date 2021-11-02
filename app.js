@@ -2,19 +2,22 @@ const express = require('express');
 const app = express();
 const path = require('path');
 const http = require('http');
+const ejs = require('ejs');
 const server = http.createServer(app);
 const { Server } = require('socket.io');
 const io = new Server(server);
 const { getTimeRemaining } = require('./util/util');
-const Bid = require('./server/models/bid_model')
 const Product = require('./server/models/product_model')
+const { setBidRecord } = require('./server/controllers/bid_controller')
 
 
-app.set('views', path.join(__dirname, 'public/views'));
 app.use('/static', express.static(path.join(__dirname,'public')));
 app.use(express.static("public"));
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
+app.set('views', path.join(__dirname, './public/views'));
+app.set('view engine', 'ejs');
+app.engine("ejs", ejs.renderFile);
 
 // API routes
 app.use('/api/1.0',
@@ -53,12 +56,15 @@ io.on('connection', socket => {
         socket.join(productId)
         
         if (userId != null) {
-            socket.broadcast.to(productId).emit('message', `買家ID進來血流成河了！`);
+            socket.broadcast.to(productId).emit('message', `買家${userId}進來血流成河了！`);
         };
 
         // Listen for bid
         socket.on('bid', async (userBid) => {
-            const bidTime = Date.now() + 28800*1000
+
+            console.log(userBid)
+
+            const bidTime = Date.now()
             const timeLeft = userBid.endTime - bidTime
             const bidRecord = {
                 product_id: userBid.productId,
@@ -67,15 +73,22 @@ io.on('connection', socket => {
                 bid_time: bidTime,
                 time_left: timeLeft
             }
-
-            const result = await Bid.setBidRecord(bidRecord)
-
-            if (result < 0) {
-                console.log('err')
+            try {
+                console.log(bidRecord)
+                await setBidRecord(bidRecord); 
+            } catch (error) {
+                console.log(error)
                 socket.emit('bidFail', bidRecord)
+                return 
             }
 
-            io.to(productId).emit('bidRefresh', bidRecord)
+            // if (result < 0) {
+            //     console.log('err')
+            //     socket.emit('bidFail', bidRecord)
+            // }
+            bidRecord.end_time = userBid.endTime + 30000
+            bidRecord.highest_bid_times = userBid.highestBidTimes + 1
+            io.emit(`refresh_${userBid.productId}`, bidRecord)
             socket.emit('bidSuccess', bidRecord)
         })
 
@@ -83,51 +96,4 @@ io.on('connection', socket => {
             io.to(productId).emit('message', '有人撐不住啦~');
         })
     })
-
-
-        // Listen for bid
-    // socket.on('bid', async (bid) => {
-    //     currentBid = Number(bid.bidNumber) + Number(bid.currentNumber)
-    //     if (currentBid > highestBid) {
-    //         const time = getTimeRemaining(endTime)
-    //         const bidMsg = {
-    //             product_id: bid.id,
-    //             user_id: socket.id,
-    //             bid_number: bid.bidNumber,
-    //             bid_current_number: currentBid,
-    //             time_hours: time.hours,
-    //             time_minutes: time.minutes,
-    //             time_seconds: time.seconds
-    //         }
-    //         try {
-    //             await Bid.setBidRecord(bidMsg)
-    //             io.to(id).emit('bid', bidMsg)
-    //         } catch(e) {
-    //             console.log(e)
-    //             socket.emit('message', '無效的出價，請在試一次！')
-    //         }
-    //     } else {
-    //         socket.emit('message', '無效的出價，請在試一次！')
-    //     }
-    //     // socket.broadcast.to(id).emit('bid', bidMsg)
-    // })
-
-    //Broadcast when a bidder leaves
 })
-
-    //Broadcast when a bidder connects
-
-    // Listen for bid
-    // socket.on('bid', bid => {
-    //     currentBid += Number(bid)
-    //     const user = socket.id
-    //     const bidMsg = {user, currentBid, time: getTimeRemaining(endTime)}
-    //     console.log(bidMsg)
-    //     io.emit('bid', bidMsg)
-    //     // socket.emit('bid', bidMsg)
-    // })
-
-    // //Broadcast when a bidder leaves
-    // socket.on('disconnect' , () => {
-    //     socket.broadcast.emit('message', 'A bidder has left the auction!');
-    // })

@@ -1,0 +1,22 @@
+body {
+    /* background: #e6e6e6; */
+    font-family: 'Noto Sans', sans-serif;
+    font-family: 'Noto Sans TC', sans-serif;
+}
+
+a{
+    text-decoration: none;
+}
+
+#my-logo {
+    height: 100%;
+    width: 100%;
+}
+
+/* .container {
+    height: 100%;
+} */
+
+.main-row {
+    background: #FFFFFF;
+}

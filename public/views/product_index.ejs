@@ -1,0 +1,26 @@
+<%- include('header') %>
+    <div class="row justify-content-end">
+      <div class="col-2">
+        <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">篩選排序</a>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" href="?order=hot">最熱門</a></li>
+          <li><a class="dropdown-item" href="?order=unpopular">最冷門</a></li>
+          <li><a class="dropdown-item" href="?order=lastest">剩下最長時間</a></li>
+          <li><a class="dropdown-item" href="?order=earliest">剩下最短時間</a></li>
+          <li><hr class="dropdown-divider"></li>
+          <li><a class="dropdown-item" href="?">無</a></li>
+        </ul>
+      </div>
+
+    </div>
+    <div class="row products-container">
+    </div>
+
+
+
+
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="../javascript/product_index.js"></script>
+  <link rel=stylesheet type="text/css" href="../css/product_index.css">
+<%- include('footer') %>

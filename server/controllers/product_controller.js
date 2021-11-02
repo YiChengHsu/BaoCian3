@@ -1,29 +1,31 @@
 const Product = require('../models/product_model');
 const _ = require('lodash')
-const pageSize = 6;
+const pageSize = 20;
 const Bid = require('../models/bid_model')
+const { setNewProductToFinisher } = require('./bid_controller')
 
 const createProduct = async(req, res) => {
+    const user = req.user.id
     const body = req.body;
     const product = {
         category: body.category,
+        sub_category: body.sub_category,
         title: body.title,
-        brand: body.brand,
-        description: body.description,
         price: body.price,
+        bid_incr: body.bid_incr,
+        description: body.description,
         texture: body.texture,
         condition: body.condition,
         original_packaging: body.original_packaging,
         with_papers: body.with_papers,
         place: body.place,
-        note: body.note,                                
-        story: body.story,
-        seller_id: '1',
-        start_time: Date.parse(body.start_time),
+        seller_id: user,
         end_time: Date.parse(body.end_time),
         highest_bid: body.price,
-        bid_incr: body.bid_incr
     }
+
+    console.log(req.user)
+    console.log(product)
 
     product.main_image = req.files.main_image[0].key;
 
@@ -36,7 +38,7 @@ const createProduct = async(req, res) => {
     if (productId == -1) {
         res.status(500);
     } else {
-        console.log(productId)
+        setNewProductToFinisher(productId, product.end_time)
         res.status(200).send({productId});
     }
 }
@@ -45,8 +47,8 @@ const getProducts =  async (req, res) => {
     const category = req.params.category;
     const query = req.query
     const paging = parseInt(query.paging) || 0;
-
-    const filterId = []
+    const order = query.order || null;
+    console.log(req.query)
 
 
     const price = {
@@ -54,25 +56,30 @@ const getProducts =  async (req, res) => {
         max: query.max,
     }
 
-    async function findProduct (category) {
+    // const subCategoryArr = ['men_shirt', 'men_pants', 'men_shoes', 'men_bag', 'men_accessories', 'men_others', 'women_shirt', 'women_dress', 'women_skirt', 'women_pants', 'women_shoes', 'women_bag', 'women_accessories', 'women_others','watch', 'bag', 'luxury_others', 'phone', 'computer', 'peripherals', 'earphone', 'camera', 'electronics_others', 'other']
+
+    const findProduct = async (category) => {
+        
         switch (category) {
             case 'all':
-                return await Product.getProducts(pageSize, paging, filterId, {price});
-            case 'men':
-                return await Product.getProducts(pageSize, paging, filterId, {category, price});
+                return await Product.getProducts(pageSize, paging, {price, order});
+            case 'men': case 'women': case 'accessories': case 'electronics': case 'other':
+                return await Product.getProducts(pageSize, paging, {category, price, order});
             case 'search': 
                 const keyword = query.keyword;
                 if (keyword) {
-                    return await Product.getProducts(pageSize, paging, null, {keyword, price});
+                    return await Product.getProducts(pageSize, paging, {keyword, price, order});
                 }
                 break;
-            case 'hot':
-                return await Product.getProducts(null, null, null, {category});
             case 'details':
                 const id = parseInt(query.id);
                 if (Number.isInteger(id)) {
-                    return await Product.getProducts(pageSize, paging, null, {id});
+                    return await Product.getProducts(pageSize, paging, {id});
                 }
+            case 'men_shirt': case 'men_pants': case 'men_shoes': case 'men_bag': case 'men_accessories': case 'men_others': case 'women_shirt': case 'women_dress': case 'women_skirt': case 'women_pants': case 'women_shoes': case 'women_bag': case 'women_accessories': case 'women_others': case'watch': case 'bag': case 'luxury_others': case 'phone': case 'computer': case 'peripherals': case 'earphone': case 'camera': case 'electronics_others': 
+                const subCategory = category
+                console.log(subCategory)
+                return await Product.getProducts(pageSize, paging, {subCategory, price, order});
             default: {
                 return ({});
             }
@@ -80,16 +87,6 @@ const getProducts =  async (req, res) => {
     }
 
     const {products, productCount} = await findProduct(category);
-
-    let productsWithImages = await getProductsImages(products)
-    let productsWithRecords = await getProductBidRecords (products)
-    let productsWithDetails
-
-    if (category == 'details') {
-        productsWithDetails = productsWithRecords[0]
-    } else {
-        productsWithDetails = productsWithImages
-    }
 
     if (!products) {
         res.status(400).send({ error: 'Bad Request'});
@@ -100,9 +97,19 @@ const getProducts =  async (req, res) => {
         if (category == 'details') {
             res.status(200).json({data: null});
         } else {
-            res.status(200).jso({data: []})
+            res.status(200).json({data: []})
         };
         return;
+    }
+
+    let productsWithImages = await getProductsImages(products)
+    let productsWithRecords = await getProductBidRecords (products)
+    let productsWithDetails
+
+    if (category == 'details') {
+        productsWithDetails = productsWithRecords[0]
+    } else {
+        productsWithDetails = productsWithImages
     }
 
     let result;
@@ -147,7 +154,48 @@ const getProductBidRecords = async(products) => {
     })
 }
 
+const setWatchList = async (req, res) => {
+    const productId = req.body.productId
+    const user = req.user
+
+    if (!user || !user.id) {
+        res.status(401).send({error: "Unauthorized"})
+        return 
+    }
+    
+    try {
+        await Product.setWatchList(user.id, productId)
+        res.status(200).send("Set the product in to watch list")
+    } catch (error) {
+        console.log(error)
+        res.status(500).send({error: "Database error"})
+    } 
+}
+
+const delWatchList = async (req, res) => {
+    const productId = req.body.productId
+    const user = req.user
+
+    console.log(user)
+
+    if (!user || !user.id) {
+        res.status(401).send({error: "Unauthorized"})
+        return 
+    }
+
+    const delResult = await Product.delWatchList(user.id, productId)
+
+    if ( delResult <= 0) {
+        res.status(400).send({error: "Bad Request"})
+        return
+    } 
+
+    res.status(200).send("Delete success")
+}
+
 module.exports = {
     createProduct,
-    getProducts
+    getProducts,
+    setWatchList,
+    delWatchList
 }

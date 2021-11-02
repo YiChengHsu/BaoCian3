@@ -12,7 +12,7 @@ const {
 } = require('../controllers/user_controller');
 
 router.route('/user/signup')
-    .get((req, res) => {res.send("This is signup page")})
+    .get((req, res) => {res.render('user_signup')})
     .post(cpUpload, signUp);
 
 router.route('/user/signin')

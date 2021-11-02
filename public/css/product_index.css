@@ -1,0 +1,12 @@
+body, .container {
+    /* background: #e6e6e6; */
+}
+.product-image {
+    border:0;
+    margin:0;
+    padding:0;
+    width: 250px;
+    height: 250px;
+    background-position: center center;
+    background-size: cover;
+}
