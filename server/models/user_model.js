@@ -110,8 +110,54 @@ const getUserProfile = async (email) => {
     }
 };
 
+const getUserWatchProductIds = async (userId) => {
+
+    const queryStr = "SELECT product_id from watch_list WHERE user_id = ? "
+    const bindings = userId
+
+    const [productIds] = await pool.query(queryStr, bindings)
+    return productIds
+}
+
+const getUserWatchList = async (pageSize, paging, userId) => {
+    const binding = [userId]
+
+    const limit = {
+        sql: 'LIMIT ?, ?',
+        binding: [pageSize * paging, pageSize]
+    };
+
+    const queryStr = "SELECT * FROM watch_list w INNER JOIN product p on w.product_id = p.id where w.user_id = ? AND p.auction_end = 0  ORDER by p.end_time " + limit.sql;
+    const countQueryStr = "SELECT product_id from watch_list WHERE user_id = ? " + limit.sql;
+    const bindings = binding.concat(limit.binding)
+
+    try {
+        const [watches] = await pool.query(queryStr, bindings)
+        const [watchCounts] = await pool.query(countQueryStr, bindings)
+
+        const data = {
+            dataList: watches,
+            dataListCounts: watchCounts
+        }
+
+        return data
+    } catch (error) {
+        console.log(error)
+        return { error}
+    }
+
+}
+
+// const getWatchListWithDetail = async (products) => {
+
+//     const productIds = products.map(e => e.product_id)
+//     const 
+// } 
+
 module.exports = {
     nativeSignUp,
     nativeSignIn,
     getUserProfile,
+    getUserWatchProductIds,
+    getUserWatchList
 }

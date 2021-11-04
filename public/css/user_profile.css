@@ -1,0 +1,45 @@
+.avatar {
+    width: 100px;
+    height: 100px;
+}
+
+.city, .town {
+    width: 150px;
+}
+
+.my-bank-select {
+    width: 100%;
+}
+
+.my-div {
+    margin-top: auto;
+    margin-bottom: 5px;
+}
+
+.select2-container .select2-choice, .select2-result-label {
+    font-size: 1.5em;
+    height: 41px; 
+    overflow: auto;
+}
+  
+.select2-selection__rendered {
+    line-height: 35px !important;
+}
+.select2-container .select2-selection--single {
+    height: 38px !important;
+}
+.select2-selection__arrow {
+    height: 100px !important;
+}
+
+.my-card {
+    height: 310px;
+}
+
+.my-bank-button {
+    margin-top: 15px;
+}
+
+.my-nav-item {
+    width: 250px;
+}

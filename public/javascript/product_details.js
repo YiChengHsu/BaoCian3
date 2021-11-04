@@ -90,8 +90,12 @@ fetch(detailsUrl)
 ;
 
 //Get user information by token
+let userId
 const accessToken = JSON.parse(localStorage.getItem('user'))
-const userId = accessToken.user.id || null;
+if (accessToken != null && accessToken.user) {
+    userId = accessToken.user.id || null;
+}
+// const userId = accessToken.user.id || null;
 
 //Join product id room with socket.io handshake
 socket.emit('join', [productId, userId])
@@ -106,6 +110,7 @@ form.addEventListener('submit', (e) => {
     e.preventDefault();
 
     const userBidIncr = Number(input.value)
+    console.log(userBidIncr)
     if (!userBidIncr) {
         alert('無效的出價')
         return

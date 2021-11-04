@@ -1,6 +1,5 @@
-body {
-    /* background: #e6e6e6; */
-    font-family: 'Noto Sans', sans-serif;
+html,body{
+    overflow-x: hidden;
     font-family: 'Noto Sans TC', sans-serif;
 }
 
@@ -13,6 +12,10 @@ a{
     width: 100%;
 }
 
+.my-button{
+    width: 100px;
+}
+
 /* .container {
     height: 100%;
 } */
@@ -20,3 +23,7 @@ a{
 .main-row {
     background: #FFFFFF;
 }
+
+/* Make the hover dropdown instead of click */
+.dropdown-menu li:hover .sub-menu {visibility: visible;}
+.dropdown:hover .dropdown-menu {display: block;}

@@ -123,17 +123,38 @@ const endProductsAuction = async (productIds) => {
     const getQueryStr = 'SELECT * FROM product WHERE id in (?)'
     const updateQueryStr = 'UPDATE product SET auction_end = 1 WHERE id in (?)'
     const bindings =  [productIds]
-    const [orderProduct]= await pool.query(getQueryStr, [bindings])
+    const [orderProduct]= await pool.query(getQueryStr, bindings)
     console.log("hey")
     await pool.query(updateQueryStr, [bindings])
     return orderProduct[0];
 }
 
 const setWatchList = async (userId, productId) => {
-    const queryStr = 'INSERT INTO watch_list VALUES user_id = ?, product_id = ?'
-    const bindings = [userId, productId]
-    await pool.query(queryStr, bindings)
-    return 
+    const conn = await pool.getConnection();
+    try {
+        await conn.query('START TRANSACTION');
+
+        const getQueryStr = 'SELECT * FROM watch_list WHERE user_id = ? AND product_id =?'
+        const [watchListId] = await conn.query(getQueryStr, [userId, productId])
+
+        if(watchListId.length > 0) {
+            await conn.query('COMMIT');
+            return -1;
+        }
+
+        const queryStr = 'INSERT INTO watch_list SET user_id = ?, product_id = ?'
+        const bindings = [userId, productId]
+        const [result] = await conn.query(queryStr, bindings)
+        return result.insertId
+
+    } catch (error) {
+        await conn.query('ROLLBACK');
+        console.log(error)
+        return -1;
+    } finally {
+        await conn.release();
+    }
+    
 }
 
 const delWatchList = async (userId, productId) => {
@@ -141,19 +162,21 @@ const delWatchList = async (userId, productId) => {
     try {
         await conn.query('START TRANSACTION');
 
-        const getQueryStr = 'SELECT * FROM watch_list WHERE user_id = ?, product_id =?'
+        const getQueryStr = 'SELECT * FROM watch_list WHERE user_id = ? AND product_id =?'
         const [watchListId] = await conn.query(getQueryStr, [userId, productId])
 
         if(watchListId.length <= 0) {
             await conn.query('COMMIT');
-            return { error: "Bad Request"};
+            return -1;
         }
 
-        await conn.query('DELETE FROM watch_list WHERE id =?', watchListId)
 
-        await conn.query('INSERT INTO product_images (product_id, image) VALUES ? ', [images]);
+        const result =  await conn.query('DELETE FROM watch_list WHERE id = ?', [watchListId[0].id])
+
+        console.log(result)
+
         await conn.query('COMMIT'); 
-        return 0;
+        return 1;
     } catch (error) {
         await conn.query('ROLLBACK');
         console.log(error)
@@ -162,6 +185,7 @@ const delWatchList = async (userId, productId) => {
         await conn.release();
     }
 }
+
 
 module.exports = {
     createProduct,

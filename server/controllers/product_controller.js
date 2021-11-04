@@ -158,21 +158,24 @@ const setWatchList = async (req, res) => {
     const productId = req.body.productId
     const user = req.user
 
-    if (!user || !user.id) {
+    if (!user || 
+        !user.id) {
         res.status(401).send({error: "Unauthorized"})
         return 
     }
     
-    try {
-        await Product.setWatchList(user.id, productId)
-        res.status(200).send("Set the product in to watch list")
-    } catch (error) {
-        console.log(error)
-        res.status(500).send({error: "Database error"})
-    } 
+    const watchListId =  await Product.setWatchList(user.id, productId)
+    if (watchListId < 0) {
+        res.status(400).send({error: "Bad Request"})
+        return
+    }
+
+    res.status(200).send({message:"Set the product in to watch list"})
+
 }
 
 const delWatchList = async (req, res) => {
+    console.log(req.body)
     const productId = req.body.productId
     const user = req.user
 
@@ -185,7 +188,7 @@ const delWatchList = async (req, res) => {
 
     const delResult = await Product.delWatchList(user.id, productId)
 
-    if ( delResult <= 0) {
+    if ( delResult < 0) {
         res.status(400).send({error: "Bad Request"})
         return
     } 

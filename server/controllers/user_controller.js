@@ -1,6 +1,9 @@
 const config = require('../../util/config');
 const validator = require('validator');
 const User = require('../models/user_model')
+const Order = require('../models/order_model');
+const { orderBy } = require('lodash');
+const pageSize = 20;
 
 const signUp = async (req ,res) => {
     let body = req.body;
@@ -108,19 +111,97 @@ const nativeSignIn = async (email, password) => {
 }
 
 const getUserProfile = async (req, res) => {
-    res.status(200).send({
-        data: {
-            provider: req.user.provider,
-            name: req.user.name,
-            email: req.user.email,
-            picture: `https://s3.ap-northeast-1.amazonaws.com/node.js-image-bucket/${req.user.picture}`
+
+    const userId = req.user.id
+    const query = req.query
+    const paging = parseInt(query.paging) || 0;
+    const listType = req.query.type;
+    const status = req.query.status || null;
+
+    const findDataList = async (listType) => {
+
+        if (listType && listType == 'order') {
+            return await Order.getUserOrders(pageSize, paging, status, userId)      
+        } else {
+            return await User.getUserWatchList(pageSize, paging, userId)
         }
-    })
-    return
+    }
+
+
+    const {dataList, dataListCounts} = await findDataList(listType) 
+
+    const user = { 
+        provider: req.user.provider,
+        name: req.user.name,
+        email: req.user.email,
+        picture: `https://s3.ap-northeast-1.amazonaws.com/node.js-image-bucket/${req.user.picture}` 
+    }
+
+    let result = {}
+    result.user = user
+
+    if (dataListCounts > (paging + 1) * pageSize) {
+        result.data = dataList
+        result.next_paging =  paging +1
+    } else {
+        result.data = dataList
+    }
+
+    res.status(200).send({result})
+    return 
+}
+
+
+const getUserWatchList = async (req, res) => {
+
+    const userId = req.user.id
+    try {
+        let watchList = await User.getUserWatchList(userId)
+        watchList = Object.values(watchList)
+
+        res.status(200).json({
+            data: { watchList }
+        })
+    } catch (error) {
+        console.log(error)
+        res.status(400).send({error: 'Bad Requset'})
+    }
+}
+
+const getUserOrders = async (req, res) => {
+
+    const query = req.query
+    const status = req.params.status || null;
+    const paging = parseInt(query.paging) || 0;
+
+    const {orders, orderCounts} = await Order.getUserOrders(pageSize, paging, status)
+
+    if (!orders) {
+        res.status(400).send({ error: 'Bad Request'});
+        return
+    }
+
+    if (orders.length == 0) {
+        res.status(200).json({data: null});
+        return
+    }
+
+    let result
+
+    if (orderCounts > (paging + 1) * pageSize) {
+        result = { data: orders, next_paging: paging +1}
+    } else {
+        result = { data: orders}
+    }
+
+    res.status(200).json(result)
+
 }
 
 module.exports = {
     signIn,
     signUp,
     getUserProfile,
+    getUserWatchList,
+    getUserOrders
 }
