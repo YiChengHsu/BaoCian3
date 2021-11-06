@@ -1,8 +1,18 @@
-// const searchForm = document.querySelector('.my-search')
+const user = JSON.parse(localStorage.getItem("user"));
+const imgUrl ='https://s3.ap-northeast-1.amazonaws.com/node.js-image-bucket/'
+console.log(user)
 
-// searchForm.addEventListener('submit', (e) => {
-//     e.preventDefault(); 
-//     const keyword = document.querySelector('.my-search-input').value
+if (user && user.user.picture) {
+    $('#signin-button').css('display', 'none')
+    $('#logout-button').css('display', 'block')
+}
 
-//     window.location.href=`/product/search?keyword=${keyword}`
-// })
+$('#logout-button').click(() => {
+    Swal.fire({
+        icon: 'success',
+        title: '登出成功',
+    }).then(()=>{
+        window.location.href ='/'
+        localStorage.removeItem('user')
+    })
+})

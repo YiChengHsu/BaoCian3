@@ -33,6 +33,8 @@ const getUserOrders = async (pageSize, paging, status, userId) => {
     const condition = {sql: '', binding: []}
     const userBinding = [userId]
 
+    console.log(status)
+
     if (status != null) {
         condition.sql = 'AND status = ? '
         condition.binding = [status]

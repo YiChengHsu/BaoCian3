@@ -1,3 +1,5 @@
+<!DOCTYPE html>
+<html>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -6,6 +8,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans&family=Noto+Sans+TC&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans&family=Noto+Sans+TC&display=swap" rel="stylesheet">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+  <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <link rel=stylesheet type="text/css" href="../css/header.css">
   <title>抱歉錢錢 - 花錢花最快的拍賣網站</title>
 </head>
@@ -85,14 +89,15 @@
           </ul>
         </li>
       </ul>
-      <a href="/user/profile">
-        <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" fill="#AEA7A9" class="bi bi-person-circle" viewBox="0 0 16 16">
+      <a href="/user/profile" class='my-profile'>
+        <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" fill="#AEA7A9" class="bi bi-person-circle" id="default-avatar" viewBox="0 0 16 16">
           <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
           <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z"/>
         </svg>
       </a>
+      <button class="btn btn-success btn-block mx-3 rounded-pill my-button" id="logout-button" type="button">登出</button>
       <a href="/user/signin">
-        <button class="btn btn-primary btn-block mx-3 rounded-pill my-button" type="button">登入</button>
+        <button class="btn btn-primary btn-block mx-3 rounded-pill my-button" id="signin-button" type="button">登入</button>
       </a>
       <a href="/user/signup">
         <button class="btn btn-secondary btn-block ms-3 rounded-pill my-button" type="button">註冊</button>

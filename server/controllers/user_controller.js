@@ -3,6 +3,7 @@ const validator = require('validator');
 const User = require('../models/user_model')
 const Order = require('../models/order_model');
 const { orderBy } = require('lodash');
+const { pool } = require('../models/mysqlcon');
 const pageSize = 20;
 
 const signUp = async (req ,res) => {
@@ -115,8 +116,13 @@ const getUserProfile = async (req, res) => {
     const userId = req.user.id
     const query = req.query
     const paging = parseInt(query.paging) || 0;
-    const listType = req.query.type;
-    const status = req.query.status || null;
+    const listType = query.type;
+    const status = query.status || null;
+
+    console.log(query)
+
+    const user = await User.getUserProfileWithDetails(userId)
+    delete user.id
 
     const findDataList = async (listType) => {
 
@@ -130,24 +136,17 @@ const getUserProfile = async (req, res) => {
 
     const {dataList, dataListCounts} = await findDataList(listType) 
 
-    const user = { 
-        provider: req.user.provider,
-        name: req.user.name,
-        email: req.user.email,
-        picture: `https://s3.ap-northeast-1.amazonaws.com/node.js-image-bucket/${req.user.picture}` 
-    }
-
-    let result = {}
-    result.user = user
+    let data = {}
+    data.user = user
 
     if (dataListCounts > (paging + 1) * pageSize) {
-        result.data = dataList
-        result.next_paging =  paging +1
+        data.list = dataList
+        data.next_paging =  paging +1
     } else {
-        result.data = dataList
+        data.list = dataList
     }
 
-    res.status(200).send({result})
+    res.status(200).send({data})
     return 
 }
 

@@ -110,6 +110,13 @@ const getUserProfile = async (email) => {
     }
 };
 
+const getUserProfileWithDetails = async (userId) => {
+    const [result] = await pool.query('SELECT * FROM (project.user u JOIN user_address a ON u.id = a.user_id) JOIN user_account acc ON u.id = acc.user_id  WHERE u.id = ?;', [userId])
+    const user = result[0]
+
+    return user
+}
+
 const getUserWatchProductIds = async (userId) => {
 
     const queryStr = "SELECT product_id from watch_list WHERE user_id = ? "
@@ -158,6 +165,7 @@ module.exports = {
     nativeSignUp,
     nativeSignIn,
     getUserProfile,
+    getUserProfileWithDetails,
     getUserWatchProductIds,
-    getUserWatchList
+    getUserWatchList,
 }

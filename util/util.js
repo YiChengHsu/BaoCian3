@@ -68,7 +68,6 @@ const wrapAsync = (fn) => {
 const authentication = () => {
     return async function (req, res, next) {
         let accessToken = req.get('Authorization');
-        console.log(accessToken)
         if (!accessToken) {
             res.status(401).send({ error: "Unauthorized" });
             return
@@ -87,7 +86,6 @@ const authentication = () => {
 
             if (!userProfile) {
                 res.status(403).send({ error: 'Forbidden'})
-                console.log('89');
             } else {
                 req.user.id = userProfile.user.id;
                 req.user.role_id = userProfile.user.role_id;

@@ -1,8 +1,6 @@
 //Get product id from query
-const productId = Qs.parse(location.search, {
-    ignoreQueryPrefix: true
-}).id;
-
+const query = location.search
+const productId = query.split('=')[1]
 const socket = io();
 
 let leastBid;
@@ -12,15 +10,12 @@ let bidTimes;
 
 //Fetch the product details
 
-const detailsUrl = `/api/1.0/product/details?id=${productId}`
-console.log(detailsUrl)
+const detailsUrl = `/api/1.0/product/details${query}`
 
 fetch(detailsUrl)
     .then(res => res.json())
     .then(res =>  res.data)
     .then((data) => {
-
-        console.log(data)
 
         if (data == null) {
             self.location.href = '/404.html'
@@ -112,7 +107,11 @@ form.addEventListener('submit', (e) => {
     const userBidIncr = Number(input.value)
     console.log(userBidIncr)
     if (!userBidIncr) {
-        alert('無效的出價')
+        Swal.fire({
+            icon: 'error',
+            title: '無效出價',
+            text: '出價欄位不得為空或包含無效字元',
+        })
         return
     }
 
@@ -123,16 +122,42 @@ form.addEventListener('submit', (e) => {
     } 
 
     if (userBidIncr < leastBid) {
-        alert('請大於最小出價')
+        Swal.fire({
+            icon: 'error',
+            title: '無效出價',
+            text: '請不要小於最低出價增額',
+        })
         return
     } else if (userBidIncr > leastBid*100) {
-        alert('珍惜荷包，請不要出大於最小出價一百倍的價格') 
+        Swal.fire({
+            icon: 'warning',
+            title: '太多啦~',
+            text: '珍惜荷包，請不要大於出價增額的一百倍',
+        }) 
         return
     }
 
-    const userBidAmount = Number(highestBid.textContent.replace("$","")) + userBidIncr;
-    socket.emit('bid', { productId, userId, userBidAmount, endTime, highestBidTimes})
-    input.value = '';
+    Swal.fire({
+        title: "確認出價",
+        text: "確認出價後即無法反悔，請做一個負責任的人",
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#e95420",
+        confirmButtonText: "確認出價",
+        cancelButtonText: "取消",
+        closeOnConfirm: false
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const userBidAmount = Number(highestBid.textContent.replace("$","")) + userBidIncr;
+        socket.emit('bid', { productId, userId, userBidAmount, endTime, highestBidTimes}) 
+        } else if (result.dismiss === Swal.DismissReason.cancel) {
+            Swal.fire(
+                '出價取消',
+                '感謝您的三思'
+            )
+            input.value = ''
+        }
+    })
 })
 
 //Get message from server
@@ -154,11 +179,22 @@ socket.on(`refresh_${productId}`, bidRecord => {
 })
 
 socket.on('bidFail', bidRecord => {
-    alert('出價失敗')
+    Swal.fire({
+        icon: 'error',
+        title: '出價失敗',
+        text: '請再試一次',
+    })
 })
 
 socket.on('bidSuccess', bidRecord => {
-    alert('出價成功')
+    Swal.fire({
+        icon: 'success',
+        title: '出價成功',
+        text: '您目前是最高出價者',
+    })
+    .then(()=>{
+        input.value = ''
+    })
 })
 
 //Output bid message to DOM

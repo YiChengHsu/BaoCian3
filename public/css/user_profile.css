@@ -36,10 +36,25 @@
     height: 310px;
 }
 
-.my-bank-button {
+.my-bank-button, .change-bank-button {
     margin-top: 15px;
 }
 
 .my-nav-item {
-    width: 250px;
+    width: 165px;
 }
+
+.my-img-div {
+    width: 150px;
+    height: 150px;
+    background-position: center center;
+    background-size: cover;
+}
+
+.card-body{
+    width: 100%;
+}
+
+/* .my-card-row{
+    width: 1140px;
+} */

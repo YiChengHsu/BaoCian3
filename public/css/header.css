@@ -15,6 +15,9 @@ a{
 .my-button{
     width: 100px;
 }
+#logout-button{
+    display: none;
+}
 
 /* .container {
     height: 100%;
