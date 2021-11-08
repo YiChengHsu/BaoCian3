@@ -1,29 +1,31 @@
 <%- include('header') %>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
     <form class="product-upload"enctype="multipart/form-data" onkeypress="return event.keyCode != 13;">
+      <h3 class="col mt-3 fw-bold text-center text-primary">你今天想賣什麼酷東西呢？</h3>
       <div class="row justify-content-center">
-        <h4 class="col-10 mt-5 fw-bold">你今天想賣什麼酷東西呢？</h4>
       </div>
       <div class="row justify-content-center">
-        <div class="col-4 text-center">
+        <div class="col-4 text-center px-0">
           <div class="mb-3">
             <label for="formFile" class="form-label">封面照片：</label>
             <input class="form-control" type="file" id="formFile" name="main_image" onchange="showImg(this)" required>
             <img src="../assest/card-image.svg" class="img-thumbnail rounded my-img" alt="" id="img"  accept="image/png image/jpg">
           </div>        
           <div class="row mb-3 justify-content-between">
-            <label for="formFile" class="form-label">其他照片：</label>
-            <input class="form-control" type="file" id="formFile" name="other_images" onchange="showOtherImg(this)" multiple required>
-            <img src="../assest/card-image.svg" alt="" id="img-0" class="img-thumbnail rounded my-other-img">
-            <img src="../assest/card-image.svg" alt="" id="img-1" class="img-thumbnail rounded my-other-img">
-            <img src="../assest/card-image.svg" alt="" id="img-2" class="img-thumbnail rounded my-other-img">
+            <div class="col px-0 justify-content-between">
+              <label for="formFile" class="form-label">其他照片：</label>
+              <input class="form-control" type="file" id="formFile" name="other_images" onchange="showOtherImg(this)" multiple required>
+              <img src="../assest/card-image.svg" alt="" id="img-0" class="img-thumbnail rounded my-other-img">
+              <img src="../assest/card-image.svg" alt="" id="img-1" class="img-thumbnail rounded my-other-img">
+              <img src="../assest/card-image.svg" alt="" id="img-2" class="img-thumbnail rounded my-other-img">
+            </div>
           </div>
         </div>
         <div class="col-1"></div>
         <div class="col-5 mt-3">
           <div class="row my-option-row px-0">
             <div class="col-4">
-              <select class="form-select form-select-lg mb-3 me-5 col-1" aria-label=".form-select-lg " onchange="changeSubCategory(this.value)" name="category" required>
+              <select class="form-select mb-3 me-5 w-100" aria-label=".form-select-lg " onchange="changeSubCategory(this.value)" name="category" required>
                 <option selected>分類</option>
                 <option value="men" >男性</option>
                 <option value="women" >女性</option>
@@ -33,7 +35,7 @@
               </select>           
             </div>
             <div class="col-8">
-              <select class="form-select form-select-lg mb-3 col-8 my-sub-category" aria-label=".form-select-lg" name="sub_category" required>
+              <select class="form-select mb-3 my-sub-category w-100" aria-label=".form-select-lg" name="sub_category" required>
                 <option selected>請選擇分類</option>
               </select>
             </div>
@@ -42,30 +44,30 @@
             <input type="text" class="form-control" id="floatingInput" name="title" placeholder="請輸入酷東西名稱" required>
             <label for="floatingInput">酷東西名稱</label>
           </div>
-          <h3 class="fw-bold">
-            關於酷東西 <span class="fs-6 text-danger">(必填)</span>
-          </h3>
-          <h4 class='mb-3'>新舊程度</h4>
+          <h5 class="fw-bold">
+            關於酷東西 <span class="fs-6 text-primary">(必填)</span>
+          </h5>
+          <h5 class='mb-3'>新舊程度</h5>
           <div class="row">
             <div class='my-3 fs-6 col'>
-              <div class="form-check form-check-inline col">
+              <div class="form-check form-check-inline col-2 m-0 p-0">
                 <input type="radio" class="btn-check" id="btn-check-1-outlined" checked autocomplete="off" name="condition" value="全新">
-                <label class="btn btn-outline-secondary" for="btn-check-1-outlined">全新</label>
+                <label class="btn btn-outline-primary" for="btn-check-1-outlined">全新</label>
               </div>
 
-              <div class="form-check form-check-inline col">
+              <div class="form-check form-check-inline col-3 m-0 p-0">
                 <input type="radio" class="btn-check" id="btn-check-2-outlined" checked autocomplete="off" name="condition" value="幾乎全新">
-                <label class="btn btn-outline-secondary" for="btn-check-2-outlined">幾乎全新</label>
+                <label class="btn btn-outline-primary" for="btn-check-2-outlined">幾乎全新</label>
               </div>
 
-              <div class="form-check form-check-inline col">
+              <div class="form-check form-check-inline col-3 m-0 p-0">
                 <input type="radio" class="btn-check" id="btn-check-3-outlined" checked autocomplete="off" name="condition" value="狀況良好">
-                <label class="btn btn-outline-secondary" for="btn-check-3-outlined">狀況良好</label>
+                <label class="btn btn-outline-primary" for="btn-check-3-outlined">狀況良好</label>
               </div>
 
-              <div class="form-check form-check-inline col">
+              <div class="form-check form-check-inline col-3 m-0 p-0">
                 <input type="radio" class="btn-check" id="btn-check-4-outlined" checked autocomplete="off" name="condition" value="狀況尚可">
-                <label class="btn btn-outline-secondary" for="btn-check-4-outlined">狀況尚可</label>
+                <label class="btn btn-outline-primary" for="btn-check-4-outlined">狀況尚可</label>
               </div>
             </div>
           </div>
@@ -73,11 +75,11 @@
           <div class="row">
             <div class="input-group mb-3 my-input col">
               <span class="input-group-text fs-6">起標價格NT$</span>
-              <input type="text" class="form-control fs-6" placeholder="設定價格" aria-label="Dollar amount (with dot and two decimal places)" name="price" required>
+              <input type="text" class="form-control fs-6 my-input-group" placeholder="設定價格" aria-label="Dollar amount (with dot and two decimal places)" name="price" required>
             </div>
             <div class="input-group mb-3 my-input col">
               <span class="input-group-text fs-6">最低增額 NT$</span>
-              <input type="text" class="form-control fs-6" placeholder="設定價格" aria-label="Dollar amount (with dot and two decimal places)" name="bid_incr" required>
+              <input type="text" class="form-control fs-6 my-input-group" placeholder="設定價格" aria-label="Dollar amount (with dot and two decimal places)" name="bid_incr" required>
             </div>
           </div>
           <h5 >結標時間</h5>

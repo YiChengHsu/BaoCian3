@@ -1,10 +1,6 @@
 const router = require('express').Router();
 const { upload, authentication } = require('../../util/util')
 
-const cpUpload = upload.fields([
-    {name: 'avatar', maxCount:1}
-]);
-
 const {
     signUp,
     signIn,
@@ -13,14 +9,13 @@ const {
     getUserOrders,
     updateUserAddress,
     updateUserAccount,
+    createRating,
 } = require('../controllers/user_controller');
 
 router.route('/user/signup')
-    .get((req, res) => {res.render('user_signup')})
-    .post(cpUpload, signUp);
+    .post(upload.single('avatar'), signUp);
 
 router.route('/user/signin')
-    .get((req, res) => {res.send("This is signin page")})
     .post(signIn);
 
 router.route('/user/profile')
@@ -34,5 +29,8 @@ router.route('/user/address')
 
 router.route('/user/account')
     .post(authentication(), upload.array() ,updateUserAccount)
+
+router.route('/user/rating')
+    .post(authentication(), createRating)
 
 module.exports = router;

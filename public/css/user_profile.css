@@ -55,6 +55,9 @@
     width: 100%;
 }
 
+.my-list-container {
+    min-height: 300px;
+}
 /* .my-card-row{
     width: 1140px;
 } */

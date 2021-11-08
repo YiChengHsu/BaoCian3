@@ -8,7 +8,7 @@ const {
 } = require('../controllers/order_controller');
 
 router.route('/order/payment')
-    .post(creatPayment)
+    .post(authentication(), creatPayment)
 
 router.route('/order/update')
     .patch(authentication(), updateOrder)

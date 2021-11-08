@@ -30,3 +30,14 @@ a{
 /* Make the hover dropdown instead of click */
 .dropdown-menu li:hover .sub-menu {visibility: visible;}
 .dropdown:hover .dropdown-menu {display: block;}
+
+#main-container{
+    min-height: 500px;
+}
+
+.home-avatar {
+    width: 36px;
+    height: 36px;
+    background-position: center center;
+    background-size: cover;
+}

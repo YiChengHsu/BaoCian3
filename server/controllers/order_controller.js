@@ -5,6 +5,7 @@ const Order = require('../models/order_model')
 
 const creatPayment = async (req, res) => {
 
+	const userId = req.user.id
   const data = req.body
 
   console.log(data.image)
@@ -27,10 +28,13 @@ const creatPayment = async (req, res) => {
 			},
 		],
 		mode: "payment",
-		success_url: `http://localhost:3000/order/success?order-id=${data.orderId}`,
-		cancel_url: "http://localhost:3000/user/profile",
+		success_url: `https://baocian3.fun/order/success?order-id=${data.orderId}`,
+		cancel_url: "https://baocian3.fun/user/profile",
 		metadata: {'order_id': data.orderId}
 	});
+
+	await Order.updateOrder(userId, data.orderId, 0)
+
 
 	console.log(session)
 
@@ -49,6 +53,7 @@ const updateOrder = async (req, res) => {
 
 	if (result <= 0 ) {
 		res.status(400).send({error: "123Bad Request"})
+		return
 	}
 
 	res.status(200).send({message:'Update success'})

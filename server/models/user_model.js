@@ -195,26 +195,27 @@ const updateUserAccount = async (userId, account) => {
     }
 }
 
-const createRating = async (rate) => {
+const createRating = async (rateId, ratedId, orderId, rating) => {
     const conn = await pool.getConnection();
 
     try{
         await conn.query('START TRANSACTION')
         
-        const [search] = conn.query('SELECT * FROM rate WHERE rate_id = ? AND order_id = ?', [rateObj.rate_id, rateObj.order_id])
+        const [search] = await conn.query('SELECT * FROM rate WHERE rate_id = ? AND order_id = ?', [rateId, orderId])
 
         if (search.length > 0) {
             conn.query('COMMIT')
-            return {error: "Already rated"}
+            return -1;
         }
+        
 
-        const [result] = await conn.query('INSERT INTO rate SET?', rateObj)
+        const [result] = await conn.query('INSERT INTO rate SET?', {rate_id: ratedId, rated_id: ratedId, order_id: orderId, rating: rating})
         await conn.query('COMMIT')
         return result.insertId
     } catch (error) {
         await conn.query('ROLLBACK')
         console.log(error)
-        return -1;
+        return error;
     } finally {
         await conn.release();
     }

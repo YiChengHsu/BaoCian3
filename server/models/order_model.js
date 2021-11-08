@@ -70,6 +70,47 @@ const getUserOrders = async (pageSize, paging, status, userId) => {
 
 }
 
+const getSellOrders = async (pageSize, paging, status, userId) => {
+    const condition = {sql: '', binding: []}
+    const userBinding = [userId]
+
+    console.log(status)
+
+    if (status != null) {
+        condition.sql = 'AND status = ? '
+        condition.binding = [status]
+    }
+
+    const limit = {
+        sql: 'LIMIT ?, ?',
+        binding: [pageSize * paging, pageSize]
+    };
+
+    const orderQuery = 'SELECT *,o.id AS order_id FROM project.order o JOIN product p on o.product_id = p.id WHERE o.seller_id = ? ' + condition.sql + limit.sql;
+    const orderBindings = userBinding.concat(condition.binding).concat(limit.binding)
+
+    const orderCountQuery = 'SELECT COUNT(*) as count FROM project.order o JOIN product p on o.product_id = p.id WHERE o.seller_id = ? ' + condition.sql + limit.sql;
+    const orderCountBindings = userBinding.concat(condition.binding).concat(limit.binding)
+
+    console.log(orderQuery)
+
+    try {
+        const [orders] = await pool.query(orderQuery, orderBindings)
+        const [orderCounts] = await pool.query(orderCountQuery, orderCountBindings)
+
+        const data = {
+            dataList: orders, 
+            dataListCounts: orderCounts
+        }
+
+        return data
+    } catch(error) {
+        console.log(error)
+        return { error }
+    }
+
+}
+
 const updateOrder = async (userId, orderId, status) => {
     const conn = await pool.getConnection();
 
@@ -79,7 +120,7 @@ const updateOrder = async (userId, orderId, status) => {
 
         console.log(search)
 
-        if (!search || (search[0].buyer_id != userId) || (search[0].status != status)) {
+        if (!search || (search[0].status != status)) {
             await conn.query('COMMIT')
             return -1;
         }
@@ -101,5 +142,6 @@ const updateOrder = async (userId, orderId, status) => {
 module.exports = {
     createOrder,
     getUserOrders,
+    getSellOrders,
     updateOrder,
 }

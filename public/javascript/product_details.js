@@ -21,13 +21,6 @@ fetch(detailsUrl)
             self.location.href = '/404.html'
         }
 
-        category = document.querySelector('.my-category')
-        category.href = `/product/${data.category}`
-        category.textContent = data.category
-
-        const productIdTitle = document.querySelector('.product-id')
-        productIdTitle.textContent = "Lot: " + data.id
-
         const productTitle = document.querySelector('.my-product-title')
         productTitle.textContent = data.title
 
@@ -85,12 +78,6 @@ fetch(detailsUrl)
 ;
 
 //Get user information by token
-let userId
-const accessToken = JSON.parse(localStorage.getItem('user'))
-if (accessToken != null && accessToken.user) {
-    userId = accessToken.user.id || null;
-}
-// const userId = accessToken.user.id || null;
 
 //Join product id room with socket.io handshake
 socket.emit('join', [productId, userId])
@@ -116,10 +103,24 @@ form.addEventListener('submit', (e) => {
     }
 
     if(!userId) {
-        alert('下標前請先登入')
-        self.location.href = "/user/signin.html"
+        Swal.fire({
+            icon: 'warning',
+            title: '下標前請登入',
+            text: '登入以享受更多競標的樂趣！',
+        }) 
+        .then(() => {
+            self.location.href = "/user/signin"
+        })
         return
     } 
+
+    if(userId == data.seller_id) {
+        Swal.fire({
+            icon: 'warning',
+            title: '請勿自行下標',
+            text: '自己的轎不能自己抬唷！',
+        }) 
+    }
 
     if (userBidIncr < leastBid) {
         Swal.fire({
@@ -151,10 +152,6 @@ form.addEventListener('submit', (e) => {
             const userBidAmount = Number(highestBid.textContent.replace("$","")) + userBidIncr;
         socket.emit('bid', { productId, userId, userBidAmount, endTime, highestBidTimes}) 
         } else if (result.dismiss === Swal.DismissReason.cancel) {
-            Swal.fire(
-                '出價取消',
-                '感謝您的三思'
-            )
             input.value = ''
         }
     })
@@ -247,7 +244,7 @@ const renderImagesSlide = (otherImages) => {
         carouselItem.className = "carousel-item"
 
         carouselImg = document.createElement('img')
-        carouselImg.className = "d-block w-100"
+        carouselImg.className = "d-block w-100 other-images"
         carouselImg.src = e
 
         carouselItem.appendChild(carouselImg)

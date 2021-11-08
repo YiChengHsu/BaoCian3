@@ -1,101 +1,84 @@
 <%- include('header') %>
-        <div class="row">
-            <button type="button" class="btn btn-warning btn-sm col-1 my-back-button me-1" onclick="history.back()">上一頁
-            </button>
-            <button type="button" class="btn btn-warning btn-sm col-1 my-back-button me-1">
-                <a class='link-light my-back-link my-category' ></a>
-            </button>
-        </div>
-            <div class="row m-4">
-                <div class="col-6 my-left">
-                    <div class='row mb-5 px-3'>
-                        <div class="col-10 fs-3 py-3 product-id"></div>
-                        <div class="col">
-                            <button>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">
-                                    <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
-                                </svg>
+        <div class="row m-4">
+            <div class="col-6 my-left">
+
+                <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
+                    <div class="carousel-indicators">
+                        <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                    </div>
+                    <div class="carousel-inner">
+                        <div class="carousel-item active">
+                        <img src="..." class="d-block w-100 main-image" alt="...">
+                        </div>
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="col-6 my-right">
+                <div class="fs-3 text-center my-product-title"></div>
+                <div class="count-down text-center">
+                    <h1 class='text-danger' id="count-down-number"></h1>
+                </div>
+
+                <div class="text-center highest-bid-container">
+                    <p class='fs-5'>目前出價：<span class="fs-1">$<span class="fs-1 highest-bid"></p>
+                </div>
+
+                <div class="server-message"></div>
+                
+                <form id="bid-form">
+                    <div class="row">
+                        <div class="col mx-2">
+                            
+                            <input class="form-control my-bid-input" id="my-bid-number" type="text" aria-label="default input example">
+                            <p class="fs-6 my-bid-warning text-center">請不要小於最低出價增額</p>
+                        </div>
+                        <div class="col mx-2">
+                            <button type="submit" class="btn btn-warning btn-sm col my-back-button me-1 my-bid-button">
+                                <a class='link-light my-back-link text-center' >抱歉錢錢</a>
                             </button>
                         </div>
                     </div>
-
-                    <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
-                        <div class="carousel-indicators">
-                          <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-                        </div>
-                        <div class="carousel-inner">
-                          <div class="carousel-item active">
-                            <img src="..." class="d-block w-100 main-image" alt="...">
-                          </div>
-                        </div>
-                        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
-                          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                          <span class="visually-hidden">Previous</span>
-                        </button>
-                        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
-                          <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                          <span class="visually-hidden">Next</span>
-                        </button>
-                    </div>
+                </form>
+                <div class="row">
+                    <div class="col" id="bid-incr"></div>
+                    <div class="col" id="bid-times"></div>
+                    <div class="col" id="seller-id"></div>
                 </div>
 
-                <div class="col-6 my-right">
-                    <div class="fs-3 text-center my-product-title my-4"></div>
-                    <div class="count-down text-center">
-                        <h1 class='text-danger' id="count-down-number"></h1>
-                    </div>
+                <div class='fs-5 my-3 text-center'>
+                    出價紀錄：
+                </div>
 
-                    <div class="text-center highest-bid-container">
-                        <p class='fs-5'>目前出價：<span class="fs-1">$<span class="fs-1 highest-bid"></p>
-                    </div>
-
-                    <div class="server-message"></div>
+                <ol class="list-group list-group-numbered my-bid-record">
                     
-                    <form id="bid-form">
-                        <div class="row">
-                            <div class="col mx-2">
-                                
-                                <input class="form-control my-bid-input" id="my-bid-number" type="text" aria-label="default input example">
-                                <p class="fs-6 my-bid-warning text-center">請不要小於最低出價增額</p>
-                            </div>
-                            <div class="col mx-2">
-                                <button type="submit" class="btn btn-warning btn-sm col my-back-button me-1 my-bid-button">
-                                    <a class='link-light my-back-link text-center' >抱歉錢錢</a>
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-                    <div class="row">
-                        <div class="col" id="bid-incr"></div>
-                        <div class="col" id="bid-times"></div>
-                        <div class="col" id="seller-id"></div>
-                    </div>
-
-                    <div class='fs-5 my-3 text-center'>
-                        出價紀錄：
-                    </div>
-
-                    <ol class="list-group list-group-numbered my-bid-record">
-                      
-                    </ol>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-6 ps-5">
-                    <div class="p-3 mb-2 bg-secondary text-white rounded text-center fs-4">商 品 資 訊</div>
-                    <div class="fs-5" id='texture'></div>
-                    <div class="fs-5" id="condition"></div>
-                    <div class="fs-5" id="original-packaging"></div>
-                    <div class="fs-5" id="with-papers"></div>
-                    <div class="fs-5" id="place"></div>
-                    <div class="fs-5" id="note"></div>
-                </div>
-                <div class="col-6">
-                    <div class="p-3 mb-2 bg-secondary text-white rounded text-center fs-4">商 品 介 紹</div>
-                    <div class="my-story fs-5" id="description"></div>
-                </div>
+                </ol>
             </div>
         </div>
+        <div class="row">
+            <div class="col-6 ps-5">
+                <div class="p-3 mb-2 bg-secondary text-white rounded text-center fs-4">商 品 資 訊</div>
+                <div class="fs-5" id='texture'></div>
+                <div class="fs-5" id="condition"></div>
+                <div class="fs-5" id="original-packaging"></div>
+                <div class="fs-5" id="with-papers"></div>
+                <div class="fs-5" id="place"></div>
+                <div class="fs-5" id="note"></div>
+            </div>
+            <div class="col-6">
+                <div class="p-3 mb-2 bg-secondary text-white rounded text-center fs-4">商 品 介 紹</div>
+                <div class="my-story fs-5" id="description"></div>
+            </div>
+        </div>
+    </div>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qs/6.10.1/qs.js" integrity="sha512-DkxSbrm2xe6jcerSwLA4vS8WV7UarP44UjrS+Yp2MRFE2md2qPLpZVTyoxHrM2mvZ2Ft2zhPUMplV20zNFXriQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="/socket.io/socket.io.js"></script>

@@ -1,21 +1,21 @@
 <%- include('header') %>
-    <div class="row">
-      <div class="col-10"></div>
-      <div class="col-2 ms-3 align-self-end">
-        <ul class="nav nav-tabs"></ul>
-          <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">排序</a>
+    <div class="row justify-content-end">
+      <div class="col-1 ms-3 align-self-end">
+        <ul class="nav"></ul>
+          <a class="nav-link dropdown-toggle p-0" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">排序</a>
           <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="#">Action</a></li>
-            <li><a class="dropdown-item" href="#">Another action</a></li>
-            <li><a class="dropdown-item" href="#">Something else here</a></li>
+            <li><a class="dropdown-item" href="?order=hot">最熱門</a></li>
+            <li><a class="dropdown-item" href="?order=unpopular">最冷門</a></li>
+            <li><a class="dropdown-item" href="?order=lastest">剩下最長時間</a></li>
+            <li><a class="dropdown-item" href="?order=earliest">剩下最短時間</a></li>
             <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="#">Separated link</a></li>
+            <li><a class="dropdown-item" href="?">無</a></li>
           </ul>
         </ul>
       </div>
     </div>
     <div class="row">
-      <div class="row products-container">
+      <div class="row products-container justify-content-between">
       </div>
     </div>
   </div>

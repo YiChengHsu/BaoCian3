@@ -7,11 +7,12 @@ const { pool } = require('../models/mysqlcon');
 const pageSize = 20;
 
 const signUp = async (req ,res) => {
+    console.log(req.file)
     let body = req.body;
     let avatar;
 
     if (req.file) {
-        avatar = req.files.avatar[0].key
+        avatar = req.file.key
     }
 
     if (!body.name || !body.email || !body.password) {
@@ -114,7 +115,6 @@ const nativeSignIn = async (email, password) => {
 const getUserProfile = async (req, res) => {
 
     const userId = req.user.id
-    console.log(userId)
     const query = req.query
     const paging = parseInt(query.paging) || 0;
     const listType = query.type;
@@ -128,7 +128,9 @@ const getUserProfile = async (req, res) => {
 
         if (listType && listType == 'order') {
             return await Order.getUserOrders(pageSize, paging, status, userId)      
-        } else {
+        } else if (listType && listType == 'sell') {
+            return await Order.getSellOrders(pageSize, paging, status, userId)   
+        } else  {
             return await User.getUserWatchList(pageSize, paging, userId)
         }
     }
@@ -203,8 +205,7 @@ const updateUserAddress = async(req ,res) => {
     
     const userId = req.user.id
     const body = req.body
-    console.log(1)
-    console.log(body)
+
     const address = { 
         city: body.city,
         town: body.town,
@@ -213,6 +214,7 @@ const updateUserAddress = async(req ,res) => {
         receiver: body.receiver,
         phone: body.phone
     }
+
     const addressId = await User.updateUserAddress(userId, address)
 
     if (addressId <= 0) {
@@ -248,28 +250,36 @@ const createRating = async (req, res) => {
     const rateId = req.user.id
     const body = req.body
 
-    const rate = {
-        rate_id: ratedId,
-        rated_id: body.rated_id,
-        order_id: body.order_id,
-        rating: body.rating
-    }
+    const ratedId = body.ratedId
+    const orderId = body.orderId
+    const rating = body.rating
 
-    const result = await User.createRating(rate)
+    try {
+        const result = await User.createRating(rateId, ratedId, orderId, rating)
 
-    if ( result <= 1 ) {
+        if ( result <= 1 ) {
+            res.status(400).send({error: 'Bad Request'})
+            return
+        }
+    
+        res.status(200).send({result})
+    } catch (err) {
+
         res.status(500).send({error: 'Datebase error'})
         return
     }
 
-    res.status(200).send({result})
 }
 
 const getRatings = async (userId) => {
 
     let rating = null
 
-    const ratings = await User.getRatings(userId)
+    let ratings = await User.getRatings(userId)
+
+    ratings = ratings.map(e => e.rating)
+
+    // rating = Object.values(rating)
 
     if (ratings.length >0) {
         let ratingSum = ratings.reduce((previous, current) => current += previous);

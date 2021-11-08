@@ -15,24 +15,6 @@ form.addEventListener('submit', (e) => {
     const formData = new FormData(form);
 
     const pwd = document.querySelector('.my-password').value
-    const pwd2 = document.querySelector('.my-password-2').value
-
-    const pwd_msg = document.querySelector('#password-msg')
-
-    if (pwd.length < 6) {
-        alert('密碼長度不足，請介於6-16位')
-        return
-    } else if (pwd.length > 16) {
-        alert('密碼長度過長，請介於6-16位')
-        return
-    }
-
-    if (pwd != pwd2) {
-        alert('兩次密碼不同，請重新輸入')
-        return
-    }
-
-    console.log(formData)
 
     fetch('/api/1.0/user/signup', {
         method: 'post',
