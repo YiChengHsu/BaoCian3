@@ -38,6 +38,11 @@ module.exports = {
     google: {
       user: process.env.GOOGLE_ACCOUNT,
       pass: process.env.GOOGLE_KEY
+    },
+
+    stripe: {
+      publishableKey: process.env.PUBLISHABLE_KEY,
+      secretKey: process.env.SECRET_KEY 
     }
     
 }

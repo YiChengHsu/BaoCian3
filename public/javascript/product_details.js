@@ -285,7 +285,6 @@ const setCountDownTimer = () => {
 const resetCountDownTimer = () => {
     clearInterval(setCountDownTimer);
     setCountDownTimer(endTime);
-    console.log("時間重新計算")
 }
 
 const transMilToDate = (totalMilSec) => {

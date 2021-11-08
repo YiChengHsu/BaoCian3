@@ -3,34 +3,22 @@ const query = window.location.search
 console.log(query)
 const socket = io();
 let productIds = []
-let userId
 let userWatchList = []
-const user = JSON.parse(localStorage.getItem('user'))
 
-if (user != null && user.user) {
-  userId = user.user.id
-  await fetch('/api/1.0/user/watchList' ,{
-    method: 'get',
-    headers: {
-      'Authorization': "Bearer " + user.access_token,
-    }
-  })
-    .then(res => res.json())
-    .then((res) => {
-
-      const data = res.data.watchList
-
-      userWatchList = Object.values(data).map(e => e.product_id)
-      console.log(userWatchList)
-    })
-    .catch(error => console.log(error))
-}
-
-fetch('/api/1.0' + params + query)
+fetch('/api/1.0' + params + query, {
+  method: 'get',
+  headers: {
+    'Authorization': "Bearer " + accessToken
+  }
+})
   .then(res => res.json())
   .then((res) => {
-
+    
+    const watchList = res.user
     const data = res.data
+
+    console.log(res)
+
     
     const products = document.querySelector('.products-container')
     data.map((e) => {
@@ -98,7 +86,7 @@ fetch('/api/1.0' + params + query)
       <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>
       </svg></button>`
 
-      if (userWatchList.includes(id)) {
+      if (watchList.includes(id)) {
         watchBtn.style.display = 'none'
       } else {
         watchedBtn.style.display = 'none'
@@ -106,6 +94,7 @@ fetch('/api/1.0' + params + query)
 
       //Set the watch list button
       watchBtn.addEventListener('click', (e) => {
+        console.log(user)
         if(userId == null) {
           alert('請登入')
           return
@@ -124,9 +113,10 @@ fetch('/api/1.0' + params + query)
         .then((res) => {
           console.log(res.status)
           if (res.status != 200) {
-            throw error
+            alert('加入失敗')
+            return
           }
-          watchedBtn.style.display = 'block'
+          watchedBtn.style.display = 'inline'
           watchBtn.style.display ='none'
           alert('加入成功')
         })
@@ -158,7 +148,7 @@ fetch('/api/1.0' + params + query)
           if (res.status != 200) {
             return error
           }
-          watchBtn.style.display = 'block'
+          watchBtn.style.display = 'inline'
           watchedBtn.style.display ='none'
           alert('刪除成功')
         })

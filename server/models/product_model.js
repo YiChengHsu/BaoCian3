@@ -106,6 +106,13 @@ const getProductsImages = async (productIds) => {
     }
 }
 
+const getProductSeller = async (sellerIds) => {
+    const queryStr = 'SELECT id, name, picture FROM user WHERE id in (?)'
+    const bindings = [sellerIds];
+    const [sellerInfo] = await pool.query(queryStr, bindings)
+    return sellerInfo;
+}
+
 const getProductById = async (productIds) => {
     const queryStr = 'SELECT * FROM product WHERE id IN (?)';
     const bindings = [productIds];
@@ -191,6 +198,7 @@ module.exports = {
     createProduct,
     getProducts,
     getProductsImages,
+    getProductSeller,
     getProductById,
     getProductEndTime,
     endProductsAuction,

@@ -24,7 +24,8 @@ app.use('/api/1.0',
     [
         require('./server/routes/bid_route'),
         require('./server/routes/product_route'),
-        require('./server/routes/user_route')
+        require('./server/routes/user_route'),
+        require('./server/routes/order_route'),
     ]
 );
 

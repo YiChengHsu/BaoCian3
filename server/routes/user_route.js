@@ -10,7 +10,9 @@ const {
     signIn,
     getUserProfile,
     getUserWatchList,
-    getUserOrders
+    getUserOrders,
+    updateUserAddress,
+    updateUserAccount,
 } = require('../controllers/user_controller');
 
 router.route('/user/signup')
@@ -24,10 +26,13 @@ router.route('/user/signin')
 router.route('/user/profile')
     .get(authentication(), getUserProfile)
 
-router.route('/user/watchList')
-    .get(authentication(), getUserWatchList)
-
 router.route('/user/order')
     .get(authentication(), getUserOrders)
+
+router.route('/user/address')
+    .post(authentication(), upload.array() ,updateUserAddress)
+
+router.route('/user/account')
+    .post(authentication(), upload.array() ,updateUserAccount)
 
 module.exports = router;

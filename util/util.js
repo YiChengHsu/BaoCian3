@@ -100,9 +100,48 @@ const authentication = () => {
     }
 }
 
+const authenticationPass = () => {
+    return async function (req, res, next) {
+        let accessToken = req.get('Authorization');
+        if (!accessToken) {
+            req.user = null;
+            next();
+            return
+        }
+
+        accessToken = accessToken.replace("Bearer ", "");
+        if (accessToken == "null") {
+            req.user = null;
+            next();
+            return
+        }
+
+        try {
+            const user = jwt.verify(accessToken, config.token.accessToken)
+            req.user = user;
+
+            let userProfile = await User.getUserProfile (user.email)
+
+            if (!userProfile) {
+                res.status(403).send({ error: 'Forbidden'})
+            } else {
+                req.user.id = userProfile.user.id;
+                req.user.role_id = userProfile.user.role_id;
+                next();
+            }
+            return;
+        } catch (error) {
+            console.log(error)
+            res.status(403).send({ error: 'Forbidden'});
+            return;
+        }
+    }
+}
+
 module.exports = {
     upload, 
     getTimeRemaining,
     wrapAsync,
     authentication,
+    authenticationPass
 };

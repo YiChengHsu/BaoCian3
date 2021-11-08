@@ -36,6 +36,11 @@ router.route('/user/profile')
     res.render('user_profile')
 })
 
+router.route('/order/success')
+    .get((req, res) => {
+    res.render('pay_success')
+})
+
 
 
 

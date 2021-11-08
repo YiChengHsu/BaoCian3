@@ -114,15 +114,15 @@ const nativeSignIn = async (email, password) => {
 const getUserProfile = async (req, res) => {
 
     const userId = req.user.id
+    console.log(userId)
     const query = req.query
     const paging = parseInt(query.paging) || 0;
     const listType = query.type;
     const status = query.status || null;
 
-    console.log(query)
-
     const user = await User.getUserProfileWithDetails(userId)
-    delete user.id
+    const rating = await getRatings(userId)
+    user.rating = rating
 
     const findDataList = async (listType) => {
 
@@ -134,7 +134,9 @@ const getUserProfile = async (req, res) => {
     }
 
 
-    const {dataList, dataListCounts} = await findDataList(listType) 
+    const {dataList, dataListCounts} = await findDataList(listType)
+
+    console.log(dataList)
 
     let data = {}
     data.user = user
@@ -197,10 +199,97 @@ const getUserOrders = async (req, res) => {
 
 }
 
+const updateUserAddress = async(req ,res) => {
+    
+    const userId = req.user.id
+    const body = req.body
+    console.log(1)
+    console.log(body)
+    const address = { 
+        city: body.city,
+        town: body.town,
+        zipcode: body.zipcode,
+        address: body.address,
+        receiver: body.receiver,
+        phone: body.phone
+    }
+    const addressId = await User.updateUserAddress(userId, address)
+
+    if (addressId <= 0) {
+        res.status(500).send({error: "Database Error"})
+        return
+    }
+
+    res.status(200).send({addressId})
+}
+
+const updateUserAccount = async(req ,res) => {
+    
+    const userId = req.user.id
+    const body = req.body
+    const account = { 
+        bank_code: body.bankCode,
+        bank_account: body.bankAccount,
+        account_name: body.accountName,
+    }
+
+    const addressId = await User.updateUserAccount(userId, account)
+
+    if (addressId <= 0) {
+        res.status(500).send({error: "Database Error"})
+        return
+    }
+
+    res.status(200).send({addressId})
+}
+
+const createRating = async (req, res) => {
+
+    const rateId = req.user.id
+    const body = req.body
+
+    const rate = {
+        rate_id: ratedId,
+        rated_id: body.rated_id,
+        order_id: body.order_id,
+        rating: body.rating
+    }
+
+    const result = await User.createRating(rate)
+
+    if ( result <= 1 ) {
+        res.status(500).send({error: 'Datebase error'})
+        return
+    }
+
+    res.status(200).send({result})
+}
+
+const getRatings = async (userId) => {
+
+    let rating = null
+
+    const ratings = await User.getRatings(userId)
+
+    if (ratings.length >0) {
+        let ratingSum = ratings.reduce((previous, current) => current += previous);
+        rating = ratingSum / ratings.length;
+    }
+
+    console.log(ratings)
+
+    return rating
+}
+
+
 module.exports = {
     signIn,
     signUp,
     getUserProfile,
     getUserWatchList,
-    getUserOrders
+    getUserOrders,
+    updateUserAddress,
+    updateUserAccount,
+    createRating,
+    getRatings
 }

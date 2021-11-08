@@ -45,7 +45,7 @@ const getUserOrders = async (pageSize, paging, status, userId) => {
         binding: [pageSize * paging, pageSize]
     };
 
-    const orderQuery = 'SELECT * FROM project.order o JOIN product p on o.product_id = p.id WHERE buyer_id = ? ' + condition.sql + limit.sql;
+    const orderQuery = 'SELECT *,o.id AS order_id FROM project.order o JOIN product p on o.product_id = p.id WHERE buyer_id = ? ' + condition.sql + limit.sql;
     const orderBindings = userBinding.concat(condition.binding).concat(limit.binding)
 
     const orderCountQuery = 'SELECT COUNT(*) as count FROM project.order o JOIN product p on o.product_id = p.id WHERE buyer_id = ? ' + condition.sql + limit.sql;
@@ -70,7 +70,36 @@ const getUserOrders = async (pageSize, paging, status, userId) => {
 
 }
 
+const updateOrder = async (userId, orderId, status) => {
+    const conn = await pool.getConnection();
+
+    try {
+        await conn.query('START TRANSACTION')
+        const [search] = await conn.query('SELECT * FROM project.order WHERE id = ? ', [orderId])
+
+        console.log(search)
+
+        if (!search || (search[0].buyer_id != userId) || (search[0].status != status)) {
+            await conn.query('COMMIT')
+            return -1;
+        }
+
+        const newStatus = status + 1
+        await conn.query('UPDATE project.order SET status = ? WHERE id = ?', [newStatus, orderId])
+        await conn.query('COMMIT')
+        return 1;
+
+    } catch (error) {
+        await conn.query('ROLLBACK');
+        console.log(error)
+        return error;
+    } finally {
+        await conn.release();
+    }
+}
+
 module.exports = {
     createOrder,
-    getUserOrders
+    getUserOrders,
+    updateOrder,
 }

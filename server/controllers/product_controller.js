@@ -3,6 +3,7 @@ const _ = require('lodash')
 const pageSize = 20;
 const Bid = require('../models/bid_model')
 const { setNewProductToFinisher } = require('./bid_controller')
+const User = require('../models/user_model')
 
 const createProduct = async(req, res) => {
     const user = req.user.id
@@ -44,6 +45,17 @@ const createProduct = async(req, res) => {
 }
 
 const getProducts =  async (req, res) => {
+
+    //If token exist, Get the watch list from DB
+    let watchList = []
+    if (req.user != null) {
+        const userId = req.user.id
+        const result = await User.getUserWatchProductIds(userId)
+        watchList = Object.values(result).map(e => e.product_id)
+    } 
+
+    console.log(watchList)
+
     const category = req.params.category;
     const query = req.query
     const paging = parseInt(query.paging) || 0;
@@ -102,6 +114,8 @@ const getProducts =  async (req, res) => {
         return;
     }
 
+    let productsWitherSeller = await getProductSellerInfo(products)
+    console.log(productsWitherSeller)
     let productsWithImages = await getProductsImages(products)
     let productsWithRecords = await getProductBidRecords (products)
     let productsWithDetails
@@ -114,9 +128,9 @@ const getProducts =  async (req, res) => {
 
     let result;
     if (productCount > (paging + 1) * pageSize) {
-        result = { data: productsWithDetails, next_paging: paging +1}
+        result = { data: productsWithDetails, next_paging: paging +1, user: watchList}
     } else {
-        result = { data: productsWithDetails}
+        result = { data: productsWithDetails, user: watchList}
     }
 
     res.status(200).json(result)
@@ -150,6 +164,19 @@ const getProductBidRecords = async(products) => {
         } else {
             e.records = recordsMap[e.id] 
         }
+        return e
+    })
+}
+
+const getProductSellerInfo = async(products) => {
+    const sellerIds = products.map(e => e.seller_id)
+    const sellers = await Product.getProductSeller(sellerIds)
+    const sellersMap = _.groupBy(sellers, e => e.id)
+
+    console.log(sellersMap)
+
+    return products.map((e) => {
+        e.sellerInfo = sellersMap[e.seller_id]
         return e
     })
 }
@@ -195,6 +222,7 @@ const delWatchList = async (req, res) => {
 
     res.status(200).send("Delete success")
 }
+
 
 module.exports = {
     createProduct,

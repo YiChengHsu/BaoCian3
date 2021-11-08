@@ -1,7 +1,8 @@
 const { pool } = require('./mysqlcon')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
-const config = require('../../util/config')
+const config = require('../../util/config');
+const { add } = require('lodash');
 
 const nativeSignUp = async (name, email, password, avatar) => {
     const conn = await pool.getConnection();
@@ -44,8 +45,11 @@ const nativeSignUp = async (name, email, password, avatar) => {
 
         console.log(user)
 
-        const [result] = await conn.query('INSERT INTo user SET ?', user);
-        user.id = result.insertId;
+        const [result] = await conn.query('INSERT INTO user SET ?', user);
+        const userId = result.insertId
+        user.id = userId;
+        await conn.query('INSERT INTO user_address (user_id) VALUES (?)', [userId])
+        await conn.query('INSERT INTO user_account (user_id) VALUES (?)', [userId])
         await conn.query('COMMIT');
         return { user };
     } catch (error) {
@@ -111,7 +115,7 @@ const getUserProfile = async (email) => {
 };
 
 const getUserProfileWithDetails = async (userId) => {
-    const [result] = await pool.query('SELECT * FROM (project.user u JOIN user_address a ON u.id = a.user_id) JOIN user_account acc ON u.id = acc.user_id  WHERE u.id = ?;', [userId])
+    const [result] = await pool.query('SELECT * FROM (project.user u LEFT JOIN user_address a ON u.id = a.user_id) LEFT JOIN user_account acc ON u.id = acc.user_id  WHERE u.id = ?;', [userId])
     const user = result[0]
 
     return user
@@ -155,11 +159,74 @@ const getUserWatchList = async (pageSize, paging, userId) => {
 
 }
 
-// const getWatchListWithDetail = async (products) => {
+const updateUserAddress = async (userId, address) => {
+    const conn = await pool.getConnection();
+    try {
+        await conn.query('START TRANSACTION');
 
-//     const productIds = products.map(e => e.product_id)
-//     const 
-// } 
+        await conn.query('UPDATE user_address SET ? WHERE user_id = ?', [address, userId]) 
+        await conn.query('COMMIT');
+        return 1;
+
+    } catch (error) {
+        await conn.query('ROLLBACK')
+        console.log(error)
+        return -1;
+    } finally {
+        await conn.release();
+    }
+}
+
+const updateUserAccount = async (userId, account) => {
+    const conn = await pool.getConnection();
+    try {
+        await conn.query('START TRANSACTION');
+
+        await conn.query('UPDATE user_account SET ? WHERE user_id = ?', [account, userId]) 
+        await conn.query('COMMIT');
+        return 1;
+
+    } catch (error) {
+        await conn.query('ROLLBACK')
+        console.log(error)
+        return -1;
+    } finally {
+        await conn.release();
+    }
+}
+
+const createRating = async (rate) => {
+    const conn = await pool.getConnection();
+
+    try{
+        await conn.query('START TRANSACTION')
+        
+        const [search] = conn.query('SELECT * FROM rate WHERE rate_id = ? AND order_id = ?', [rateObj.rate_id, rateObj.order_id])
+
+        if (search.length > 0) {
+            conn.query('COMMIT')
+            return {error: "Already rated"}
+        }
+
+        const [result] = await conn.query('INSERT INTO rate SET?', rateObj)
+        await conn.query('COMMIT')
+        return result.insertId
+    } catch (error) {
+        await conn.query('ROLLBACK')
+        console.log(error)
+        return -1;
+    } finally {
+        await conn.release();
+    }
+}
+
+const getRatings = async (userId) => {
+    const queryStr = 'SELECT rating FROM rate WHERE rated_id = ?'
+    const bindings = [userId]
+
+    const [ratings] = await pool.query(queryStr, bindings)
+    return ratings
+}
 
 module.exports = {
     nativeSignUp,
@@ -168,4 +235,8 @@ module.exports = {
     getUserProfileWithDetails,
     getUserWatchProductIds,
     getUserWatchList,
+    updateUserAddress,
+    updateUserAccount,
+    createRating,
+    getRatings,
 }

@@ -2,6 +2,7 @@
 <script src="https://cdn.jsdelivr.net/npm/jquery-twzipcode@1.7.14/jquery.twzipcode.min.js"></script>
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="../util/lib/jquery.raty.js"></script>
   <div class="row justify-content-center main-area">
     <div class="col-4 sign-block text-center mt-4">
       <img class="avatar mx-auto d-block">
@@ -17,24 +18,10 @@
         </div>
 
         <div class="my-rating-start">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#e95420" class="bi bi-star-fill" viewBox="0 0 16 16">
-                <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
-          </svg>
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#e95420" class="bi bi-star-fill" viewBox="0 0 16 16">
-                <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
-          </svg>
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#e95420" class="bi bi-star" viewBox="0 0 16 16">
-                <path d="M2.866 14.85c-.078.444.36.791.746.593l4.39-2.256 4.389 2.256c.386.198.824-.149.746-.592l-.83-4.73 3.522-3.356c.33-.314.16-.888-.282-.95l-4.898-.696L8.465.792a.513.513 0 0 0-.927 0L5.354 5.12l-4.898.696c-.441.062-.612.636-.283.95l3.523 3.356-.83 4.73zm4.905-2.767-3.686 1.894.694-3.957a.565.565 0 0 0-.163-.505L1.71 6.745l4.052-.576a.525.525 0 0 0 .393-.288L8 2.223l1.847 3.658a.525.525 0 0 0 .393.288l4.052.575-2.906 2.77a.565.565 0 0 0-.163.506l.694 3.957-3.686-1.894a.503.503 0 0 0-.461 0z"/>
-          </svg>
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#e95420" class="bi bi-star" viewBox="0 0 16 16">
-                <path d="M2.866 14.85c-.078.444.36.791.746.593l4.39-2.256 4.389 2.256c.386.198.824-.149.746-.592l-.83-4.73 3.522-3.356c.33-.314.16-.888-.282-.95l-4.898-.696L8.465.792a.513.513 0 0 0-.927 0L5.354 5.12l-4.898.696c-.441.062-.612.636-.283.95l3.523 3.356-.83 4.73zm4.905-2.767-3.686 1.894.694-3.957a.565.565 0 0 0-.163-.505L1.71 6.745l4.052-.576a.525.525 0 0 0 .393-.288L8 2.223l1.847 3.658a.525.525 0 0 0 .393.288l4.052.575-2.906 2.77a.565.565 0 0 0-.163.506l.694 3.957-3.686-1.894a.503.503 0 0 0-.461 0z"/>
-          </svg>
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#e95420" class="bi bi-star" viewBox="0 0 16 16">
-                <path d="M2.866 14.85c-.078.444.36.791.746.593l4.39-2.256 4.389 2.256c.386.198.824-.149.746-.592l-.83-4.73 3.522-3.356c.33-.314.16-.888-.282-.95l-4.898-.696L8.465.792a.513.513 0 0 0-.927 0L5.354 5.12l-4.898.696c-.441.062-.612.636-.283.95l3.523 3.356-.83 4.73zm4.905-2.767-3.686 1.894.694-3.957a.565.565 0 0 0-.163-.505L1.71 6.745l4.052-.576a.525.525 0 0 0 .393-.288L8 2.223l1.847 3.658a.525.525 0 0 0 .393.288l4.052.575-2.906 2.77a.565.565 0 0 0-.163.506l.694 3.957-3.686-1.894a.503.503 0 0 0-.461 0z"/>
-          </svg>
+          <div id="star"></div>
         </div>
-        <div class="my-rating-score mt-2">
-          <h6>分數</h6>
+        <div class="my-rating-score mt-2 text-primary fs-3">
+          <h6 id='user-rating'></h6>
         </div>
         </div>
         <div class="col-4">
@@ -47,7 +34,8 @@
                 <input type="text" class="form-control mb-2 receiver address-input"  placeholder="姓名" name='receiver' disabled>
                 <input type="text" class="form-control mb-2 phone address-input"  placeholder="連絡電話" name='phone' disabled>
                 <button type="button" class="btn btn-secondary mt-3 my-address-button">更改地址</button>
-                <button type="button" class="btn btn-success mt-3 change-address-button" style="display:none">確認更改</button>                             
+                <button type="button" class="btn btn-success mt-3 change-address-button" style="display:none">確認更改</button>
+                <button type="button" class="btn btn-warning mt-3 cancel-address-button" style="display:none">取消更改</button>                               
               </form>
             </div>
           </div>
@@ -56,8 +44,8 @@
           <div class="card mb-0">
             <div class="card-body my-card">
               <h5 class="card-title">收款帳戶</h5>
-              <form class='mb-0' action="">
-                <select class="form-select js-example-basic-single my-bank-select mb-2 bank-input" aria-label="Default select example" disabled>
+              <form class='mb-0' id="bank-form" action="">
+                <select class="form-select js-example-basic-single my-bank-select mb-2 bank-input" aria-label="Default select example" name='bankCode' disabled>
                   <option value='000' selected>請選擇銀行</option>
                   <option value="004">004 - 臺灣銀行</option> 
                   <option value="005">005 - 土地銀行</option> 
@@ -161,14 +149,15 @@
                   <option value="951">951 - 北農中心</option> 
                   <option value="954">954 - 中南部地區農漁會</option>
                 </select>
-                <input type="text" class="form-control my-2 bank-account bank-input"  placeholder="帳戶" disabled>
-                <input type="text" class="form-control mb-2 account-name bank-input"  placeholder="戶名" disabled>
+                <input type="text" class="form-control my-2 bank-account bank-input"  placeholder="帳戶" name="bankAccount" disabled>
+                <input type="text" class="form-control mb-2 account-name bank-input"  placeholder="戶名" name='accountName' disabled>
                 <div class="div">
                   <p>請填寫正確的帳戶與戶名以免影響權益
                 </div>
                 <div class='text-center mt-4'>
                   <button type="button" class="btn btn-secondary my-bank-button">更改地址</button> 
                   <button type="submit" class="btn btn-success change-bank-button" style="display:none">確認更改</button>
+                  <button type="button" class="btn btn-warning mt-3 cancel-bank-button" style="display:none">取消更改</button>    
                 </div>
               </form>
             </div>
@@ -202,17 +191,14 @@
           <div class="col-md-2 p-2">
             <h5 class="card-title">圖片</h5>
           </div>
-          <div class="col-1 align-middle my-auto">
-            <h5 class="card-title">Id</h5>
-          </div>
           <div class="col-2 align-middle my-auto">
             <h5 class="card-title align-middle">商品名稱</h5>
           </div>
           <div class="col-2 align-middle my-auto">
             <h5 class="card-title align-middle">得標價格</h5>
           </div>
-          <div class="col-1 align-middle my-auto">
-            <h6 class="card-title align-middle">得標<br>時間</h6>
+          <div class="col-2 align-middle my-auto">
+            <h5 class="card-title align-middle">得標時間</h5>
           </div>
           <div class="col-2 align-middle my-auto">
             <h5 class="card-title align-middle">訂單狀態</h5>
@@ -224,37 +210,33 @@
         <div class="row align-middle mb-3 text-center border border-1 rounded">
           <div class="col-md-2 p-2 my-img-div" style="background-image: url('https://s3.ap-northeast-1.amazonaws.com/node.js-image-bucket/sorry-my-wallet/16359259917083ff19d92.jpeg')">
           </div>
-          <div class="col-1 align-middle my-auto">
+          <!-- <div class="col-1 align-middle my-auto">
             <h5 class="card-title">Id</h5>
-          </div>
+          </div> -->
           <div class="col-2 align-middle my-auto">
             <h5 class="card-title align-middle">Card title</h5>
           </div>
           <div class="col-2 align-middle my-auto">
             <h5 class="card-title align-middle">Price</h5>
           </div>
-          <div class="col-1 align-middle my-auto">
+          <div class="col-2 align-middle my-auto">
             <h5 class="card-title align-middle">Time</h5>
           </div>
           <div class="col-2 align-middle my-auto">
             <h5 class="card-title align-middle">狀態</h5>
           </div>
           <div class="col-2 align-middle my-auto">
-            <button type="button" class="btn btn-block btn-primary mb-2">付款</button>
+            <form action="/charge" method="post">
+              <article><label>Amount: $10.00</label></article>
+              <script class="stripe-button" data-key="pk_test_nk4UQNZM8NWjfvmhKjfZnWav" src="//checkout.stripe.com/v2/checkout.js" data-locale="auto" data-description="Sample Charge" data-amount="500"></script>
+            </form>
+            <button type="button" class="btn btn-block btn-info">寄出商品</button>
+            <button type="button" class="btn btn-block btn-success">完成訂單</button>
             <button type="button" class="btn btn-block btn-warning">評分</button>
           </div>
         </div>
-        <form action="your-server-side-code" method="POST">
-          <script
-            src="https://checkout.stripe.com/checkout.js" class="stripe-button"
-            data-key="pk_test_g6do5S237ekq10r65BnxO6S0"
-            data-amount="999"
-            data-name="Stripe.com"
-            data-description="Example charge"
-            data-image="https://stripe.com/img/documentation/checkout/marketplace.png"
-            data-locale="auto"
-            data-zip-code="true">
-          </script>
+        <form action="/api/1.0/order/payment" method="POST">
+          <button class="btn btn-block btn-primary mb-2" type="submit">Checkout</button>
         </form>
       </div>
     </div>   
