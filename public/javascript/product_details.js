@@ -7,6 +7,7 @@ let leastBid;
 let highestBidTimes;
 let endTime;
 let bidTimes;
+let sellerId;
 
 //Fetch the product details
 
@@ -44,8 +45,9 @@ fetch(detailsUrl)
         highestBidTimes = data.bid_times
         bidTimesDiv.textContent = `出價次數： ${highestBidTimes}`
 
-        const sellerId = document.querySelector('#seller-id')
-        sellerId.textContent = `賣家編號： ${data.seller_id}`
+        sellerId = data.seller_id
+        const sellerDiv = document.querySelector('#seller-id')
+        sellerDiv.textContent = `賣家編號： ${sellerId}`
 
         const bidRecords = document.querySelector('.my-bid-record')
         const recordsData = data.records || [];
@@ -114,7 +116,7 @@ form.addEventListener('submit', (e) => {
         return
     } 
 
-    if(userId == data.seller_id) {
+    if(userId == sellerId) {
         Swal.fire({
             icon: 'warning',
             title: '請勿自行下標',

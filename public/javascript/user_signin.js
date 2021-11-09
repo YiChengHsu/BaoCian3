@@ -18,11 +18,19 @@ form.addEventListener("submit", (e) => {
 	})
 		.then((res) => {
 			if (res.status == 200) {
-				alert("登入成功");
-				self.location.href = "/user/profile";
-				return res.json();
+				Swal.fire({
+					icon: 'success',
+					title: '登入成功',
+					text: '你可以隨便逛逛了唷~',
+				}).then(() => {
+					self.location.href = "/user/profile";
+				})
 			} else if (res.status == 403) {
-				alert("帳號密碼錯誤、請再試一次！");
+				Swal.fire({
+					icon: 'error',
+					title: '登入失敗',
+					text: '請再試一次',
+				})
 				return;
 			} else {
 				alert("伺服器忙碌中，請稍後再試。");
