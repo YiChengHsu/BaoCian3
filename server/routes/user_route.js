@@ -7,6 +7,7 @@ const {
     getUserProfile,
     getUserWatchList,
     getUserOrders,
+    getUserAddress,
     updateUserAddress,
     updateUserAccount,
     createRating,
@@ -25,6 +26,7 @@ router.route('/user/order')
     .get(authentication(), getUserOrders)
 
 router.route('/user/address')
+    .get(authentication(), getUserAddress)
     .post(authentication(), upload.array() ,updateUserAddress)
 
 router.route('/user/account')

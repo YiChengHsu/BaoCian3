@@ -159,6 +159,16 @@ const getUserWatchList = async (pageSize, paging, userId) => {
 
 }
 
+const getUserAddress = async (userId) => {
+
+    const queryStr = "SELECT * from user_address WHERE user_id = ? "
+    const bindings = userId
+
+    const [address] = await pool.query(queryStr, bindings)
+
+    return address[0]
+} 
+
 const updateUserAddress = async (userId, address) => {
     const conn = await pool.getConnection();
     try {
@@ -229,6 +239,15 @@ const getRatings = async (userId) => {
     return ratings
 }
 
+const banUserWithoutPay = async (userId) => {
+    const queryStr = 'UPDATE user SET role_id = 2 WHERE id = ?'
+    const bindings = userId
+
+    await pool.query(queryStr, bindings)
+
+    return userId
+}
+
 module.exports = {
     nativeSignUp,
     nativeSignIn,
@@ -236,8 +255,10 @@ module.exports = {
     getUserProfileWithDetails,
     getUserWatchProductIds,
     getUserWatchList,
+    getUserAddress,
     updateUserAddress,
     updateUserAccount,
     createRating,
     getRatings,
+    banUserWithoutPay
 }

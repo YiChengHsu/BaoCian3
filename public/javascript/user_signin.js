@@ -23,7 +23,7 @@ form.addEventListener("submit", (e) => {
 					title: '登入失敗',
 					text: '請再試一次',
 				})
-				return;
+				throw new Error
 			}
 			return res.json();
 		})

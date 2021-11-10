@@ -9,15 +9,24 @@ const io = new Server(server);
 const { getTimeRemaining } = require('./util/util');
 const Product = require('./server/models/product_model')
 const { setBidRecord } = require('./server/controllers/bid_controller')
+require('dotenv').config()
 
 
 app.use('/static', express.static(path.join(__dirname,'public')));
 app.use(express.static("public"));
-app.use(express.json());
 app.use(express.urlencoded({extended:true}));
 app.set('views', path.join(__dirname, './public/views'));
 app.set('view engine', 'ejs');
 app.engine("ejs", ejs.renderFile);
+
+// Use JSON parser for all non-webhook routes
+app.use((req, res, next) => {
+    if (req.originalUrl === '/api/1.0/order/webhook') {
+      next();
+    } else {
+      express.json()(req, res, next);
+    }
+});
 
 // API routes
 app.use('/api/1.0',
@@ -74,23 +83,25 @@ io.on('connection', socket => {
                 bid_time: bidTime,
                 time_left: timeLeft
             }
-            try {
-                console.log(bidRecord)
-                await setBidRecord(bidRecord); 
-            } catch (error) {
-                console.log(error)
-                socket.emit('bidFail', bidRecord)
-                return 
-            }
 
-            // if (result < 0) {
-            //     console.log('err')
-            //     socket.emit('bidFail', bidRecord)
-            // }
-            bidRecord.end_time = userBid.endTime + 30000
-            bidRecord.highest_bid_times = userBid.highestBidTimes + 1
-            io.emit(`refresh_${userBid.productId}`, bidRecord)
-            socket.emit('bidSuccess', bidRecord)
+            const result = await setBidRecord(bidRecord); 
+
+            switch (result.status) {
+                case 1:
+                    bidRecord.end_time = userBid.endTime + 30000
+                    bidRecord.highest_bid_times = userBid.highestBidTimes + 1
+                    io.emit(`refresh_${userBid.productId}`, bidRecord)
+                    socket.emit('bidSuccess', bidRecord)
+                    break;
+                case -1:
+                    socket.emit('bidFail', message = '您有訂單尚未付款，無法參競標')
+                    break;
+                case 0:
+                    socket.emit('bidFail', message = '手速慢了，有人已經出價了唷!')
+                    break;    
+                default:
+                    socket.emit('bidFail', message = '請稍後再試')
+            }
         })
 
         socket.on('disconnect' , () => {

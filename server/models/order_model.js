@@ -111,7 +111,7 @@ const getSellOrders = async (pageSize, paging, status, userId) => {
 
 }
 
-const updateOrder = async (userId, orderId, status) => {
+const updateOrder = async (userId, orderId, status, delivery) => {
     const conn = await pool.getConnection();
 
     try {
@@ -126,7 +126,7 @@ const updateOrder = async (userId, orderId, status) => {
         }
 
         const newStatus = status + 1
-        await conn.query('UPDATE project.order SET status = ? WHERE id = ?', [newStatus, orderId])
+        await conn.query('UPDATE project.order SET status = ?, delivery = ? WHERE id = ?', [newStatus, delivery ,orderId])
         await conn.query('COMMIT')
         return 1;
 
@@ -139,9 +139,65 @@ const updateOrder = async (userId, orderId, status) => {
     }
 }
 
+const createPayment = async (userId, orderId, paymentIntent) => {
+    
+    const queryStr = 'INSERT INTO payment SET order_id = ?, user_id = ?, payment_intent = ?, pay_status = 0'
+    const bindings = [orderId, userId ,paymentIntent]
+
+    try {
+        const [result] = await pool.query(queryStr, bindings)
+        const payId = result.insertId  
+    } catch(error) {
+        console.log(error)
+        return -1
+    }
+
+    return 1
+}
+
+const confirmPayment = async (paymentIntent, payment) => {
+
+    const conn = await pool.getConnection();
+    payment.pay_time = Date.now();
+
+    try {
+        await conn.query('START TRANSACTION')
+        const [search] = await conn.query('SELECT id, order_id FROM payment WHERE payment_intent = ? ', paymentIntent)
+
+        if (search.length <= 0) {
+            await conn.query('COMMIT')
+            return -1;
+        }
+        
+        const payId = search[0].id
+        const orderId = search[0].order_id
+
+        await conn.query('UPDATE payment SET ?  WHERE id = ?', [payment, payId])
+        await conn.query('UPDATE project.order SET status = 1 WHERE id = ?', orderId)
+        await conn.query('COMMIT')
+        return 1;
+
+    } catch (error) {
+        await conn.query('ROLLBACK');
+        console.log(error)
+        return error;
+    } finally {
+        await conn.release();
+    }
+}
+
+const getExpiredOrder = async () => {
+    const [endTimeArr] = await pool.query('SELECT id, buyer_id, pay_deadline FROM project.order WHERE status = 0')
+    return endTimeArr
+}
+
+
 module.exports = {
     createOrder,
     getUserOrders,
     getSellOrders,
     updateOrder,
+    createPayment,
+    confirmPayment,
+    getExpiredOrder
 }

@@ -3,6 +3,10 @@ html,body{
     font-family: 'Noto Sans TC', sans-serif;
 }
 
+img{
+    object-fit: cover;
+}
+
 a{
     text-decoration: none;
 }
@@ -15,6 +19,7 @@ a{
 .my-button{
     width: 100px;
 }
+
 #logout-button{
     display: none;
 }

@@ -49,6 +49,11 @@ fetch(detailsUrl)
         const sellerDiv = document.querySelector('#seller-id')
         sellerDiv.textContent = `賣家編號： ${sellerId}`
 
+        if (userId == sellerId) {
+            $('.my-bit-button').attr('disable', true).text('這是您的商品')
+        }
+
+
         const bidRecords = document.querySelector('.my-bid-record')
         const recordsData = data.records || [];
         recordsData.reverse().map((e) => {
@@ -121,7 +126,8 @@ form.addEventListener('submit', (e) => {
             icon: 'warning',
             title: '請勿自行下標',
             text: '自己的轎不能自己抬唷！',
-        }) 
+        })
+        return
     }
 
     if (userBidIncr < leastBid) {
@@ -140,19 +146,21 @@ form.addEventListener('submit', (e) => {
         return
     }
 
+    const currentAmount = highestBid.textContent
+    const userBidAmount = Number(highestBid.textContent.replace("$","")) + userBidIncr
+
     Swal.fire({
         title: "確認出價",
-        text: "確認出價後即無法反悔，請做一個負責任的人",
-        type: "warning",
+        html: `<p>最高價：<br><b>$${currentAmount}</b></p><p>即將出價：<br><b>$${userBidAmount}</b></p>`,
+        icon: "warning",
         showCancelButton: true,
         confirmButtonColor: "#e95420",
-        confirmButtonText: "確認出價",
-        cancelButtonText: "取消",
+        confirmButtonText: "警告",
+        cancelButtonText: "這是灰色",
         closeOnConfirm: false
     }).then((result) => {
         if (result.isConfirmed) {
-            const userBidAmount = Number(highestBid.textContent.replace("$","")) + userBidIncr;
-        socket.emit('bid', { productId, userId, userBidAmount, endTime, highestBidTimes}) 
+            socket.emit('bid', { productId, userId, userBidAmount, endTime, highestBidTimes}) 
         } else if (result.dismiss === Swal.DismissReason.cancel) {
             input.value = ''
         }
@@ -177,11 +185,12 @@ socket.on(`refresh_${productId}`, bidRecord => {
 
 })
 
-socket.on('bidFail', bidRecord => {
+socket.on('bidFail', (message) => {
     Swal.fire({
         icon: 'error',
         title: '出價失敗',
-        text: '請再試一次',
+        text: message,
+        confirmButtonText: '知道了'
     })
 })
 
@@ -260,7 +269,7 @@ const renderImagesSlide = (otherImages) => {
 const setCountDownTimer = () => {
     setInterval(() => {
         let start = Date.now();
-
+        //Convert to timestamp
         let totalMilSec = (endTime) - Date.now();
         const countDown = document.querySelector('#count-down-number')
 

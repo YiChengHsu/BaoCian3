@@ -45,15 +45,15 @@ fetch(url + params, {
 
   if (res.data.user.rating != null) { 
 		$('#star').raty({score: data.user.rating, readOnly: true});
-    $("#user-rating").text(`平均評分：${data.user.rating}`);
+    $("#user-rating").text(`平均評分：${data.user.rating.toFixed(2)}`);
   } else {
     $("#user-rating").text("尚未評分");
   }
 
   $("#twzipcode").twzipcode("set", {
-    county: user.city,
-    district: user.town,
-    zipcode: Number(user.zipcode)
+    county: data.user.city,
+    district: data.user.town,
+    zipcode: Number(data.user.zipcode)
   });
   
   $(".address").val(data.user.address);
@@ -62,6 +62,12 @@ fetch(url + params, {
   $(".bank-account").val(data.user.bank_code).trigger("change");
   $(".bank-account").val(data.user.bank_account);
   $(".account-name").val(data.user.account_name);
+
+  console.log(data.user)
+
+  if (data.user.address == null || data.user.address == '' ) {
+    Swal.fire({icon: "warning", title: "缺少收件資訊", text: "可能得標後許處理，請盡速處理！"})
+  }
 
   list.map((e) => {
     const id = e.id;
@@ -91,32 +97,21 @@ fetch(url + params, {
           class: "col-2 align-middle my-auto",
           id: `my-title-${id}`
         }).appendTo(`#my-row-${id}`);
-        $("<h5/>").text(e.title).appendTo(`#my-title-${id}`);
+        $("<h6/>").text(e.title).appendTo(`#my-title-${id}`);
 
         $("<div/>", {
           class: "col-2 align-middle my-auto",
           id: `my-price-${id}`
         }).appendTo(`#my-row-${id}`);
-        $("<h5/>").text(e.total).appendTo(`#my-price-${id}`);
+        $("<h6/>").text(e.total).appendTo(`#my-price-${id}`);
 
-        const time = new Date(e.end_time);
-        const year = time.getFullYear();
-        const month = time.getMonth() + 1;
-        const date = time.getDate();
-        let hours = time.getHours();
-        if (hours < 10) {
-          hours = `0${hours}`;
-        }
-        let minutes = time.getMinutes();
-        if (minutes < 10) {
-          minutes = `0${minutes}`;
-        }
+        const endTime = tranTimestamp(e.end_time)
 
         $("<div/>", {
           class: "col-2 align-middle my-auto text-center",
           id: `my-endTime-${id}`
         }).appendTo(`#my-row-${id}`);
-        $("<h5/>").html(`${year}<br>${month}/${date}<br>${hours}:${minutes}`).appendTo(`#my-endTime-${id}`);
+        $("<h6/>").html(`${endTime.year}<br>${endTime.month}/${endTime.date}<br>${endTime.hours}:${endTime.minutes}`).appendTo(`#my-endTime-${id}`);
 
         $("<div/>", {
           class: "col-2 align-middle my-auto",
@@ -130,7 +125,18 @@ fetch(url + params, {
 
         switch (e.status) {
           case 0:
-            $("<h5/>").text("待付款").appendTo(`#my-status-${id}`);
+
+            Swal.fire({
+              title:"付款提醒",
+              icon: 'warning',
+              text:"尚有得標商品未結帳，請盡速結帳以免影響權益！",
+              confirmButtonText: '知道了'
+            })
+
+            const payDeadline = tranTimestamp(e.pay_deadline)
+
+            $("<h6/>").text("待付款").appendTo(`#my-status-${id}`);
+            $("<h6/>").html(`付款期限:<br><b>${payDeadline.year}<br>${payDeadline.month}/${payDeadline.date}<br>${payDeadline.hours}:${payDeadline.minutes}</b>`).appendTo(`#my-status-${id}`);
 
             if (e.seller_id == userId) {
               return
@@ -167,11 +173,44 @@ fetch(url + params, {
             break;
           case 1:
 
-            $("<h5/>").text("已付款").appendTo(`#my-status-${id}`);
+            $("<h6/>").text("已付款").appendTo(`#my-status-${id}`);
 
             if (e.seller_id != userId) {
               return
             }
+
+            $("<button/>", {
+              class: "btn btn-block btn-info mb-2",
+              id: `deliverInfo-button-${id}`,
+              text: "寄送資訊",
+            }).appendTo(`#my-button-div-${id}`);
+
+            $(`#deliverInfo-button-${id}`).click(()=> {
+              fetch(`/api/1.0/user/address?id=${e.buyer_id}}`, {
+                method: 'get',
+                headers: {
+                  Authorization: "Bearer " + user.access_token,
+                }
+              }).then(res => res.json())
+              .then((res) => { 
+                const data = res.data
+                if (data.address == null || data.receiver == null ) {
+                  Swal.fire({
+                    title: '缺少資料',
+                    icon: 'warning',
+                    html:`目前缺乏買家收件資料，<br>已通知買家盡速補齊，請見諒！`,
+                    confirmButtonText: '知道了'
+                  })
+                  return
+                }
+
+                Swal.fire({
+                  title: '寄送地址',
+                  html:`<b>${data.zipcode}  ${data.city} ${data.town} <br> ${data.address} <br> ${data.receiver}  ${data.phone}</b> `,
+                  confirmButtonText: '知道了'
+                })
+              })
+            })
 
             $("<button/>", {
               class: "btn btn-block btn-success mb-2",
@@ -179,7 +218,19 @@ fetch(url + params, {
               text: "寄送",
             }).appendTo(`#my-button-div-${id}`);
 
-            $(`#deliver-button-${id}`).click(() => {
+            $(`#deliver-button-${id}`).click( async () => {
+              const { value: delivery } = await Swal.fire({
+                title: '請輸入寄件編號',
+                input: 'text',
+                inputLabel: '寄件編號',
+                showCancelButton: true,
+                inputValidator: (value) => {
+                  if (!value) {
+                    return '若無寄件編號無法確認出貨!'
+                  }
+                }
+              })
+
               fetch("/api/1.0/order/update", {
                 method: "PATCH",
                 headers: {
@@ -187,17 +238,17 @@ fetch(url + params, {
                   "content-type": "application/json"
                 },
                 body: JSON.stringify(
-                  {orderId: e.order_id, status: e.status}
+                  {orderId: e.order_id, status: e.status, delivery: delivery}
                 )
               }).then((res) => {
                 Swal.fire({icon: "success", title: "寄送成功", text: "請等候買家確認訂單！"});
-								$(`#deliver-button-${id}`).attr('disabled', true).text('已寄送')
+                $(`#deliver-button-${id}`).attr('disabled', true).text('已寄送')
               })
             }); 
             break;
           case 2:
 
-            $("<h5/>").text("已寄送").appendTo(`#my-status-${id}`);
+            $("<h6/>").html(`<p>已寄送<br>寄件編號:<br><b>${e.delivery }</b></p>`).appendTo(`#my-status-${id}`);
 
             if (e.seller_id == userId) {
               return
@@ -228,11 +279,7 @@ fetch(url + params, {
             break;
           case 3:
 
-            $("<h5/>").text("完成訂單").appendTo(`#my-status-${id}`);
-
-            if (e.seller_id == userId) {
-              return
-            }
+            $("<h6/>").text("完成訂單").appendTo(`#my-status-${id}`);
 
             $("<button/>", {
               class: "btn btn-block btn-warning",
@@ -245,15 +292,17 @@ fetch(url + params, {
 
             let rating = null
 
-            $(`#star2`).raty({
+            $('<div/>', {
+              id: `start-${e.order_id}`
+            }).appendTo('#star-form')
+
+            $(`#star-${id}`).raty({
               click: function (score) {
                 rating = score
               }
             });
 
             $('#send-button').click( async () => {
-
-
 
               console.log(rating)
 
@@ -268,7 +317,8 @@ fetch(url + params, {
                 )
               }).then((res) => {
 								if(res.status == 400) {
-									Swal.fire({icon: "error", title: "重複評分", text: "已經評分過了唷~"});
+									Swal.fire({icon: "error", title: "重複評分", text: "已經評分過了唷~"})
+                  $(`#my-rate-button-${id}`).attr('disabled', true);
 									return
 								}
 								Swal.fire({icon: "success", title: "評分成功", text: "感謝您的回饋！"});
@@ -374,3 +424,21 @@ $(".change-bank-button").click((e) => {
   	Swal.fire({icon: "error", title: "更改失敗", text: "請再試一次"});
 	});
 });
+
+const tranTimestamp = (timestamp) => {
+
+  const time = new Date(timestamp);
+
+  const year = time.getFullYear();
+  const month = time.getMonth() + 1;
+  const date = time.getDate();
+  let hours = time.getHours();
+  let minutes = time.getMinutes();
+  if (hours < 10) {
+    hours = `0${hours}`;
+  }
+  if (minutes < 10) {
+    minutes = `0${minutes}`;
+  }
+  return { year, month, date, hours, minutes}
+}

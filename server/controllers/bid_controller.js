@@ -24,18 +24,17 @@ const setNewProductToFinisher = (id, end_time) => {
 
 const setBidRecord = async (userBid) => {
 
-    try {
-        const isBidSuccess = await Bid.setBidRecord(userBid)
-    } catch (error) {
-        console.log(error)
-        return error;
+    const isBidSuccess = await Bid.setBidRecord(userBid)
+
+    if (isBidSuccess.status <= 0) {
+        return isBidSuccess
     }
 
     const bidIndexInArr = sortedEndTimeArr.array.findIndex(e => e.id == Number(userBid.product_id));
 
     sortedEndTimeArr.array[bidIndexInArr].end_time += 30000;
 
-    return 
+    return isBidSuccess
 }
 
 const getUserBidRecords = async (req, res) => {

@@ -19,7 +19,7 @@ if (user && user.access_token && user.user) {
 
 if (user && user.user.picture) {
     $('#signin-button').css('display', 'none')
-    $('#logout-button').css('display', 'block')
+    $('#logout-button').css('display', 'inline').attr('width', '100px')
 }
 
 $('#logout-button').click(() => {

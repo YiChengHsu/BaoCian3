@@ -201,6 +201,19 @@ const getUserOrders = async (req, res) => {
 
 }
 
+const getUserAddress = async (req, res) => {
+
+    const userId = req.query.id
+
+    const address = await User.getUserAddress(userId)
+
+    if ( address.length <= 0) {
+        res.status(400).send({error: "Bad Request"})
+        return
+    }
+    res.status(200).send({data: address})
+}
+
 const updateUserAddress = async(req ,res) => {
     
     const userId = req.user.id
@@ -298,6 +311,7 @@ module.exports = {
     getUserProfile,
     getUserWatchList,
     getUserOrders,
+    getUserAddress,
     updateUserAddress,
     updateUserAccount,
     createRating,
