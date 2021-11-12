@@ -181,7 +181,6 @@ form.addEventListener('submit', (e) => {
         confirmButtonColor: "#e95420",
         confirmButtonText: "我跟他拚了！",
         cancelButtonText: "怕.jpg",
-        closeOnConfirm: false
     }).then((result) => {
         if (result.isConfirmed) {
             socket.emit('bid', { productId, userId, userBidAmount, endTime, highestBidTimes}) 
