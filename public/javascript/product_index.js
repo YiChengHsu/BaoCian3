@@ -89,7 +89,7 @@ fetch('/api/1.0' + params + query, {
       productFooter.className = 'row mt-2 justify-content-center'
 
       const roomUserDiv = document.createElement('div');
-      const roomUserNum = roomUsers[id] ? roomUser[id].length : 0;
+      const roomUserNum = roomUsers[id] ? roomUsers[id].length : 0;
       roomUserDiv.className = `room-user col-3`
       roomUserDiv.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-people-fill" viewBox="0 0 16 16">
       <path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1H7zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>

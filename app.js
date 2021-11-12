@@ -102,7 +102,7 @@ io.on('connection', socket => {
                 case 1:
                     bidRecord.end_time = userBid.endTime + 30000
                     bidRecord.highest_bid_times = userBid.highestBidTimes + 1
-                    bidRecord.roomPeople = roomUsers.productId.length || 0
+                    bidRecord.roomUsers= roomUsers.productId ? roomUsers.productId.length:0;
                     io.emit(`refresh_${userBid.productId}`, bidRecord)
                     socket.emit('bidSuccess', bidRecord)
                     break;
