@@ -3,7 +3,10 @@ const _ = require('lodash')
 const pageSize = 20;
 const Bid = require('../models/bid_model')
 const { setNewProductToFinisher } = require('./bid_controller')
-const User = require('../models/user_model')
+const User = require('../models/user_model');
+require('dotenv').config();
+const imagePath = process.env.IMAGE_PATH
+
 
 const createProduct = async(req, res) => {
     const user = req.user.id
@@ -21,7 +24,7 @@ const createProduct = async(req, res) => {
         with_papers: body.with_papers,
         place: body.place,
         seller_id: user,
-        end_time: Date.parse(body.end_time),
+        end_time: Date.parse(body.end_time) - 8*60*60*1000,
         highest_bid: body.price,
     }
 
@@ -139,8 +142,6 @@ const getProductsImages = async (products) => {
     const images = await Product.getProductsImages(productIds);
     const imagesMap = _.groupBy(images, e => e.product_id)
 
-    const imagePath = 'https://s3.ap-northeast-1.amazonaws.com/node.js-image-bucket/'
-
     return products.map((e) => {
         e.main_image = e.main_image ? imagePath + e.main_image : null;
         e.images = e.images ? e.images.split(',').map(img => imagePath + img) : null; 
@@ -188,6 +189,7 @@ const getProductSellerInfo = async(products) => {
 
     sellers = sellers.map((e) => {
         e.rating = ratingAvg[e.id]
+        e.picture = imagePath + e.picture
         return e
     })
 

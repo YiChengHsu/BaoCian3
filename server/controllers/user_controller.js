@@ -10,6 +10,7 @@ const {
     getProductsImages,
     getProductWatchTimes,
 } = require('../controllers/product_controller')
+require('dotenv').config();
 
 const signUp = async (req ,res) => {
     console.log(req.file)
@@ -98,7 +99,7 @@ const signIn = async (req, res) => {
                 provider: user.provider,
                 name: user.name,
                 email: user.email,
-                picture: user.picture
+                picture: process.env.IMAGE_PATH + user.picture
             }
         }
     });
@@ -127,7 +128,6 @@ const getUserProfile = async (req, res) => {
 
     const user = await User.getUserProfileWithDetails(userId)
     const rating = await getRatings(userId)
-    user.rating = rating
 
     const findDataList = async (listType) => {
 

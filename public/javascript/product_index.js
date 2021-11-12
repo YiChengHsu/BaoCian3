@@ -1,3 +1,5 @@
+const currentTime = Date.now()
+console.log(currentTime)
 const params = window.location.pathname
 const query = window.location.search
 const socket = io();
@@ -43,7 +45,7 @@ fetch('/api/1.0' + params + query, {
 
       const sellerImg = document.createElement('img')
       sellerImg.className = 'col-4 rounded-circle seller-img p-0'
-      sellerImg.src = `https://s3.ap-northeast-1.amazonaws.com/node.js-image-bucket/${e.sellerInfo.picture}`
+      sellerImg.src = e.sellerInfo.picture
       productHeader.appendChild(sellerImg)
 
       const sellerRating = e.sellerInfo.rating ? e.sellerInfo.rating.toFixed(2): '尚未評分' 
@@ -269,6 +271,8 @@ fetch('/api/1.0' + params + query, {
         endTime = bidRecord.end_time
         intervalId = resetCountDownTimer(intervalId, id, endTime)
       })
+    console.log(Date.now())
+    console.log(Date.now() - currentTime)
     })
   })
 ;
@@ -321,3 +325,4 @@ const fixTime = (time) => {
       return time;
   }
 }
+

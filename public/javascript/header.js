@@ -8,7 +8,7 @@ if (user && user.access_token && user.user) {
     accessToken = user.access_token
     userId = user.user.id
     $('<img>', {
-        src: "https://s3.ap-northeast-1.amazonaws.com/node.js-image-bucket/" + user.user.picture,
+        src: user.user.picture,
         class: 'rounded-circle',
         width: '36',
         height: '36'

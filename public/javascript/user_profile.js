@@ -26,7 +26,7 @@ $(document).ready(function () {
   $(".js-example-basic-single").select2();
 });
 
-$(".avatar").attr("src", "https://s3.ap-northeast-1.amazonaws.com/node.js-image-bucket/" + user.user.picture);
+$(".avatar").attr("src", user.user.picture);
 $(".user-id").text(user.user.user_id);
 $(".user-name").text(user.user.name);
 $(".user-email").text(user.user.email);
