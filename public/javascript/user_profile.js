@@ -279,7 +279,7 @@ fetch(url + params, {
             break;
           case 3:
 
-            $("<h6/>").text("完成訂單").appendTo(`#my-status-${id}`);
+            $("<h6/>").text("確認收貨").appendTo(`#my-status-${id}`);
 
             $("<button/>", {
               class: "btn btn-block btn-warning",
@@ -290,17 +290,14 @@ fetch(url + params, {
               'data-bs-whatever': "@mdo"
             }).appendTo(`#my-button-div-${id}`);
 
-            let rating = null
 
             $('<div/>', {
-              id: `start-${e.order_id}`
-            }).appendTo('#star-form')
-
-            $(`#star-${id}`).raty({
+              id: `start-${id}`,
+            }).raty({
               click: function (score) {
                 rating = score
               }
-            });
+            }).appendTo('#star-form')
 
             $('#send-button').click( async () => {
 

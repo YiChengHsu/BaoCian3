@@ -17,6 +17,7 @@ fetch(detailsUrl)
     .then(res => res.json())
     .then(res =>  res.data)
     .then((data) => {
+        
 
         if (data == null) {
             self.location.href = '/404.html'
@@ -29,7 +30,30 @@ fetch(detailsUrl)
         mainImage.src = data.main_image
 
         endTime = data.end_time
-        setCountDownTimer(endTime)
+
+        if (endTime < Date.now()) {
+            $('#count-down-number').text('完結')
+            const bidButton = document.querySelector('.my-bid-button')
+            const bidInput = document.querySelector('.my-bid-input')
+            $('.my-bid-button').attr('disabled', true)
+            bidButton.disable = true;
+            bidInput.readOnly = true;
+            bidButton.className.remove = 'btn-primary'
+            bidButton.className.add = 'btn-secondary'
+            bidButton.textContent = "競標結束";
+
+            if (data.highest_user_id == userId) {
+                $('<div>', {
+                    class: "col-12 alert alert-primary text-center my-alert" ,
+                    role:"alert",
+                    html: '您已成功得標，請前往<a href="/user/profile?type=order&status=0" class="alert-link">個人頁面</a>進行付款'
+                }).prependTo('.main-row')
+            }
+
+
+        } else {
+            setCountDownTimer(endTime) 
+        }
 
         const currentNumber = document.querySelector('.highest-bid')
         currentNumber.textContent = data.highest_bid
@@ -70,7 +94,7 @@ fetch(detailsUrl)
         condition.textContent = `商品狀況： ${data.condition}`
 
         const originalPackaging = document.querySelector('#original-packaging')
-        originalPackaging.texture = `原外包裝： ${data.original_packaging}`
+        originalPackaging.textContent = `原外包裝： ${data.original_packaging}`
 
         const withPapers = document.querySelector('#with-papers')
         withPapers.textContent = `商品相關證明： ${data.with_papers}`
@@ -155,8 +179,8 @@ form.addEventListener('submit', (e) => {
         icon: "warning",
         showCancelButton: true,
         confirmButtonColor: "#e95420",
-        confirmButtonText: "警告",
-        cancelButtonText: "這是灰色",
+        confirmButtonText: "我跟他拚了！",
+        cancelButtonText: "怕.jpg",
         closeOnConfirm: false
     }).then((result) => {
         if (result.isConfirmed) {
@@ -204,6 +228,7 @@ socket.on('bidSuccess', bidRecord => {
         input.value = ''
     })
 })
+
 
 //Output bid message to DOM
 const renderBidRecord = (record) => {
@@ -261,7 +286,6 @@ const renderImagesSlide = (otherImages) => {
         carouselItem.appendChild(carouselImg)
         carousel.appendChild(carouselItem)
 
-        console.log(carousel.innerHTML)
     })
 } 
 
@@ -274,12 +298,12 @@ const setCountDownTimer = () => {
         const countDown = document.querySelector('#count-down-number')
 
         if (totalMilSec <= 0) {
-            countDown.textContent = "時間到，競標結束！"
+            countDown.textContent = "完結"
             const bidButton = document.querySelector('.my-bid-button')
             const bidInput = document.querySelector('.my-bid-input')
             bidButton.disable = true;
             bidInput.readOnly = true;
-            bidButton.style.background = '#DC3545'
+            bidButton.className = ''
             bidButton.textContent = "競標結束";
             return
         }

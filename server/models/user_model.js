@@ -139,7 +139,7 @@ const getUserWatchList = async (pageSize, paging, userId) => {
     };
 
     const queryStr = "SELECT * FROM watch_list w INNER JOIN product p on w.product_id = p.id where w.user_id = ? AND p.auction_end = 0  ORDER by p.end_time " + limit.sql;
-    const countQueryStr = "SELECT product_id from watch_list WHERE user_id = ? " + limit.sql;
+    const countQueryStr = "SELECT COUNT(*) from watch_list WHERE user_id = ? " + limit.sql;
     const bindings = binding.concat(limit.binding)
 
     try {
@@ -147,8 +147,8 @@ const getUserWatchList = async (pageSize, paging, userId) => {
         const [watchCounts] = await pool.query(countQueryStr, bindings)
 
         const data = {
-            dataList: watches,
-            dataListCounts: watchCounts
+            'products': watches,
+            'productCount': watchCounts[0].count
         }
 
         return data
@@ -211,7 +211,7 @@ const createRating = async (rateId, ratedId, orderId, rating) => {
     try{
         await conn.query('START TRANSACTION')
         
-        const [search] = await conn.query('SELECT * FROM rate WHERE rate_id = ? AND order_id = ?', [rateId, orderId])
+        const [search] = await conn.query('SELECT * FROM project.rate WHERE rate_id = ? AND order_id = ? ', [rateId, orderId])
 
         if (search.length > 0) {
             conn.query('COMMIT')
@@ -219,7 +219,7 @@ const createRating = async (rateId, ratedId, orderId, rating) => {
         }
         
 
-        const [result] = await conn.query('INSERT INTO rate SET?', {rate_id: ratedId, rated_id: ratedId, order_id: orderId, rating: rating})
+        const [result] = await conn.query('INSERT INTO rate SET?', {rate_id: rateId, rated_id: ratedId, order_id: orderId, rating: rating})
         await conn.query('COMMIT')
         return result.insertId
     } catch (error) {
@@ -232,10 +232,11 @@ const createRating = async (rateId, ratedId, orderId, rating) => {
 }
 
 const getRatings = async (userId) => {
-    const queryStr = 'SELECT rating FROM rate WHERE rated_id = ?'
+    const queryStr = 'SELECT rated_id, rating FROM rate WHERE rated_id in (?)'
     const bindings = [userId]
 
     const [ratings] = await pool.query(queryStr, bindings)
+    console.log(ratings)
     return ratings
 }
 

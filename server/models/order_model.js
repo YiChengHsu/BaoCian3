@@ -1,3 +1,4 @@
+const { result } = require('lodash');
 const {pool} = require('./mysqlcon')
 
 const createOrder = async (product) => {
@@ -162,7 +163,7 @@ const confirmPayment = async (paymentIntent, payment) => {
 
     try {
         await conn.query('START TRANSACTION')
-        const [search] = await conn.query('SELECT id, order_id FROM payment WHERE payment_intent = ? ', paymentIntent)
+        const [search] = await conn.query('SELECT id, user_id, order_id FROM payment WHERE payment_intent = ? ', paymentIntent)
 
         if (search.length <= 0) {
             await conn.query('COMMIT')
@@ -170,10 +171,22 @@ const confirmPayment = async (paymentIntent, payment) => {
         }
         
         const payId = search[0].id
+        const buyerId = search[0].user_id
         const orderId = search[0].order_id
 
         await conn.query('UPDATE payment SET ?  WHERE id = ?', [payment, payId])
         await conn.query('UPDATE project.order SET status = 1 WHERE id = ?', orderId)
+
+        const [isOtherUnpaidOrder] = await conn.query('SELECT * FROM project.order WHERE status = 0 AND buyer_id = ? AND pay_deadline < ?', [buyerId, payment.pay_time])
+
+        console.log(isOtherUnpaidOrder)
+
+        if (isOtherUnpaidOrder.length == 0) {
+            const [result] = await conn.query('UPDATE user SET role_id = 0 WHERE id = ?', [buyerId])
+            console.log(result)
+        }
+
+        
         await conn.query('COMMIT')
         return 1;
 

@@ -5,6 +5,11 @@ const Order = require('../models/order_model');
 const { orderBy } = require('lodash');
 const { pool } = require('../models/mysqlcon');
 const pageSize = 20;
+const {
+    getProductSellerInfo,
+    getProductsImages,
+    getProductWatchTimes,
+} = require('../controllers/product_controller')
 
 const signUp = async (req ,res) => {
     console.log(req.file)
@@ -157,18 +162,37 @@ const getUserProfile = async (req, res) => {
 
 const getUserWatchList = async (req, res) => {
 
-    const userId = req.user.id
-    try {
-        let watchList = await User.getUserWatchList(userId)
-        watchList = Object.values(watchList)
+    const pageSize = 20
 
-        res.status(200).json({
-            data: { watchList }
-        })
-    } catch (error) {
-        console.log(error)
-        res.status(400).send({error: 'Bad Requset'})
+    const userId = req.user.id
+    const paging = parseInt(req.query.paging) || 0
+
+    let watchList = await User.getUserWatchProductIds(userId)
+    watchList = Object.values(watchList).map(e => e.product_id)
+
+    const {products, productCount} = await User.getUserWatchList(pageSize, paging, userId)
+
+    if (products.length == 0) {
+        res.status(200).json({data: []})
+        return;
     }
+
+    let productsWitherSeller = await getProductSellerInfo(products)
+    let productsWithImages = await getProductsImages(products)
+    let productWithWatchTimes = await getProductWatchTimes(products)
+    let productsWithDetails
+
+    productsWithDetails = productsWithImages
+
+    let result;
+    if (productCount > (paging + 1) * pageSize) {
+        result = { data: productsWithDetails, next_paging: paging +1, user: watchList}
+    } else {
+        result = { data: productsWithDetails, user: watchList}
+    }
+
+    res.status(200).json(result)
+
 }
 
 const getUserOrders = async (req, res) => {
@@ -298,8 +322,6 @@ const getRatings = async (userId) => {
         let ratingSum = ratings.reduce((previous, current) => current += previous);
         rating = ratingSum / ratings.length;
     }
-
-    console.log(ratings)
 
     return rating
 }

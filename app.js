@@ -60,14 +60,26 @@ server.listen(3000, () => {
     console.log('listen on 3000') ;   
 });
 
+const roomUsers = {}
+
 
 io.on('connection', socket => {
+
+    socket.emit('roomUsers', roomUsers)
+
     socket.on('join', async ([productId, userId]) => {
         socket.join(productId)
-        
-        if (userId != null) {
-            socket.broadcast.to(productId).emit('message', `買家${userId}進來血流成河了！`);
-        };
+
+
+        if (roomUsers[productId]) {
+            roomUsers[productId].push(socket.id)
+        } else {
+            roomUsers[productId] = [socket.id]
+        }
+
+        io.emit('roomUsers', roomUsers)
+
+
 
         // Listen for bid
         socket.on('bid', async (userBid) => {
@@ -90,6 +102,7 @@ io.on('connection', socket => {
                 case 1:
                     bidRecord.end_time = userBid.endTime + 30000
                     bidRecord.highest_bid_times = userBid.highestBidTimes + 1
+                    bidRecord.roomPeople = roomUsers.productId.length || 0
                     io.emit(`refresh_${userBid.productId}`, bidRecord)
                     socket.emit('bidSuccess', bidRecord)
                     break;
@@ -104,8 +117,15 @@ io.on('connection', socket => {
             }
         })
 
-        socket.on('disconnect' , () => {
-            io.to(productId).emit('message', '有人撐不住啦~');
+        socket.on('disconnect' , (userId) => {
+
+            roomUsers[productId].map((e, index) => {
+                if (e == socket.id){
+                    roomUsers[productId].splice(index, 1 )
+                }
+            })
+
+            io.emit('roomUsers', roomUsers)
         })
     })
 })

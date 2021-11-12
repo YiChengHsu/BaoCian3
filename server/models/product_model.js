@@ -152,6 +152,8 @@ const setWatchList = async (userId, productId) => {
         const queryStr = 'INSERT INTO watch_list SET user_id = ?, product_id = ?'
         const bindings = [userId, productId]
         const [result] = await conn.query(queryStr, bindings)
+
+        await conn.query('COMMIT'); 
         return result.insertId
 
     } catch (error) {
@@ -193,6 +195,14 @@ const delWatchList = async (userId, productId) => {
     }
 }
 
+const getWatchTimes = async (products) => {
+    const queryStr = 'SELECT product_id as id, COUNT(product_id) as watch_times FROM project.watch_list WHERE product_id in (?) group by product_id;'
+    const bindings = [products]
+
+    const [watchTimes] = await pool.query(queryStr, bindings)
+    return watchTimes 
+}
+
 
 module.exports = {
     createProduct,
@@ -204,4 +214,5 @@ module.exports = {
     endProductsAuction,
     setWatchList,
     delWatchList,
+    getWatchTimes,
 }

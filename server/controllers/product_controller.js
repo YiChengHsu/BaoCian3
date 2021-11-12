@@ -25,8 +25,6 @@ const createProduct = async(req, res) => {
         highest_bid: body.price,
     }
 
-    console.log(req.user)
-    console.log(product)
 
     product.main_image = req.files.main_image[0].key;
 
@@ -53,8 +51,6 @@ const getProducts =  async (req, res) => {
         const result = await User.getUserWatchProductIds(userId)
         watchList = Object.values(result).map(e => e.product_id)
     } 
-
-    console.log(watchList)
 
     const category = req.params.category;
     const query = req.query
@@ -88,6 +84,7 @@ const getProducts =  async (req, res) => {
                 if (Number.isInteger(id)) {
                     return await Product.getProducts(pageSize, paging, {id});
                 }
+                break;
             case 'men_shirt': case 'men_pants': case 'men_shoes': case 'men_bag': case 'men_accessories': case 'men_others': case 'women_shirt': case 'women_dress': case 'women_skirt': case 'women_pants': case 'women_shoes': case 'women_bag': case 'women_accessories': case 'women_others': case'watch': case 'bag': case 'luxury_others': case 'phone': case 'computer': case 'peripherals': case 'earphone': case 'camera': case 'electronics_others': 
                 const subCategory = category
                 console.log(subCategory)
@@ -115,8 +112,8 @@ const getProducts =  async (req, res) => {
     }
 
     let productsWitherSeller = await getProductSellerInfo(products)
-    console.log(productsWitherSeller)
     let productsWithImages = await getProductsImages(products)
+    let productWithWatchTimes = await getProductWatchTimes(products)
     let productsWithRecords = await getProductBidRecords (products)
     let productsWithDetails
 
@@ -170,15 +167,52 @@ const getProductBidRecords = async(products) => {
 
 const getProductSellerInfo = async(products) => {
     const sellerIds = products.map(e => e.seller_id)
-    const sellers = await Product.getProductSeller(sellerIds)
-    const sellersMap = _.groupBy(sellers, e => e.id)
+    let sellers = await Product.getProductSeller(sellerIds)
 
-    console.log(sellersMap)
+    const sellersRating = await User.getRatings(sellerIds)
+    let ratingSum = {}
+    sellersRating.map((e) => {
+        if (ratingSum[e.rated_id]) {
+            ratingSum[e.rated_id] += e.rating
+        } else {
+            ratingSum[e.rated_id] = e.rating
+        }
+    })
 
-    return products.map((e) => {
-        e.sellerInfo = sellersMap[e.seller_id]
+    let ratingCount = _.countBy(sellersRating, e => e.rated_id)
+
+    let ratingAvg = {}
+    Object.keys(ratingSum).map((e) => {
+        ratingAvg[e] = ratingSum[e] / ratingCount[e]
+    })
+
+    sellers = sellers.map((e) => {
+        e.rating = ratingAvg[e.id]
         return e
     })
+
+    let sellersMap = _.groupBy(sellers, e => e.id)
+
+    return products.map((e) => {
+        e.sellerInfo = sellersMap[e.seller_id][0]
+        return e
+    })
+}
+
+const getProductWatchTimes = async (products) => {
+    const productIds = products.map(e => e.id);
+    const watchTimes = await Product.getWatchTimes(productIds);
+    const watchTimesMap = _.groupBy(watchTimes, e => e.id)
+
+    console.log(watchTimesMap)
+
+    return products.map((e) => {
+        if (watchTimesMap[e.id]) {
+            e.watchTimes = watchTimesMap[e.id][0].watch_times
+        } else e.watchTimes = 0
+        return e
+    })
+
 }
 
 const setWatchList = async (req, res) => {
@@ -228,5 +262,8 @@ module.exports = {
     createProduct,
     getProducts,
     setWatchList,
-    delWatchList
+    delWatchList,
+    getProductSellerInfo,
+    getProductsImages,
+    getProductWatchTimes,
 }

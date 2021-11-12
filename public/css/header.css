@@ -20,7 +20,7 @@ a{
     width: 100px;
 }
 
-#logout-button{
+#logout-button, #like-button{
     display: none;
 }
 
@@ -45,4 +45,13 @@ a{
     height: 36px;
     background-position: center center;
     background-size: cover;
+}
+
+.swal-wide{
+    width:850px !important;
+}
+
+
+.swal2-shown {
+    padding: 0px !important;    
 }

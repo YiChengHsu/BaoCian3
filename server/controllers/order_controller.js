@@ -135,7 +135,7 @@ const setOrderPayExpiredBanner = async () => {
 
 	setInterval( async () => {
 
-		while (sortedEndTimeArr.array[0].pay_deadline <= Date.now()) {
+		while (sortedEndTimeArr.array[0] && sortedEndTimeArr.array[0].pay_deadline <= Date.now()) {
 			const userWithoutPay = sortedEndTimeArr.shift().buyer_id;
 			try {
 					const bannedUserId = await User.banUserWithoutPay(userWithoutPay);
@@ -144,7 +144,7 @@ const setOrderPayExpiredBanner = async () => {
 					console.log(error)
 			}
 		}
-	}, 6000)
+	}, 60000)
 	
 }
 
