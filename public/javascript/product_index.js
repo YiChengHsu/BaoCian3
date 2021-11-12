@@ -5,7 +5,7 @@ const query = window.location.search
 const socket = io();
 let productIds = []
 let userWatchList = []
-let roomUsers;
+let roomUsers = {};
 
 socket.emit('connection')
 
