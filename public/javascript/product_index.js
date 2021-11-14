@@ -37,11 +37,11 @@ fetch('/api/1.0' + params + query, {
     data.map((e) => {
 
       const productItem = document.createElement('div');
-      productItem.className = 'card col-3 m-3 rounded-3 productItem px-0 mx-0'
+      productItem.className = 'card rounded rounded-3 col-2 productItem mx-3 mb-3'
       productItem.style="width: 18rem;"
 
       const productHeader = document.createElement('div');
-      productHeader.className = 'row mx-2 mt-2 mb-1'
+      productHeader.className = 'row mx-2 mb-1 fs-6'
 
       const sellerImg = document.createElement('img')
       sellerImg.className = 'col-4 rounded-circle seller-img p-0'
@@ -62,31 +62,39 @@ fetch('/api/1.0' + params + query, {
       productLink.href = '/product/details?id=' + id
 
       const productImage = document.createElement('div');
-      productImage.className = 'card-img-top product-image w-100'
+      productImage.className = 'card-img rounded-2 product-image w-100 text-end p-2 pt-3'
       productImage.style.backgroundImage = `url(${e.main_image})`;
+
+      if (e.highest_user_id == userId) {
+        $('<span>').addClass('p-2 btn-danger disabled rounded rounded-pill').text('得標中').appendTo(productImage)
+      }
+
+      if (e.seller_id == userId) {
+        $('<span>').addClass('p-2 btn-success disabled rounded rounded-pill').text('自己的').appendTo(productImage)
+      }
 
       const productBody = document.createElement('div');
       productBody.className = 'card-body px-0 text-center'
 
-      const productTitle = document.createElement('h5');
-      productTitle.className = 'card-title mb-1 product-title'
+      const productTitle = document.createElement('h6');
+      productTitle.className = 'card-title product-title mb-0'
       productTitle.textContent = e.title
 
       const productText = document.createElement('div');
       productText.className = 'card-text'
 
       const highestBid = document.createElement("div");
-      highestBid.className = `highest-bid highest-bid-${id}`;
-      highestBid.textContent = `目前最高： $${e.highest_bid}`;
+      const currencyNum = toCurrency(e.highest_bid)
+      highestBid.innerHTML = `目前最高：<b class='text-success' id='highest-bid-${id}'> $${currencyNum} </b>`;
 
       let endTime;
       const timeLeft = document.createElement('div');
       endTime = e.end_time
-      timeLeft.className = `text-center fs-3 time-left countdown-timer-${id}`
+      timeLeft.className = `text-center text-primary fs-4 my-1 time-left countdown-timer-${id}`
       let intervalId = setCountDownTimer(id, endTime)
 
       const productFooter = document.createElement('div');
-      productFooter.className = 'row mt-2 justify-content-center'
+      productFooter.className = 'row mt-2 justify-content-center text-center'
 
       const roomUserDiv = document.createElement('div');
       const roomUserNum = roomUsers[id] ? roomUsers[id].length : 0;
@@ -100,11 +108,18 @@ fetch('/api/1.0' + params + query, {
       const bidTimesDiv = document.createElement('div');
       let bidTimes = e.bid_times
       bidTimesDiv.className = `bid-times col-3`
-      bidTimesDiv.id = `bid-times-${id}`
-      bidTimesDiv.innerHTML = `<svg id="Layer_1" enable-background="new 0 0 34 34" height="24" viewBox="0 0 30 32" width="24" xmlns="http://www.w3.org/2000/svg"><g><g><g><path d="m20.8 32.6c0 .6-.4 1-1 1h-15c-.3 0-.7-.2-.9-.5s-.2-.7 0-1l2-4c.2-.3.5-.6.9-.6h11c.4 0 .7.2.9.6l1.9 3.8c.1.2.2.4.2.7z"/></g></g><g><g><path d="m21.2 6.9-1.1 1.9c-.3.6-1 .9-1.6.9-.3 0-.6-.1-.9-.2l-3.6 6.1c.4.2.7.6.8 1.1s.1 1-.2 1.4l-1 1.7c-.3.6-1 1-1.6 1-.3 0-.7-.1-1-.3l-6.2-3.6c-.9-.5-1.2-1.7-.7-2.6l1-1.7c.5-.9 1.7-1.2 2.5-.7l3.5-6.1c-.9-.5-1.2-1.7-.6-2.6l1.1-1.9c.5-.9 1.7-1.2 2.6-.7l6.3 3.6c.4.3.8.7.9 1.2s0 1.1-.2 1.5z"/></g></g><g><g><path d="m29.9 20.7c-.4.8-1.3 1.3-2.2 1.3-.4 0-.9-.1-1.3-.3l-9.7-5.7c-.1-.2-.2-.4-.3-.6l2.1-3.6c.2 0 .4 0 .7-.1l9.8 5.7c1.2.6 1.6 2.1.9 3.3z"/></g></g></g></svg> <h6 class='mt-1'>${bidTimes} </h6>`
+      bidTimesDiv.innerHTML = `<svg id="Layer_1" enable-background="new 0 0 34 34" height="24" viewBox="0 0 30 32" width="24" xmlns="http://www.w3.org/2000/svg"><g><g><g><path d="m20.8 32.6c0 .6-.4 1-1 1h-15c-.3 0-.7-.2-.9-.5s-.2-.7 0-1l2-4c.2-.3.5-.6.9-.6h11c.4 0 .7.2.9.6l1.9 3.8c.1.2.2.4.2.7z"/></g></g><g><g><path d="m21.2 6.9-1.1 1.9c-.3.6-1 .9-1.6.9-.3 0-.6-.1-.9-.2l-3.6 6.1c.4.2.7.6.8 1.1s.1 1-.2 1.4l-1 1.7c-.3.6-1 1-1.6 1-.3 0-.7-.1-1-.3l-6.2-3.6c-.9-.5-1.2-1.7-.7-2.6l1-1.7c.5-.9 1.7-1.2 2.5-.7l3.5-6.1c-.9-.5-1.2-1.7-.6-2.6l1.1-1.9c.5-.9 1.7-1.2 2.6-.7l6.3 3.6c.4.3.8.7.9 1.2s0 1.1-.2 1.5z"/></g></g><g><g><path d="m29.9 20.7c-.4.8-1.3 1.3-2.2 1.3-.4 0-.9-.1-1.3-.3l-9.7-5.7c-.1-.2-.2-.4-.3-.6l2.1-3.6c.2 0 .4 0 .7-.1l9.8 5.7c1.2.6 1.6 2.1.9 3.3z"/></g></g></g></svg> <h6 class='mt-1' id= 'bid-times-${id}'>${bidTimes} </h6>`
 
       const watchBtn = document.createElement('div');
-      const watchTimes = e.watchTimes
+
+      let watchTimes;
+
+      if (watchList.includes(id)) {
+        watchTimes = e.watchTimes -1
+      } else {
+        watchTimes = e.watchTimes
+      }
+      
       watchBtn.className = 'col-3'
       //Get star-icon from bootstrap
       watchBtn.innerHTML = `
@@ -232,14 +247,10 @@ fetch('/api/1.0' + params + query, {
         })
       })
 
-      // productButton2.href = '/product/details?id=' + id
-      // productButton2.textContent = '<i class="bi bi-heart"></i>'
-
+      productText.appendChild(productTitle)
       productText.appendChild(timeLeft) 
       productText.appendChild(highestBid)
-      productText.appendChild(bidTimesDiv) 
       
-      productBody.appendChild(productTitle)
       productBody.appendChild(productText)
       productFooter.appendChild(roomUserDiv)
       productFooter.appendChild(bidTimesDiv)
@@ -259,13 +270,17 @@ fetch('/api/1.0' + params + query, {
 
       socket.on(`refresh_${id}`, bidRecord => {
 
-        console.log(bidRecord)
+        productItem.classList.add('fade-it')
+        setTimeout(() => {
+          productItem.classList.remove('fade-it')
+        }, 2000)
 
-        const highestBid = document.querySelector(`.highest-bid-${bidRecord.product_id}`)
-        highestBid.textContent = `目前最高： $${bidRecord.bid_amount}`
-      
+        const highestBid = document.querySelector(`#highest-bid-${bidRecord.product_id}`)
+        highestBid.animate({backgroundColor: 'red'})
+        highestBid.textContent = `$${toCurrency(bidRecord.bid_amount)}`
+
         const bidTimesDiv = document.querySelector(`#bid-times-${bidRecord.product_id}`)
-        bidTimesDiv.textContent = `出價次數： ${bidRecord.highest_bid_times}`
+        bidTimesDiv.textContent = bidRecord.highest_bid_times
         
         endTime = bidRecord.end_time
         intervalId = resetCountDownTimer(intervalId, id, endTime)
@@ -273,6 +288,41 @@ fetch('/api/1.0' + params + query, {
     console.log(Date.now())
     console.log(Date.now() - currentTime)
     })
+
+    const currentPage = res.page
+    const totalPage = res.total_page
+
+    if (currentPage == 0) {
+      $('.previous-page').hide()
+    } else {
+      $('.previous-page-link').attr('href', `?paging=${currentPage - 1}`)
+    }
+
+    if (currentPage == (totalPage - 1 )) {
+      $('.next-page').hide()
+    } else {
+      $('.next-page-link').attr('href', `?paging=${currentPage + 1}`)
+    }
+
+    // let startPage
+    // if (totalPage > 5 && currentPage > 4) {
+    //   startPage = currentPage -2
+    // } else {
+    //   startPage = 0
+    // }
+
+    // const presentPage = Math.min((totalPage - currentPage), 5)
+
+    for (let i = 0; i < totalPage; i++) {
+      if ( i == currentPage) {
+        $(`<li class="page-item disabled"><a class="page-link" href="?paging=${i}">${i+1}</a></li>`).insertBefore('.next-page')
+      } else {
+        $(`<li class="page-item"><a class="page-link" href="?paging=${i}">${i+1}</a></li>`).insertBefore('.next-page')
+      }
+    }
+
+    console.log(res.page)
+    console.log(res.total_page)
   })
 ;
 
@@ -324,4 +374,11 @@ const fixTime = (time) => {
       return time;
   }
 }
+
+const toCurrency = (num) => {
+  const parts = num.toString().split('.');
+  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  return parts.join('.');
+}
+
 

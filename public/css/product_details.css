@@ -2,10 +2,14 @@
     border:0;
     margin:0;
     padding:0;
-    width: 450px;
-    height: 688px;
+    width: 350px;
+    height: 600px;
     background-position: center center;
     background-size: cover;
+}
+
+.carousel-inner{
+    height: 700px;
 }
 
 #my-middle-wrapper {
@@ -55,3 +59,49 @@
 .my-alert {
     margin: 0px 12px 16px;
 }
+
+#my-bid-number{
+    height: 50px;
+}
+
+.seller-img{
+    width: 75px;
+    height: 75px;
+}
+
+#star img {
+    width: 20px;
+    height: 20px;
+}
+
+@-webkit-keyframes yellow-fade {
+    from {
+      background: #e95420;
+    }
+    to {
+      background: #fff;
+    }
+  }
+  @-moz-keyframes yellow-fade {
+    from {
+      background: #e95420;
+    }
+    to {
+      background: #fff;
+    }
+  }
+  @keyframes yellow-fade {
+    from {
+      background: #e95420;
+    }
+    to {
+      background: #fff;
+    }
+  }
+
+  .fade-it {
+    -webkit-animation: yellow-fade 1s ease-in-out 0s;
+    -moz-animation: yellow-fade 1s ease-in-out 0s;
+    -o-animation: yellow-fade 1s ease-in-out 0s;
+    animation: yellow-fade 1s ease-in-out 0s;
+  }

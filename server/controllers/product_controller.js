@@ -1,6 +1,6 @@
 const Product = require('../models/product_model');
 const _ = require('lodash')
-const pageSize = 20;
+const pageSize = 12;
 const Bid = require('../models/bid_model')
 const { setNewProductToFinisher } = require('./bid_controller')
 const User = require('../models/user_model');
@@ -11,6 +11,7 @@ const imagePath = process.env.IMAGE_PATH
 const createProduct = async(req, res) => {
     const user = req.user.id
     const body = req.body;
+
     const product = {
         category: body.category,
         sub_category: body.sub_category,
@@ -18,14 +19,19 @@ const createProduct = async(req, res) => {
         price: body.price,
         bid_incr: body.bid_incr,
         description: body.description,
-        texture: body.texture,
+        texture: body.texture || '資訊未提供',
         condition: body.condition,
-        original_packaging: body.original_packaging,
-        with_papers: body.with_papers,
-        place: body.place,
+        original_packaging: body.original_packaging || '資訊未提供',
+        with_papers: body.with_papers || '資訊未提供',
+        place: body.place || '資訊未提供',
         seller_id: user,
         end_time: Date.parse(body.end_time) - 8*60*60*1000,
         highest_bid: body.price,
+    }
+
+    if (product.price <= 0 || product.bid_incr <= 0 || product.end_time <= Date.now()) {
+        res.status(400).send({error :'Bad Requset'}) 
+        return
     }
 
 
@@ -55,19 +61,18 @@ const getProducts =  async (req, res) => {
         watchList = Object.values(result).map(e => e.product_id)
     } 
 
+    console.log(watchList)
+
     const category = req.params.category;
     const query = req.query
     const paging = parseInt(query.paging) || 0;
     const order = query.order || null;
-    console.log(req.query)
 
 
     const price = {
         min: query.min,
         max: query.max,
     }
-
-    // const subCategoryArr = ['men_shirt', 'men_pants', 'men_shoes', 'men_bag', 'men_accessories', 'men_others', 'women_shirt', 'women_dress', 'women_skirt', 'women_pants', 'women_shoes', 'women_bag', 'women_accessories', 'women_others','watch', 'bag', 'luxury_others', 'phone', 'computer', 'peripherals', 'earphone', 'camera', 'electronics_others', 'other']
 
     const findProduct = async (category) => {
         
@@ -90,7 +95,6 @@ const getProducts =  async (req, res) => {
                 break;
             case 'men_shirt': case 'men_pants': case 'men_shoes': case 'men_bag': case 'men_accessories': case 'men_others': case 'women_shirt': case 'women_dress': case 'women_skirt': case 'women_pants': case 'women_shoes': case 'women_bag': case 'women_accessories': case 'women_others': case'watch': case 'bag': case 'luxury_others': case 'phone': case 'computer': case 'peripherals': case 'earphone': case 'camera': case 'electronics_others': 
                 const subCategory = category
-                console.log(subCategory)
                 return await Product.getProducts(pageSize, paging, {subCategory, price, order});
             default: {
                 return ({});
@@ -126,12 +130,8 @@ const getProducts =  async (req, res) => {
         productsWithDetails = productsWithImages
     }
 
-    let result;
-    if (productCount > (paging + 1) * pageSize) {
-        result = { data: productsWithDetails, next_paging: paging +1, user: watchList}
-    } else {
-        result = { data: productsWithDetails, user: watchList}
-    }
+    const totalPage = Math.ceil(productCount/pageSize)
+    const  result = { data: productsWithDetails, page: paging, total_page: totalPage, user: watchList}
 
     res.status(200).json(result)
 
@@ -206,8 +206,6 @@ const getProductWatchTimes = async (products) => {
     const watchTimes = await Product.getWatchTimes(productIds);
     const watchTimesMap = _.groupBy(watchTimes, e => e.id)
 
-    console.log(watchTimesMap)
-
     return products.map((e) => {
         if (watchTimesMap[e.id]) {
             e.watchTimes = watchTimesMap[e.id][0].watch_times
@@ -238,11 +236,9 @@ const setWatchList = async (req, res) => {
 }
 
 const delWatchList = async (req, res) => {
-    console.log(req.body)
     const productId = req.body.productId
     const user = req.user
 
-    console.log(user)
 
     if (!user || !user.id) {
         res.status(401).send({error: "Unauthorized"})

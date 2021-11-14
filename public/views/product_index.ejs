@@ -1,4 +1,6 @@
 <%- include('header') %>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/twbs-pagination/1.4.2/jquery.twbsPagination.min.js"></script>
+  <div class="container mb-5" id='main-container'>
     <div class="row justify-content-end">
       <div class="col-1 ms-3 align-self-end">
         <ul class="nav"></ul>
@@ -9,18 +11,37 @@
             <li><a class="dropdown-item" href="?order=lastest">剩下最長時間</a></li>
             <li><a class="dropdown-item" href="?order=earliest">剩下最短時間</a></li>
             <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="?">無</a></li>
+            <li><a class="dropdown-item" href="?">預設</a></li>
           </ul>
         </ul>
       </div>
     </div>
     <div class="row">
-      <div class="row products-container justify-content-between">
+      <div class="row products-container px-3">
+      </div>
+    </div>
+    <div class="row justify-content-center">
+      <div class="col-4">
+        <nav aria-label="Page navigation example">
+          <ul class="pagination justify-content-center">
+            <li class="page-item previous-page">
+              <a class="page-link previous-page-link" href="#" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+              </a>
+            </li>
+            <li class="page-item next-page">
+              <a class="page-link next-page-link" href="#" aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
       </div>
     </div>
   </div>
 
   <script src="/socket.io/socket.io.js"></script>
   <script src="../javascript/product_index.js"></script>
+  <script src='../javascript/bootstrap-paginator.js'></script>
   <link rel=stylesheet type="text/css" href="../css/product_index.css">
 <%- include('footer') %>

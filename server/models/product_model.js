@@ -22,10 +22,7 @@ const createProduct = async (product, other_images) => {
 
 const getProducts = async (pageSize, paging, requirement = {}) => {
     const condition = {sql: '', binding: []};
-    const filter = {sql: '', binding: []};
-    const price = {sql: '', binding: []};
     const order = {sql: ''};
-    const isEnd = {sql: ''}
 
     if (requirement.category) {
         condition.sql = 'WHERE auction_end = 0 AND category = ?';
@@ -34,24 +31,13 @@ const getProducts = async (pageSize, paging, requirement = {}) => {
         condition.sql = 'WHERE auction_end = 0 AND sub_category = ?';
         condition.binding = [requirement.subCategory];
     } else if (requirement.keyword != null) {
-        condition.sql = 'WHERE title LIKE ?';
+        condition.sql = 'WHERE auction_end = 0 AND title LIKE ?';
         condition.binding = [`%${requirement.keyword}%`];
     } else if (requirement.id != null) {
         condition.sql = 'WHERE id = ?';
         condition.binding = [requirement.id];
     } else {
-        isEnd.sql = 'WHERE auction_end = 0 '
-    }
-
-    if (requirement.id == null && requirement.price.min && requirement.price.max) {
-        price.sql = 'AND price BETWEEN ? AND ? '
-        price.binding = [requirement.price.min, requirement.price.max]
-    } else if (requirement.price && requirement.price.min) {
-        price.sql = 'AND price > ? '
-        price.binding = [requirement.price.min]
-    } else if (requirement.price && requirement.price.max) {
-        price.sql = 'AND price < ? '
-        price.binding = [requirement.price.max] 
+        condition.sql = 'WHERE auction_end = 0 '
     }
 
     if (requirement.order == 'hot') {
@@ -72,13 +58,13 @@ const getProducts = async (pageSize, paging, requirement = {}) => {
         binding: [pageSize * paging, pageSize]
     };
 
-    const productQueryRaw = 'SELECT * FROM product ' + condition.sql + price.sql + isEnd.sql + order.sql + limit.sql;
+    const productQueryRaw = 'SELECT * FROM product ' + condition.sql + order.sql + limit.sql;
     const productQuery = productQueryRaw.replace("product AND", "product WHERE")
-    const productBindings = condition.binding.concat(price.binding).concat(limit.binding);
+    const productBindings = condition.binding.concat(limit.binding);
 
-    const productCountQueryRaw = 'SELECT COUNT(*) as count FROM product ' + condition.sql + order.sql + price.sql;
+    const productCountQueryRaw = 'SELECT COUNT(*) as count FROM product ' + condition.sql + order.sql;
     const productCountQuery = productCountQueryRaw.replace("product AND", "product WHERE")
-    const productCountBindings = condition.binding.concat(price.binding);
+    const productCountBindings = condition.binding;
 
     try {
         const [products] = await pool.query(productQuery, productBindings);

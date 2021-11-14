@@ -1,12 +1,12 @@
 .my-img {
-    width: 440px;
-    height: 250px;
-    background-position: center center;
-    background-size: cover;
+    width: 450px;
+    height: 450px;
+    /* background-position: center center;
+    background-size: cover; */
 }
 
 .my-other-img {
-    width: 134px;
+    width: 144.25px;
     height: 145px;
     padding: 0px;
     margin: 0px;

@@ -11,6 +11,10 @@ a{
     text-decoration: none;
 }
 
+.navbar {
+    height: 48px;
+}
+
 #my-logo {
     height: 100%;
     width: 100%;

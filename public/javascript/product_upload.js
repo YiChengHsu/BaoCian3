@@ -47,29 +47,23 @@ const changeSubCategory = (value) => {
     })
 }
 
-//Set the default and minimum time of auction end time
-const timeInput = document.querySelector('#my-time-input')
-// const timeHourAfter = new Date(Date.now() + 60*60*1000);
-const timeHourAfter = new Date(Date.now());
-const minTime = {
-    yearNow: timeHourAfter.getFullYear(),
-    monthNow: timeHourAfter.getMonth() + 1  < 10 ? "0"+(timeHourAfter.getMonth()+1): (timeHourAfter.getMonth() + 1),
-    dateNow: timeHourAfter.getDate() < 10 ? "0"+(timeHourAfter.getDate()) : (timeHourAfter.getDate()),
-    hourNow: timeHourAfter.getHours() < 10 ? "0"+(timeHourAfter.getHours()) : (timeHourAfter.getHours()),
-    minNow: timeHourAfter.getMinutes() < 10 ? "0"+(timeHourAfter.getMinutes()) : (timeHourAfter.getMinutes()),
-    secNow: "00"
-}
-
-const minDateTime = `${minTime.yearNow}-${minTime.monthNow}-${minTime.dateNow}T${minTime.hourNow}:${minTime.minNow}:${minTime.secNow}`
-
-timeInput.value = minDateTime
-timeInput.min = minDateTime
 
 
-button.addEventListener('click', (e) => {
+form.addEventListener('submit', (e) => {
     e.preventDefault();
     const formData = new FormData(form);
     const user = JSON.parse(localStorage.getItem("user"));
+
+    if ($('.my-number').val() <= 0) {
+        Swal.fire({
+            title: 'HAIYAAA!!!',
+            text: '數字不能為0或是負值',
+            imageUrl: 'https://imgur.dcard.tw/BBYi0Wch.jpg',
+            imageWidth: 400,
+            imageHeight: 300,
+        })
+        return
+    }
 
     console.log(user)
     console.log(formData)
@@ -83,31 +77,48 @@ button.addEventListener('click', (e) => {
     })
 
     .then((res)=> {
-        if(res.status != 200) {
+        if (res.status == 400) {
+            Swal.fire({
+                title: 'HAIYAAA!!!',
+                text: '上傳資料不符合格式唷!',
+                imageUrl: 'https://imgur.dcard.tw/BBYi0Wch.jpg',
+                imageWidth: 400,
+                imageHeight: 300,
+            })
+            return 
+        } else if(res.status != 200) {
             throw error
         }
         
         return res.json();
     })
     .then((res) => {
-        alert("上傳成功")
-        self.location.href = `/product/details?id=${res.productId}`
+        Swal.fire({
+            title: '上傳成功',
+            text: 'Rick為你高興到開始跳舞',
+            imageUrl: 'https://www.icegif.com/wp-content/uploads/rick-roll-icegif-3.gif',
+            imageWidth: 400,
+            imageHeight: 300,
+        }).then(() => {
+            self.location.href = `/product/details?id=${res.productId}`
+        })
     })
     .catch((err) => {
         console.log(err)
-        alert('伺服器忙碌中，請稍後再試。')
+        Swal.fire({
+            title: 'HAIYAAA!!!',
+            text: '有東西出錯了，請稍後再試',
+            imageUrl: 'https://imgur.dcard.tw/BBYi0Wch.jpg',
+            imageWidth: 400,
+            imageHeight: 300,
+        })
     })
 })
 
 const showImg = (obj) => {
 
-    // const trueFile = verifyImgFile(obj)
-    // const trueSize = verifyImgSize(obj)
-
-    // if (!trueFile || !trueSize) {
-    //     alert('請再試一次！')
-    //     return
-    // }
+    const trueFile = verifyImgFile(obj)
+    const trueSize = verifyImgSize(obj)
 
     const file=$(obj)[0].files[0];    //獲取文件信息
 
@@ -115,11 +126,12 @@ const showImg = (obj) => {
         const reader=new FileReader();  //調用FileReader
         reader.readAsDataURL(file); //將文件讀取為 DataURL(base64)
         reader.onload=function(evt){   //讀取操作完成時觸發。
-            $("#img").attr('src',evt.target.result)  //將img標簽的src綁定為DataURL
+            $("#img").attr({
+                src: evt.target.result,
+                width: 400,
+                height: 600
+            })  //將img標簽的src綁定為DataURL
         };
-    }
-    else{
-        alert("上傳失敗");
     }
 }
 
@@ -155,7 +167,14 @@ const verifyImgFile = (file) => {
             }
         }
         if (!isNext){
-            alert('不接受此檔案型別');
+            Swal.fire({
+                title: '我不能接受',
+                text: '圖片僅支援JPG與PNG檔',
+                imageUrl: 'https://s3.ap-northeast-1.amazonaws.com/node.js-image-bucket/myicon/non-accept.png',
+                imageWidth: 300,
+                imageHeight: 200,
+                imageAlt: 'I can not accept!',
+            })
             file.value = "";
             return false;
         }
@@ -166,13 +185,19 @@ const verifyImgFile = (file) => {
 
 const verifyImgSize = (file) => {
     let fileSize = 0;
-    const fileMaxSize = 2048; //2M
+    const fileMaxSize = 2000000; //2M
     const filePath = file.value;
     if(filePath){
         fileSize = file.files[0].size;
-        const size = fileSize / 1024;
-        if (size > fileMaxSize) {
-            alert("照片檔案大小不能超過2MB！");
+        if (fileSize > fileMaxSize) {
+            Swal.fire({
+                title: '你的很大',
+                text: '圖片大小請不要超過2MB',
+                imageUrl: 'https://s3.ap-northeast-1.amazonaws.com/node.js-image-bucket/myicon/over-size.jpg',
+                imageWidth: 500,
+                imageHeight: 300,
+                imageAlt: 'Too big',
+            })
             file.value = "";
             return false;
         }
@@ -180,3 +205,32 @@ const verifyImgSize = (file) => {
         return false;
     }
 }
+
+const transTimeToDate = (timestamp) => {
+    const time =  {
+        yearNow: timestamp.getFullYear(),
+        monthNow: timestamp.getMonth() + 1  < 10 ? "0"+(timestamp.getMonth()+1): (timestamp.getMonth() + 1),
+        dateNow: timestamp.getDate() < 10 ? "0"+(timestamp.getDate()) : (timestamp.getDate()),
+        hourNow: timestamp.getHours() < 10 ? "0"+(timestamp.getHours()) : (timestamp.getHours()),
+        minNow: timestamp.getMinutes() < 10 ? "0"+(timestamp.getMinutes()) : (timestamp.getMinutes()),
+        secNow: "00"
+    }
+
+    return `${time.yearNow}-${time.monthNow}-${time.dateNow}T${time.hourNow}:${time.minNow}:${time.secNow}`
+}
+
+//Set the default and minimum time of auction end time
+const timeInput = document.querySelector('#my-time-input')
+// const timestamp = new Date(Date.now() + 60*60*1000);
+const minTimestamp = new Date(Date.now());
+const maxTimestamp = new Date(Date.now() + 7*24*60*60*1000);
+const minTime = transTimeToDate(minTimestamp)
+const maxTime = transTimeToDate(maxTimestamp)
+
+console.log(minTime)
+console.log(maxTime)
+
+
+timeInput.value = minTime
+timeInput.min = minTime
+timeInput.max = maxTime

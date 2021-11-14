@@ -9,11 +9,12 @@ if (user && user.access_token && user.user) {
     userId = user.user.id
     $('<img>', {
         src: user.user.picture,
-        class: 'rounded-circle',
-        width: '36',
-        height: '36'
+        class: 'rounded-circle avatar-img',
+        width: '30',
+        height: '30',
+        text: user.user.name
     }).appendTo('.home-avatar')
-    $('.bi-person-circle').remove();
+    $('.greeting-word').html(`<span class='text-body'>Hello, </span>${user.user.name} `)
 }
 
 
@@ -26,11 +27,19 @@ if (user && user.user.picture) {
 
 $('#logout-button').click(() => {
     Swal.fire({
-        icon: 'success',
-        title: '登出成功',
-    }).then(()=>{
-        window.location.href ='/'
-        localStorage.removeItem('user')
+        icon :"warning",
+        title: '確認要登出嗎?',
+        showCancelButton: true,
+        confirmButtonText: '我跟你走',
+        cancelButtonText: `留下來`,
+    }).then((result) => {
+        if (result.isConfirmed) {
+            Swal.fire({
+                icon: 'success',
+                title: '登出成功',
+            }).then(() => location.reload())
+            localStorage.removeItem('user')
+        }
     })
 })
 

@@ -8,20 +8,47 @@ let highestBidTimes;
 let endTime;
 let bidTimes;
 let sellerId;
+let roomUsers;
+let watchList = []
 
 //Fetch the product details
 
+socket.on('roomUsers', (data) => {
+    console.log(data)
+    roomUsers = data[productId] ? data[productId].length : 0;
+    const roomUserDiv = document.querySelector('#room-user')
+    roomUserDiv.textContent = `在線人數： ${roomUsers}`
+})
+
 const detailsUrl = `/api/1.0/product/details${query}`
 
-fetch(detailsUrl)
+fetch(detailsUrl, {
+    method: 'get',
+    headers: {
+      'Authorization': "Bearer " + accessToken
+    }
+})
     .then(res => res.json())
-    .then(res =>  res.data)
-    .then((data) => {
-        
+    .then((res) => {
 
+        const data = res.data
+        watchList = res.user
+        
         if (data == null) {
             self.location.href = '/404.html'
         }
+
+        const category = convertCategory( data.category, data.sub_category)
+
+        console.log(category)
+
+        $('#bread-category').attr('href', `/product/${data.category}`).text(category.category)
+
+        $('#bread-subcategory').attr('href', `/product/${data.subCategory}`).text(category.subCategory,)
+
+        $('#bread-title').text(data.title)
+
+
 
         const productTitle = document.querySelector('.my-product-title')
         productTitle.textContent = data.title
@@ -30,6 +57,12 @@ fetch(detailsUrl)
         mainImage.src = data.main_image
 
         endTime = data.end_time
+
+        const flipdown = new FlipDown(endTime/1000);
+        flipdown.start();
+        flipdown.ifEnded(() => {
+            console.log('時間結束')
+        });
 
         if (endTime < Date.now()) {
             $('#count-down-number').text('完結')
@@ -53,16 +86,20 @@ fetch(detailsUrl)
 
         } else {
             setCountDownTimer(endTime) 
+
+            if (data.highest_user_id == userId) {
+                $('.highest-bid-header').css('display', 'block')
+            }
         }
 
         const currentNumber = document.querySelector('.highest-bid')
-        currentNumber.textContent = data.highest_bid
+        currentNumber.textContent = `$${toCurrency(data.highest_bid)}`
 
         const bidEnter = document.querySelector('#my-bid-number')
         bidEnter.placeholder = `$${data.bid_incr}`
 
         const bidIncr = document.querySelector('#bid-incr')
-        bidIncr.textContent = `最低出價增額： ${data.bid_incr}`
+        bidIncr.textContent = `最低出價增額： $${data.bid_incr}`
         leastBid = data.bid_incr;
 
         const bidTimesDiv = document.querySelector('#bid-times')
@@ -70,8 +107,6 @@ fetch(detailsUrl)
         bidTimesDiv.textContent = `出價次數： ${highestBidTimes}`
 
         sellerId = data.seller_id
-        const sellerDiv = document.querySelector('#seller-id')
-        sellerDiv.textContent = `賣家編號： ${sellerId}`
 
         if (userId == sellerId) {
             $('.my-bit-button').attr('disable', true).text('這是您的商品')
@@ -84,27 +119,147 @@ fetch(detailsUrl)
             renderBidRecord(e)
         })
 
+        $('.seller-img').attr('src', data.sellerInfo.picture)
+        $('.seller-name').text(data.sellerInfo.name)
+
+        if (data.sellerInfo.rating != null) { 
+            $('#star').raty({score: data.user.rating, readOnly: true});
+            $("#user-rating").text(`平均評分：${data.user.rating.toFixed(2)}`);
+        } else {
+            $('#star').raty({score: 0, readOnly: true});
+            $("#user-rating").text("尚未評分");
+        }
+
+
         const description = document.querySelector('#description')
-        description.textContent = `商品描述： ${data.description}`
+        description.textContent = data.description
 
         const texture = document.querySelector('#texture')
-        texture.textContent = `商品材質： ${data.texture}`
+        texture.textContent = data.texture
 
         const condition = document.querySelector('#condition')
-        condition.textContent = `商品狀況： ${data.condition}`
+        condition.textContent = data.condition
 
         const originalPackaging = document.querySelector('#original-packaging')
-        originalPackaging.textContent = `原外包裝： ${data.original_packaging}`
+        originalPackaging.textContent = data.original_packaging
 
         const withPapers = document.querySelector('#with-papers')
-        withPapers.textContent = `商品相關證明： ${data.with_papers}`
+        withPapers.textContent = data.with_papers
 
         const place = document.querySelector('#place')
-        place.textContent = `商品所在地點： ${data.place}`
+        place.textContent = data.place
 
         renderImagesSlide(data.images)
 
-
+        if (watchList.includes(data.id)) {
+            $('#watch-btn').hide()
+        } else {
+            $('#unwatch-btn').hide()
+        }
+    
+        // Set the watch list button
+        $('#watch-btn').click(() => {
+            if(userId == null) {
+              Swal.fire({
+                icon: 'warning',
+                title: '請登入',
+                text:'登入可以使用更多功能唷!',
+                confirmButtonText:'左轉登入',
+                showCancelButton: true,
+                cancelButtonText:'先不用'
+              }).then((result) => {
+                if (result.isConfirmed){
+                  self.location.href='/user/signin'
+                }
+              })
+              return
+            }
+    
+            fetch('/api/1.0/product/watchList/set', {
+              method: 'post',
+              headers: {
+                'Authorization': "Bearer " + user.access_token,
+                'content-type': 'application/json'
+              },
+              body: JSON.stringify({
+                'productId': data.id
+              })
+            })
+            .then((res) => {
+              console.log(res.status)
+              if (res.status != 200) {
+                Swal.fire({
+                  icon: 'error',
+                  title: '加入失敗',
+                  text: '請再試一次!',
+                })
+                return
+              }
+              $('#unwatch-btn').show();
+              $('#watch-btn').hide();
+              Swal.fire({
+                icon: 'success',
+                title: '加入成功',
+                text: '可於關注頁面的進行查看!',
+              })
+              
+            })
+            .catch((error) => {
+              console.log(error)
+              Swal.fire({
+                icon: 'error',
+                title: '加入失敗',
+                text: '請再試一次!',
+              })
+            })
+          })
+    
+          //Del the watch list button
+          $('#unwatch-btn').click(() => {
+            if(userId == null) {
+              Swal.fire({
+                icon: 'warning',
+                title: '請登入',
+                text:'登入可以使用更多功能唷!',
+                footer: '<a href="/user/signin">左轉登入頁面</a>',
+                confirmButtonText:'知道了!'
+              })
+              return
+            }
+    
+            fetch('/api/1.0/product/watchList/del', {
+              method: 'post',
+              headers: {
+                'Authorization': "Bearer " + user.access_token,
+                'content-type': 'application/json'
+              },
+              body: JSON.stringify({
+                'productId': data.id
+              })
+            })
+            .then((res) => {
+              console.log(res.status)
+              if (res.status != 200) {
+                return error
+              }
+              $('#unwatch-btn').hide();
+              $('#watch-btn').show();
+              Swal.fire({
+                icon: 'success',
+                title: '刪除成功',
+                text: '有緣再相見!',
+              })
+            })
+            .catch((err) => {
+              console.log(err)
+              Swal.fire({
+                icon: 'error',
+                title: '刪除失敗',
+                text: '請稍後再試一次!',
+              })
+            })
+          })
+    
     })
 ;
 
@@ -171,11 +326,13 @@ form.addEventListener('submit', (e) => {
     }
 
     const currentAmount = highestBid.textContent
-    const userBidAmount = Number(highestBid.textContent.replace("$","")) + userBidIncr
+    const userBidAmount = Number(highestBid.textContent.replace('$',"").replace(',','')) + userBidIncr
+
+    console.log(userBidAmount)
 
     Swal.fire({
         title: "確認出價",
-        html: `<p>最高價：<br><b>$${currentAmount}</b></p><p>即將出價：<br><b>$${userBidAmount}</b></p>`,
+        html: `<p>目前出價：<b>${currentAmount}</b></p><p>你的出價：<b>$${toCurrency(userBidAmount)}</b></p>`,
         icon: "warning",
         showCancelButton: true,
         confirmButtonColor: "#e95420",
@@ -203,8 +360,17 @@ socket.on(`refresh_${productId}`, bidRecord => {
     bidTimesDiv.textContent = `出價次數： ${highestBidTimes}`
 
     endTime = bidRecord.end_time
+    $('#flipdown').html('')
+    const flipdown = new FlipDown(endTime/1000);
+    flipdown.start();
     resetCountDownTimer()
     renderBidRecord(bidRecord)
+
+    const rightDiv = document.querySelector('.my-right')
+    rightDiv.classList.add('fade-it')
+    setTimeout(() => {
+        rightDiv.classList.remove('fade-it')
+    }, 2000)
 
 })
 
@@ -244,6 +410,12 @@ const renderBidRecord = (record) => {
     let subDiv = document.createElement('div')
     subDiv.className = 'fw-bold fs-6'
     subDiv.textContent = `${record.user_id}號買家舉起了號碼牌`
+
+    if (record.user_id == userId) {
+        $('.highest-bid-header').css('display', 'block')
+    } else {
+        $('.highest-bid-header').css('display', 'none')
+    }
     
     
     let recordSpan = document.createElement('span')
@@ -253,12 +425,16 @@ const renderBidRecord = (record) => {
     recordDiv.appendChild(subDiv)
     recordLi.appendChild(recordDiv)
     recordLi.appendChild(recordSpan)
-    bidRecords.prepend(recordLi)
+    // bidRecords.prepend(recordLi)
+    // $(recordLi).hide().prependTo(bidRecords).show('normal');
+    $(recordLi).hide().prependTo(bidRecords).slideDown('slow').animate({backgroundColor:'red'}, 400).delay(400).animate({backgroundColor:'black'}, 1000);
+
+    $('.record-message').animate({backgroundColor:'red'}, 400).delay(400).animate({backgroundColor:'black'}, 1000);
 
     const messages = document.querySelectorAll('.record-message')
 
-    messages.forEach(e => e.classList.remove('fs-2'))
-    messages[0].classList.add('fs-2')
+    // messages.forEach(e => e.classList.remove('fs-2'))
+    // messages[0].classList.add('fs-2')
 
     if(messages.length > 5) {
         bidRecords.removeChild(messages[5])
@@ -294,7 +470,6 @@ const setCountDownTimer = () => {
         let start = Date.now();
         //Convert to timestamp
         let totalMilSec = (endTime) - Date.now();
-        const countDown = document.querySelector('#count-down-number')
 
         if (totalMilSec <= 0) {
             countDown.textContent = "完結"
@@ -307,9 +482,6 @@ const setCountDownTimer = () => {
             return
         }
 
-        let time = transMilToDate(totalMilSec)
-
-        countDown.textContent = `${time.days}:${time.hours}:${time.min}:${time.sec} `
     },500)
 }
 
@@ -335,5 +507,32 @@ const fixTime = (time) => {
         return time;
     }
 }
+
+const toCurrency = (num) => {
+    const parts = num.toString().split('.');
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return parts.join('.');
+}
+
+const convertCategory = (categoryRaw, subCategoryRaw) => {
+
+    const categoryInTc = {
+        'men': '男性',
+        'women': '女性',
+        'luxury': '名牌',
+        'electronics': '3C',
+        'other': '其他'
+    }
+
+    const subCategoryInTc = {
+        'men_shirt':'上衣', 'men_pants': '褲子', 'men_shoes': '鞋子', 'men_bag': '包包', 'men_accessories': '配件', 'men_others':'其他','women_shirt': '上衣','women_dress': '洋裝','women_skirt': '裙子','women_pants': '褲子','women_shoes': '鞋子','women_bag': '包包','women_accessories': '配件','women_others': '其他', 'watch': '品牌手錶','bag': '品牌包包','luxury_others': '其他', 'phone': '手機','computer': '筆電電腦','peripherals': '電腦周邊','earphone': '耳機','camera': '相機', 'electronics_others': '其他', 'other': '其他'
+    }
+
+    const category = categoryInTc[categoryRaw]
+    const subCategory = subCategoryInTc[subCategoryRaw]
+
+    return {category, subCategory}
+}
+
 
 

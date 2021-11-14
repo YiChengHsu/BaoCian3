@@ -1,29 +1,41 @@
 <%- include('header') %>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
-    <form class="product-upload"enctype="multipart/form-data" onkeypress="return event.keyCode != 13;">
-      <h3 class="col mt-3 fw-bold text-center text-primary">你今天想賣什麼酷東西呢？</h3>
+  <div class="container mt-3 mb-5" id='main-container'>
+    <form action="#" class="product-upload" enctype="multipart/form-data" onkeypress="return event.keyCode != 13;">
+      <h3 class="col my-3 fw-bold text-center text-primary">你今天想賣什麼酷東西呢？</h3>
       <div class="row justify-content-center">
       </div>
       <div class="row justify-content-center">
         <div class="col-4 text-center px-0">
-          <div class="mb-3">
-            <label for="formFile" class="form-label">封面照片：</label>
-            <input class="form-control" type="file" id="formFile" name="main_image" onchange="showImg(this)" required>
-            <img src="../assest/card-image.svg" class="img-thumbnail rounded my-img" alt="" id="img"  accept="image/png image/jpg">
+          <div class="mb-3 pt-3">
+            <div class="input-group mb-3">
+              <label class="input-group-text" for="inputGroupFile01">封面照片</label>
+              <input type="file" class="form-control rounded" id="inputGroupFile01" name="main_image" onchange="showImg(this)" required/>
+              <img src="../assest/file-image.svg" class="p-3 img-thumbnail my-img rounded border border-2" alt="" id="img"  accept="image/png image/jpg">
+            </div>
           </div>        
-          <div class="row mb-3 justify-content-between">
-            <div class="col px-0 justify-content-between">
-              <label for="formFile" class="form-label">其他照片：</label>
-              <input class="form-control" type="file" id="formFile" name="other_images" onchange="showOtherImg(this)" multiple required>
-              <img src="../assest/card-image.svg" alt="" id="img-0" class="img-thumbnail rounded my-other-img">
-              <img src="../assest/card-image.svg" alt="" id="img-1" class="img-thumbnail rounded my-other-img">
-              <img src="../assest/card-image.svg" alt="" id="img-2" class="img-thumbnail rounded my-other-img">
+          <div class="mb-3 justify-content-between">
+            <div class="col input-group px-0 justify-content-between">
+              <label for="inputGroupFile02" class="input-group-text">其他照片：</label>
+              <input class="form-control rounded" type="file" id="inputGroupFile02" name="other_images" onchange="showOtherImg(this)" multiple required/>
+            </div>
+            <div>
+              <div width="440px">
+                <img src="../assest/card-image.svg" alt="" id="img-0" class="img-thumbnail rounded my-other-img col-4">
+                <img src="../assest/card-image.svg" alt="" id="img-1" class="img-thumbnail rounded my-other-img col-4">
+                <img src="../assest/card-image.svg" alt="" id="img-2" class="img-thumbnail rounded my-other-img col-4">
+            </div>
+            <p>(最多三張)</p>
             </div>
           </div>
         </div>
         <div class="col-1"></div>
-        <div class="col-5 mt-3">
+        <div class="col-5">
           <div class="row my-option-row px-0">
+            <div class="form-floating mb-3 col-12 fs-5">
+              <input type="text" class="form-control" id="floatingInput" name="title" placeholder="請輸入酷東西名稱" required/>
+              <label class="px-4" for="floatingInput">酷東西名稱</label>
+            </div>
             <div class="col-4">
               <select class="form-select mb-3 me-5 w-100" aria-label=".form-select-lg " onchange="changeSubCategory(this.value)" name="category" required>
                 <option selected>分類</option>
@@ -40,19 +52,32 @@
               </select>
             </div>
           </div>
-          <div class="form-floating mb-3 fs-5">
-            <input type="text" class="form-control" id="floatingInput" name="title" placeholder="請輸入酷東西名稱" required>
-            <label for="floatingInput">酷東西名稱</label>
+          <h5 class="fw-bold">
+            競標細節 <span class="fs-6 text-primary">(必填)</span>
+          </h5>
+          <h6 class='mb-3'>起標價格</h6>
+          <div class="row">
+            <div class="input-group mb-3 my-input col">
+              <span class="input-group-text fs-6">起標價格NT$</span>
+              <input type="text" class="form-control fs-6 my-input-group my-number" placeholder="設定價格" aria-label="Dollar amount (with dot and two decimal places)" name="price" min='0' required>
+            </div>
+            <div class="input-group mb-3 my-input col">
+              <span class="input-group-text fs-6">最低增額 NT$</span>
+              <input type="text" class="form-control fs-6 my-input-group" id='' placeholder="設定價格" aria-label="Dollar amount (with dot and two decimal places)" name="bid_incr" min='0' required>
+            </div>
+          </div>
+          <h5 >結標時間<span class="fs-6 text-danger">(最短一小時，最長一週)</span></h5>
+          <div class="input-group mb-3 my-input">
+            <input type="datetime-local" class="form-control fs-6" placeholder="設定時間" name="end_time" id="my-time-input" required>
           </div>
           <h5 class="fw-bold">
             關於酷東西 <span class="fs-6 text-primary">(必填)</span>
           </h5>
-          <h5 class='mb-3'>新舊程度</h5>
           <div class="row">
             <div class='my-3 fs-6 col'>
               <div class="form-check form-check-inline col-2 m-0 p-0">
-                <input type="radio" class="btn-check" id="btn-check-1-outlined" checked autocomplete="off" name="condition" value="全新">
-                <label class="btn btn-outline-primary" for="btn-check-1-outlined">全新</label>
+                <input type="radio" class="btn-check w-100" id="btn-check-1-outlined" checked autocomplete="off" name="condition" width='90px'  value="全新">
+                <label class="btn btn-outline-primary" width='90px' for="btn-check-1-outlined">全新</label>
               </div>
 
               <div class="form-check form-check-inline col-3 m-0 p-0">
@@ -71,29 +96,12 @@
               </div>
             </div>
           </div>
-          <h5 class='mb-3'>起標價格</h5>
-          <div class="row">
-            <div class="input-group mb-3 my-input col">
-              <span class="input-group-text fs-6">起標價格NT$</span>
-              <input type="text" class="form-control fs-6 my-input-group" placeholder="設定價格" aria-label="Dollar amount (with dot and two decimal places)" name="price" required>
-            </div>
-            <div class="input-group mb-3 my-input col">
-              <span class="input-group-text fs-6">最低增額 NT$</span>
-              <input type="text" class="form-control fs-6 my-input-group" placeholder="設定價格" aria-label="Dollar amount (with dot and two decimal places)" name="bid_incr" required>
-            </div>
-          </div>
-          <h5 >結標時間</h5>
-          <div class="input-group mb-3 my-input">
-            <input type="datetime-local" class="form-control fs-6" placeholder="設定時間" name="end_time" id="my-time-input" step=30>
-          </div>
-          <h6 class="text-danger text-end">拍賣時間需至少一小時</h6>
-          <h5 class='mb-3'>酷東西敘述</h5>
           <div class="mb-3">
             <textarea class="form-control" id="exampleFormControlTextarea1" rows="4" placeholder="描述您所想賣的酷東西，並包含買家可能感興趣的任何細節，用戶們喜歡有故事的酷東西！" name='description' required></textarea>
           </div>
-          <h3 class="fw-bold">
+          <h5 class="fw-bold">
             選填資訊
-          </h3>
+          </h5>
           <div class="row">
             <div class="form-floating mb-3 col">
               <input type="text" class="form-control" id="floatingInput" name="texture" placeholder="請輸入酷東西材質">
@@ -106,27 +114,31 @@
           </div>
           <div class="row">
             <div class='fs-6 col justify-content-center'>
-              <h4 class='mb-3'>購買證明</h4>
-              <div class="form-check form-check-inline px-0 mx-0 col-3">
+              <h6 class='mb-3'>購買證明</h6>
+              <div class="form-check form-check-inline px-0 mx-0 col-4">
                 <input type="radio" class="btn-check" id="btn-check-5-outlined" checked autocomplete="off" name="with_papers" value="保證書">
                 <label class="btn btn-outline-secondary" for="btn-check-5-outlined">保證書</label>
               </div>
-              <div class="form-check form-check-inline px-0 mx-0 col-3">
+              <div class="form-check form-check-inline px-0 mx-0 col-5">
                 <input type="radio" class="btn-check" id="btn-check-6-outlined" checked autocomplete="off" name="with_papers" value="購買證明">
                 <label class="btn btn-outline-secondary" for="btn-check-6-outlined">購買證明</label>
               </div>
-              <div class="form-check form-check-inline px-0 mx-0 col-3">
+              <div class="form-check form-check-inline px-0 mx-0 col-2">
                 <input type="radio" class="btn-check" id="btn-check-7-outlined" checked autocomplete="off" name="with_papers" value="無">
                 <label class="btn btn-outline-secondary" for="btn-check-7-outlined">無</label>
               </div>
             </div>
-            <div class="col">
-              <h4 class='mb-3'>原外包裝</h4>
-              <div class="form-check form-check-inline col">
-                <input type="radio" class="btn-check" id="btn-check-8-outlined" autocomplete="off"  name="original_packaging" value="原外包裝">
-                <label class="btn btn-outline-secondary" for="btn-check-8-outlined">原外包裝</label>
+            <div class="col pe-0">
+              <h6 class='mb-3'>外包裝</h6>
+              <div class="form-check form-check-inline col-4 ps-0 me-0">
+                <input type="radio" class="btn-check" id="btn-check-8-outlined" autocomplete="off"  name="original_packaging" value="原包裝">
+                <label class="btn btn-outline-secondary" for="btn-check-8-outlined">原包裝</label>
               </div>
-              <div class="form-check form-check-inline col">
+              <div class="form-check form-check-inline col-4 ps-0 me-0">
+                <input type="radio" class="btn-check" id="btn-check-8-outlined" autocomplete="off"  name="original_packaging" value="其他包裝">
+                <label class="btn btn-outline-secondary" for="btn-check-8-outlined">其他</label>
+              </div>
+              <div class="form-check form-check-inline ps-0 col-2">
                 <input type="radio" class="btn-check" id="btn-check-9-outlined" autocomplete="off"  name="original_packaging" value="無">
                 <label class="btn btn-outline-secondary" for="btn-check-9-outlined">無</label>
               </div>
@@ -134,8 +146,31 @@
           </div>
         </div>
       </div>
-      <div class="row justify-content-center my-4">
-          <button type="click" class="btn-lg btn-warning col-4 upload">上傳</button>
+      <div class="row justify-content-center">
+        <div class="col-10">
+          <div class="card mt-3">
+            <div class="card-header">
+              服務條款
+            </div>
+            <div class="card-body px-5">
+              <p class="card-text">
+                本服務是提供予使用者們互動及買賣物品之平台。抱歉錢錢不會事前審查使用者或使用者所刊登之內容，亦不會直接介入使用者間的交易。因此，抱歉錢錢無法掌控以下事項，而您同意抱歉錢錢無須對以下事項負責：<br>
+                <ul>
+                  <li>刊登物品任何方面的品質、安全性、道德性及合法性。</li>
+                  <li>刊登物品內容的真實性或正確性、賣家銷售物品之能力或買家之支付能力。</li>
+                  <li>使用者真實的身份、年齡、國籍或幽默感。</li>
+                  <li>任何使用者刊登之「內容」。</li>
+                </ul>
+              我們鼓勵您使用本服務提供的功能與其他使用者溝通，以瞭解更多相關使用者上架銷售物品之資訊。然而，請您以一般常識及良好的判斷與其他使用者互動。當旋轉拍賣致力於為所有使用者維護本服務之安全時，亦請您自行就您使用本服務及與其他使用者互動之風險負責。
+            </div>
+          </div>
+          <div class="row justify-content-center my-3">
+            <label class="form-check-label text-center text-danger mb-1" for="flexCheckIndeterminate">
+              上傳即表示您已閱讀並同意本網站之服務條款
+            </label>
+            <button type="submit" class="btn btn-lg btn-warning col-4 upload">上傳</button>
+          </div>
+        </div>
       </div>
     </form>
   </div>

@@ -1,14 +1,31 @@
 <%- include('header') %>
-        <div class="row m-4 main-row">
+    <script src="../util/lib/jquery.raty.js"></script>
+    <div class="container mt-5 mb-5" id='main-container'>
+        <div class="row m-4 mb-2 main-row">
+            <div class="col-12">
+                <div class="alert alert-danger text-center highest-bid-header" role="alert" style="display:none">
+                    您目前是最高出價者
+                </div>
+            </div>
+            <div class="col-12">
+                <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
+                    <ol class="breadcrumb px-2 fs-5">
+                      <li class="breadcrumb-item"><a href="/">首頁</a></li>
+                      <li class="breadcrumb-item" aria-current="page"><a id='bread-category'></a></li>
+                      <li class="breadcrumb-item" aria-current="page"><a id='bread-subcategory'></a></li>
+                      <li class="breadcrumb-item active" id='bread-title' aria-current="page"></li>
+                    </ol>
+                  </nav>
+            </div>
             <div class="col-6 my-left">
 
-                <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
+                <div id="carouselExampleIndicators" class="carousel carousel-dark slide mt-1 rounded" data-bs-ride="carousel">
                     <div class="carousel-indicators">
                         <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
                     </div>
                     <div class="carousel-inner">
                         <div class="carousel-item active">
-                        <img src="..." class="d-block w-100 main-image" alt="...">
+                        <img src="..." class="d-block w-100 main-image rounded img-thumbnail" alt="...">
                         </div>
                     </div>
                     <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
@@ -22,65 +39,103 @@
                 </div>
             </div>
 
-            <div class="col-6 my-right">
-                <div class="fs-5 mb-3 text-center my-product-title"></div>
-                <div class="count-down mb-3 text-center">
-                    <h1 class='text-danger' id="count-down-number"></h1>
+            <div class="col-6 my-right rounded rounded-3">
+                <div class="ps-5 mb-3">
+                    <div id="flipdown" width='100px' class="flipdown col"></div>
                 </div>
-
-                <div class="text-center mb-3 highest-bid-container">
-                    <h5>目前出價：$<span class="highest-bid"></h5>
+                <div class="row">
+                    <div class="col-2"></div>
+                    <div class=" col-8 fs-4 mb-2 text-center my-product-title"></div>
+                    <div class="col-2 ps-5">
+                        <button type="button" class="btn btn-default pt-1 p-0" id="watch-btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#e95420" class="bi bi-heart" viewBox="0 0 16 16">
+                            <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
+                            </svg>
+                        </button>
+                        <button type="button" class="btn btn-default pt-1 p-0" id="unwatch-btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#e95420" class="bi bi-heart-fill" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
-
-                <div class="server-message"></div>
-                
+                <!-- <div class="ps-5 mb-3">
+                    <div id="flipdown" width='100px' class="flipdown col"></div>
+                </div> -->
+                <div class="text-center fs-4 mb-3 highest-bid-container">
+                    目前出價：<span class="highest-bid fw-bold text-success"></span>
+                </div>
                 <form id="bid-form">
-                    <div class="row">
+                    <div class="row mb-3">
                         <div class="col mx-2">
                             
-                            <input class="form-control my-bid-input" id="my-bid-number" type="text" aria-label="default input example">
-                            <p class="fs-6 my-bid-warning text-center">請不要小於最低出價增額</p>
+                            <input class="form-control my-bid-input fs-5" id="my-bid-number" type="text" aria-label="default input example">
                         </div>
                         <div class="col mx-2">
                             <button type="submit" class="btn btn-primary btn-sm col  me-1 my-bid-button">
-                                <a class='link-light my-bid-button text-center' >抱歉錢錢</a>
+                                <a class='link-light my-bid-button text-center fs-5' >抱 歉 錢 錢</a>
                             </button>
                         </div>
                     </div>
                 </form>
-                <div class="row">
+                <div class="row text-center">
                     <div class="col" id="bid-incr"></div>
                     <div class="col" id="bid-times"></div>
-                    <div class="col" id="seller-id"></div>
+                    <div class="col" id="room-user"></div>
                 </div>
 
-                <div class='fs-5 my-3 text-center'>
+                <div class='fs-6 ps-3 my-2'>
                     出價紀錄：
                 </div>
 
-                <ol class="list-group list-group-numbered my-bid-record">
+                <ol class="list-group ps-2 list-group-numbered my-bid-record">
                     
                 </ol>
             </div>
         </div>
         <div class="row">
-            <div class="col-6 ps-5">
-                <div class="p-3 mb-2 bg-secondary text-white rounded text-center fs-4">商 品 資 訊</div>
-                <div class="fs-5" id='texture'></div>
-                <div class="fs-5" id="condition"></div>
-                <div class="fs-5" id="original-packaging"></div>
-                <div class="fs-5" id="with-papers"></div>
-                <div class="fs-5" id="place"></div>
-                <div class="fs-5" id="note"></div>
+            <div class="col-3 ps-5 pe-2">
+                <div class="p-2 mb-2 bg-secondary text-white rounded text-center fs-5">賣 家 資 訊</div>
+                <div class="row justify-content-center">
+                    <div class="col-4">
+                        <img class="rounded-circle seller-img p-0">
+                    </div>
+                    <div class="col-6 text-center">
+                        <div class="seller-name fs-5 fw-bold"></div>
+                        <div id='star' class="mb-1"></div>
+                        <div id="user-rating"></div>
+                    </div>
+                </div>
             </div>
-            <div class="col-6">
-                <div class="p-3 mb-2 bg-secondary text-white rounded text-center fs-4">商 品 介 紹</div>
-                <div class="my-story fs-5" id="description"></div>
+            <div class="col-4">
+                <div class="p-2 mb-2 bg-secondary text-white rounded text-center fs-5">商 品 資 訊</div>
+                <div class="row px-2">
+                    <div class="col-3 fs-6">
+                        <div class="mt-1">商品狀況：</div>
+                        <div class="mt-1">商品材質：</div>
+                        <div class="mt-1">相關證明：</div>
+                        <div class="mt-1">所在地點：</div>
+                        <div class="mt-1">包裝外盒：</div>
+                    </div>
+                    <div class="col-9">
+                        <div class="mt-1" id='condition'></div>
+                        <div class="mt-1" id="texture"></div>
+                        <div class="mt-1" id="with-papers">123</div>
+                        <div class="mt-1" id="place"></div>
+                        <div class="mt-1" id="original-packaging"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-5 ps-2 pe-5">
+                <div class="p-2 mb-2 bg-secondary text-white rounded text-center fs-5">商 品 介 紹</div>
+                <div class="my-story px-2 fs-6" id="description"></div>
             </div>
         </div>
     </div>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qs/6.10.1/qs.js" integrity="sha512-DkxSbrm2xe6jcerSwLA4vS8WV7UarP44UjrS+Yp2MRFE2md2qPLpZVTyoxHrM2mvZ2Ft2zhPUMplV20zNFXriQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link rel="stylesheet" href="../css/flipdown.css" />
+    <script src="../javascript/flipdown.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="../javascript/product_details.js"></script>
     <link rel=stylesheet type="text/css" href="../css/product_details.css">
