@@ -30,8 +30,19 @@ fetch('/api/1.0' + params + query, {
     const watchList = res.user
     const data = res.data
 
-    console.log(res)
-
+    if (data.length <= 0) {
+      Swal.fire({
+        imageUrl: '../assest/nothing.png',
+        imageWidth: 400,
+        imageHeight: 300,
+        title: '這裡有..',
+        text: '頁面沒有任何東西唷！',
+        confirmButtonText: '回溫泉'
+      }).then(() => {
+        self.location.href = '/'
+        return
+      })
+    }
     
     const products = document.querySelector('.products-container')
     data.map((e) => {
@@ -146,9 +157,11 @@ fetch('/api/1.0' + params + query, {
       watchBtn.addEventListener('click', (e) => {
         if(userId == null) {
           Swal.fire({
-            icon: 'warning',
+            imageUrl: '../assest/more.jpg',
+            imageWidth: 400,
+            imageHeight: 300,
             title: '請登入',
-            text:'登入可以使用更多功能唷!',
+            text: '登入以享受更多競標的樂趣！',
             confirmButtonText:'左轉登入',
             showCancelButton: true,
             cancelButtonText:'先不用'
@@ -204,9 +217,11 @@ fetch('/api/1.0' + params + query, {
       watchedBtn.addEventListener('click', (e) => {
         if(userId == null) {
           Swal.fire({
-            icon: 'warning',
-            title: '請登入',
-            text:'登入可以使用更多功能唷!',
+            imageUrl: '../assest/more.jpg',
+            imageWidth: 400,
+            imageHeight: 300,
+            title: '下標前請登入',
+            text: '登入以享受更多競標的樂趣！',
             footer: '<a href="/user/signin">左轉登入頁面</a>',
             confirmButtonText:'知道了!'
           })
@@ -352,7 +367,6 @@ const setCountDownTimer = (id, endTime) => {
 
 const resetCountDownTimer = (intervalId, id, endTime) => {
   clearInterval(intervalId);
-  console.log("時間重新計算");
   return setCountDownTimer(id, endTime);
 }
 

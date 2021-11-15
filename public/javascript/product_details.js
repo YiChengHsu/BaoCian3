@@ -159,9 +159,11 @@ fetch(detailsUrl, {
         $('#watch-btn').click(() => {
             if(userId == null) {
               Swal.fire({
-                icon: 'warning',
-                title: '請登入',
-                text:'登入可以使用更多功能唷!',
+                imageUrl: '../assest/more.jpg',
+                imageWidth: 400,
+                imageHeight: 300,
+                title: '下標前請登入',
+                text: '登入以享受更多競標的樂趣！',
                 confirmButtonText:'左轉登入',
                 showCancelButton: true,
                 cancelButtonText:'先不用'
@@ -215,13 +217,13 @@ fetch(detailsUrl, {
           //Del the watch list button
           $('#unwatch-btn').click(() => {
             if(userId == null) {
-              Swal.fire({
-                icon: 'warning',
-                title: '請登入',
-                text:'登入可以使用更多功能唷!',
-                footer: '<a href="/user/signin">左轉登入頁面</a>',
-                confirmButtonText:'知道了!'
-              })
+                Swal.fire({
+                    imageUrl: '../assest/more.jpg',
+                    imageWidth: 400,
+                    imageHeight: 300,
+                    title: '下標前請登入',
+                    text: '登入以享受更多競標的樂趣！',
+                }) 
               return
             }
     
@@ -288,7 +290,9 @@ form.addEventListener('submit', (e) => {
 
     if(!userId) {
         Swal.fire({
-            icon: 'warning',
+            imageUrl: '../assest/more.jpg',
+            imageWidth: 400,
+            imageHeight: 300,
             title: '下標前請登入',
             text: '登入以享受更多競標的樂趣！',
         }) 
@@ -300,7 +304,9 @@ form.addEventListener('submit', (e) => {
 
     if(userId == sellerId) {
         Swal.fire({
-            icon: 'warning',
+            imageUrl: '../assest/self.jpg',
+            imageWidth: 400,
+            imageHeight: 250,
             title: '請勿自行下標',
             text: '自己的轎不能自己抬唷！',
         })
@@ -309,14 +315,18 @@ form.addEventListener('submit', (e) => {
 
     if (userBidIncr < leastBid) {
         Swal.fire({
-            icon: 'error',
+            imageUrl: '../assest/tiny.gif',
+            imageWidth: 400,
+            imageHeight: 330,
             title: '無效出價',
             text: '請不要小於最低出價增額',
         })
         return
     } else if (userBidIncr > leastBid*100) {
         Swal.fire({
-            icon: 'warning',
+            imageUrl: '../assest/toomuch.png',
+            imageWidth: 400,
+            imageHeight: 300,
             title: '太多啦~',
             text: '珍惜荷包，請不要大於出價增額的一百倍',
         }) 
@@ -326,7 +336,7 @@ form.addEventListener('submit', (e) => {
     const currentAmount = highestBid.textContent
     const userBidAmount = Number(highestBid.textContent.replace('$',"").replace(',','')) + userBidIncr
 
-    console.log(userBidAmount)
+    console.log(userName)
 
     Swal.fire({
         title: "確認出價",
@@ -338,7 +348,7 @@ form.addEventListener('submit', (e) => {
         cancelButtonText: "怕.jpg",
     }).then((result) => {
         if (result.isConfirmed) {
-            socket.emit('bid', { productId, userId, userBidAmount, endTime, highestBidTimes}) 
+            socket.emit('bid', { productId, userId, userBidAmount, endTime, highestBidTimes, userName}) 
         } else if (result.dismiss === Swal.DismissReason.cancel) {
             input.value = ''
         }
@@ -383,7 +393,9 @@ socket.on('bidFail', (message) => {
 
 socket.on('bidSuccess', bidRecord => {
     Swal.fire({
-        icon: 'success',
+        imageUrl: '../assest/best.png',
+        imageWidth: 400,
+        imageHeight: 300,
         title: '出價成功',
         text: '您目前是最高出價者',
     })
@@ -405,8 +417,8 @@ const renderBidRecord = (record) => {
     recordDiv.textContent =  `$${record.bid_amount}`
     
     let subDiv = document.createElement('div')
-    subDiv.className = 'fw-bold fs-6'
-    subDiv.textContent = `${record.user_id}號買家舉起了號碼牌`
+    subDiv.className = 'fs-6'
+    subDiv.innerHTML= `好朋友 <b>${record.user_name}</b> 舉起了號碼牌`
 
     console.log(record)
 

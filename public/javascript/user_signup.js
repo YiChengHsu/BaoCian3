@@ -23,13 +23,31 @@ form.addEventListener('submit', (e) => {
 
     .then((res)=> {
         if(res.status == 200) {
-            alert("註冊成功")
+            Swal.fire({
+                title: '註冊成功',
+                text: '歡迎加入Rick Roll的行列',
+                imageUrl: '../assest/rick-roll-rick-ashley.gif',
+                imageWidth: 400,
+                imageHeight: 500,
+            }) 
             self.location.href = "/user/profile"
             return res.json();
         } else if (res.status == 403) {
-            alert("Email已存在")
+            Swal.fire({
+                title: 'HAIYAAA!!!',
+                text: 'Email已存在唷!',
+                imageUrl: 'https://imgur.dcard.tw/BBYi0Wch.jpg',
+                imageWidth: 400,
+                imageHeight: 300,
+            })
         } else if (res.status == 400) {
-            alert("Email 不符合格式")
+            Swal.fire({
+                title: 'HAIYAAA!!!',
+                text: 'Email 不符合格式唷!',
+                imageUrl: 'https://imgur.dcard.tw/BBYi0Wch.jpg',
+                imageWidth: 400,
+                imageHeight: 300,
+            })
         }
     })
     .then((res) => {

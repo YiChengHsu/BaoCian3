@@ -5,6 +5,7 @@ const multerS3 = require('multer-s3')
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const User = require('../server/models/user_model')
+require('dotenv').config();
 
 //Create multer middleware to S3
 aws.config.update({
@@ -83,6 +84,7 @@ const authentication = () => {
 
         try {
             const user = jwt.verify(accessToken, config.token.accessToken)
+            user.picture = process.env.IMAGE_PATH + user.picture
             req.user = user;
 
             let userProfile = await User.getUserProfile (user.email)

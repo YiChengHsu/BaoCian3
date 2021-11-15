@@ -68,6 +68,16 @@ form.addEventListener('submit', (e) => {
     console.log(user)
     console.log(formData)
 
+    let timerInterval
+    Swal.fire({
+        title: 'Loading',
+        imageUrl: '../assest/loading-cat.gif',
+        imageWidth: 400,
+        imageHeight: 200,
+        timer: 2000,
+        timerProgressBar: true
+    })
+
     fetch('/api/1.0/product/upload', {
         method: 'post',
         headers: {
@@ -93,15 +103,15 @@ form.addEventListener('submit', (e) => {
         return res.json();
     })
     .then((res) => {
+        console.log(res)
         Swal.fire({
             title: '上傳成功',
             text: 'Rick為你高興到開始跳舞',
-            imageUrl: 'https://www.icegif.com/wp-content/uploads/rick-roll-icegif-3.gif',
+            imageUrl: '../assest/rick-roll-rick-ashley.gif',
             imageWidth: 400,
-            imageHeight: 300,
-        }).then(() => {
-            self.location.href = `/product/details?id=${res.productId}`
-        })
+            imageHeight: 500,
+        }) 
+        self.location.href = `/product/details?id=${res.productId}`
     })
     .catch((err) => {
         console.log(err)

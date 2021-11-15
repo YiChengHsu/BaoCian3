@@ -3,10 +3,12 @@ const imgUrl ='https://s3.ap-northeast-1.amazonaws.com/node.js-image-bucket/'
 console.log(user)
 let accessToken = null;
 let userId = null;
+let userName = null;
 
 if (user && user.access_token && user.user) {
     accessToken = user.access_token
     userId = user.user.id
+    userName = user.user.name
     $('<img>', {
         src: user.user.picture,
         class: 'rounded-circle avatar-img',
@@ -27,8 +29,11 @@ if (user && user.user.picture) {
 
 $('#logout-button').click(() => {
     Swal.fire({
-        icon :"warning",
-        title: '確認要登出嗎?',
+        imageUrl: '../assest/stay.png',
+        imageWidth: 400,
+        imageHeight: 300,
+        title: '修但幾勒',
+        text:'你忍心離開嗎?',
         showCancelButton: true,
         confirmButtonText: '我跟你走',
         cancelButtonText: `留下來`,

@@ -85,8 +85,6 @@ io.on('connection', socket => {
         // Listen for bid
         socket.on('bid', async (userBid) => {
 
-            console.log(userBid)
-
             const bidTime = Date.now()
             const timeLeft = userBid.endTime - bidTime
             const bidRecord = {
@@ -94,7 +92,8 @@ io.on('connection', socket => {
                 user_id: userBid.userId,
                 bid_amount: userBid.userBidAmount,
                 bid_time: bidTime,
-                time_left: timeLeft
+                time_left: timeLeft,
+                user_name: userBid.userName
             }
 
             const result = await setBidRecord(bidRecord); 
