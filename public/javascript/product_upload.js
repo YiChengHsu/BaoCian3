@@ -208,7 +208,7 @@ const verifyImgSize = (file) => {
                 imageWidth: 400,
                 imageHeight: 300,
                 imageAlt: 'Too big',
-                confirmButtonText:'我有其他的 size free style!'
+                confirmButtonText:'我有其他的 file style!'
             })
             file.value = "";
             return false;
