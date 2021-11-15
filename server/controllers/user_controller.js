@@ -303,6 +303,11 @@ const createRating = async (req, res) => {
 
         const result2 = await Order.updateOrder(rateId, orderId, 3, null)
 
+        if ( result <= 1 ) {
+            res.status(400).send({error: 'Bad Request'})
+            return
+        }
+
         console.log(result2)
     
         res.status(200).send({result})

@@ -38,7 +38,7 @@ const getUserOrders = async (pageSize, paging, status, userId) => {
 
     if (status != null && status == 3) {
         condition.sql = 'AND status in (3,4) '
-    } else if (statua != null) {
+    } else if (status != null) {
         condition.sql = 'AND status = ? '
         condition.binding = [status]
     }

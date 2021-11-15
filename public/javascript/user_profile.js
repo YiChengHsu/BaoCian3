@@ -315,9 +315,14 @@ fetch(url + params, {
               }
             }).appendTo('#star-form')
 
-            $('#send-button').click( async () => {
+            let ratedId
+            if (e.seller_id == userId) {
+              ratedId = e.buyer_id
+            } else {
+              ratedId = e.seller_id 
+            }
 
-              console.log(rating)
+            $('#send-button').click( async () => {
 
               fetch("/api/1.0/user/rating", {
                 method: "post",
@@ -326,16 +331,16 @@ fetch(url + params, {
                   "content-type": "application/json"
                 },
                 body: JSON.stringify(
-                  {ratedId: e.seller_id, orderId: e.order_id, rating: rating}
+                  {ratedId: ratedId, orderId: e.order_id, rating: rating}
                 )
               }).then((res) => {
 								if(res.status == 400) {
 									Swal.fire({icon: "error", title: "重複評分", text: "已經評分過了唷~"})
-                  $(`#my-rate-button-${id}`).attr('disabled', true);
+                  $(`#my-rate-button-${id}`).attr('disabled', true).text('已評分');
 									return
 								}
 								Swal.fire({icon: "success", title: "評分成功", text: "感謝您的回饋！"});
-								$(`#my-rate-button-${id}`).attr('disabled', true)
+								$(`#my-rate-button-${id}`).attr('disabled', true).text('已評分');
               })
 						})
 						break;
