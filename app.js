@@ -20,14 +20,23 @@ app.set('view engine', 'ejs');
 app.engine("ejs", ejs.renderFile);
 
 // Use JSON parser for all non-webhook routes
-app.use((req, res, next) => {
-    console.log(req.originalUrl)
-    if (req.originalUrl == '/api/1.0/order/webhook') {
-      next();
-    } else {
-      express.json()(req, res, next);
+// app.use((req, res, next) => {
+//     console.log(req.originalUrl)
+//     if (req.originalUrl == '/api/1.0/order/webhook') {
+//       next();
+//     } else {
+//       express.json()(req, res, next);
+//     }
+// });
+
+app.use(express.json({
+    verify: function (req, res, buf) {
+      var url = req.originalUrl;
+      if (url.startsWith('/stripe')) {
+         req.rawBody = buf.toString();
+      }
     }
-});
+}));
 
 // API routes
 app.use('/api/1.0',
