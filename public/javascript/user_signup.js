@@ -22,17 +22,7 @@ form.addEventListener('submit', (e) => {
     })
 
     .then((res)=> {
-        if(res.status == 200) {
-            Swal.fire({
-                title: '註冊成功',
-                text: '歡迎加入Rick Roll的行列',
-                imageUrl: '../assest/rick-roll-rick-ashley.gif',
-                imageWidth: 400,
-                imageHeight: 500,
-            }) 
-            self.location.href = "/user/profile"
-            return res.json();
-        } else if (res.status == 403) {
+        if (res.status == 403) {
             Swal.fire({
                 title: 'HAIYAAA!!!',
                 text: 'Email已存在唷!',
@@ -40,6 +30,7 @@ form.addEventListener('submit', (e) => {
                 imageWidth: 400,
                 imageHeight: 300,
             })
+            return 
         } else if (res.status == 400) {
             Swal.fire({
                 title: 'HAIYAAA!!!',
@@ -48,11 +39,22 @@ form.addEventListener('submit', (e) => {
                 imageWidth: 400,
                 imageHeight: 300,
             })
+            return
         }
-    })
-    .then((res) => {
-        const data = res.data
-        localStorage.setItem("user", JSON.stringify(data));
+
+        if(res.status == 200) {
+            Swal.fire({
+                title: '註冊成功',
+                text: '歡迎加入Rick Roll的行列',
+                imageUrl: '../assest/rick-roll-rick-ashley.gif',
+                imageWidth: 400,
+                imageHeight: 500,
+            }).then(()=> {
+                self.location.href = "/user/profile"
+            })
+            const data = res.json().data
+            localStorage.setItem("user", JSON.stringify(data));
+        }
     })
     .catch((err) => {
         console.log(err)

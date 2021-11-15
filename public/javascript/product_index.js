@@ -10,7 +10,6 @@ let roomUsers = {};
 socket.emit('connection')
 
 socket.on('roomUsers', (data) => {
-  console.log(data)
   roomUsers = data
   Object.keys(roomUsers).map((e) => {
     $(`#room-user-${e}`).text(data[e].length || 0)
@@ -30,13 +29,15 @@ fetch('/api/1.0' + params + query, {
     const watchList = res.user
     const data = res.data
 
+    console.log(res)
+
     if (data.length <= 0) {
       Swal.fire({
         imageUrl: '../assest/nothing.png',
         imageWidth: 400,
         imageHeight: 300,
         title: '這裡有..',
-        text: '頁面沒有任何東西唷！',
+        text: '目前沒有任何東西唷！',
         confirmButtonText: '回溫泉'
       }).then(() => {
         self.location.href = '/'
@@ -186,7 +187,7 @@ fetch('/api/1.0' + params + query, {
         .then((res) => {
           console.log(res.status)
           if (res.status != 200) {
-            Swal.fire({
+            Toast.fire({
               icon: 'error',
               title: '加入失敗',
               text: '請再試一次!',
@@ -196,16 +197,16 @@ fetch('/api/1.0' + params + query, {
           watchedBtn.style.display = 'inline'
           watchBtn.style.display ='none'
           $
-          Swal.fire({
+          Toast.fire({
             icon: 'success',
             title: '加入成功',
-            text: '可於個人頁面的收藏清單查看!',
+            text: '可於右上關注頁面查看!',
           })
           
         })
         .catch((error) => {
           console.log(error)
-          Swal.fire({
+          Toast.fire({
             icon: 'error',
             title: '加入失敗',
             text: '請再試一次!',
@@ -246,7 +247,7 @@ fetch('/api/1.0' + params + query, {
           watchBtn.style.display = 'inline'
           watchedBtn.style.display ='none'
           $('.watched-text').text(watchTimes+1)
-          Swal.fire({
+          Toast.fire({
             icon: 'success',
             title: '刪除成功',
             text: '有緣再相見!',
@@ -254,7 +255,7 @@ fetch('/api/1.0' + params + query, {
         })
         .catch((err) => {
           console.log(err)
-          Swal.fire({
+          Toast.fire({
             icon: 'error',
             title: '刪除失敗',
             text: '請稍後再試一次!',
@@ -393,5 +394,17 @@ const toCurrency = (num) => {
   parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   return parts.join('.');
 }
+
+const Toast = Swal.mixin({
+  toast: true,
+  position: 'top-end',
+  showConfirmButton: false,
+  timer: 3000,
+  timerProgressBar: true,
+  didOpen: (toast) => {
+    toast.addEventListener('mouseenter', Swal.stopTimer)
+    toast.addEventListener('mouseleave', Swal.resumeTimer)
+  }
+})
 
 

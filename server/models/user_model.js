@@ -139,12 +139,14 @@ const getUserWatchList = async (pageSize, paging, userId) => {
     };
 
     const queryStr = "SELECT * FROM watch_list w INNER JOIN product p on w.product_id = p.id where w.user_id = ? AND p.auction_end = 0  ORDER by p.end_time " + limit.sql;
-    const countQueryStr = "SELECT COUNT(*) from watch_list WHERE user_id = ? " + limit.sql;
+    const countQueryStr = "SELECT COUNT(*) as count from watch_list WHERE user_id = ? "
     const bindings = binding.concat(limit.binding)
 
     try {
         const [watches] = await pool.query(queryStr, bindings)
-        const [watchCounts] = await pool.query(countQueryStr, bindings)
+        const [watchCounts] = await pool.query(countQueryStr, binding)
+
+        console.log(watchCounts[0])
 
         const data = {
             'products': watches,

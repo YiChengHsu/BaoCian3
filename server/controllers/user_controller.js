@@ -59,7 +59,7 @@ const signUp = async (req ,res) => {
                 provider: user.provider,
                 name: user.name,
                 email: user.email,
-                picture: user.picture
+                picture:  process.env.IMAGE_PATH + user.picture
             }
         }
     });
@@ -162,7 +162,7 @@ const getUserProfile = async (req, res) => {
 
 const getUserWatchList = async (req, res) => {
 
-    const pageSize = 20
+    const pageSize = 12
 
     const userId = req.user.id
     const paging = parseInt(req.query.paging) || 0
@@ -173,7 +173,7 @@ const getUserWatchList = async (req, res) => {
     const {products, productCount} = await User.getUserWatchList(pageSize, paging, userId)
 
     if (products.length == 0) {
-        res.status(200).json({data: []})
+        res.status(200).json({data: [], page: 0, total_page: 1, user: watchList})
         return;
     }
 
@@ -184,12 +184,10 @@ const getUserWatchList = async (req, res) => {
 
     productsWithDetails = productsWithImages
 
-    let result;
-    if (productCount > (paging + 1) * pageSize) {
-        result = { data: productsWithDetails, next_paging: paging +1, user: watchList}
-    } else {
-        result = { data: productsWithDetails, user: watchList}
-    }
+    console.log(productCount)
+
+    const totalPage = Math.ceil(productCount/pageSize)
+    const result = { data: productsWithDetails, page: paging, total_page: totalPage, user: watchList}
 
     res.status(200).json(result)
 
