@@ -93,7 +93,7 @@ fetch(url + params, {
         
         $("<a/>", {
           class: `col-2 my-img-div rounded`,
-          href: `http://localhost:3000/product/details?id=${id}`,
+          href: `/product/details?id=${id}`,
           id: `my-img-link-${id}`
         }).appendTo(`#my-row-${id}`);
 
