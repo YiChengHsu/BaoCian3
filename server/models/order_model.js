@@ -112,11 +112,9 @@ const getSellOrders = async (pageSize, paging, userId) => {
 const updateOrder = async (userId, orderId, status, delivery) => {
     const conn = await pool.getConnection();
 
-    if (delivery)
-
     try {
         await conn.query('START TRANSACTION')
-        const [search] = await conn.query('SELECT * FROM project.order WHERE id = ? ', [orderId])
+        const [search] = await conn.query('SELECT status FROM project.order WHERE id in (?) ', [orderId])
 
         console.log(search)
 

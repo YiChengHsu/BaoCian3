@@ -112,6 +112,8 @@ const updateOrder = async (req, res) => {
 
   const result = await Order.updateOrder(userId, orderId, status, delivery)
 
+	console.log('here '+ result)
+
 	if (result <= 0 ) {
 		res.status(400).send({error: "Bad Request"})
 		return

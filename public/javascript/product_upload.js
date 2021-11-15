@@ -95,7 +95,7 @@ form.addEventListener('submit', (e) => {
                 imageWidth: 400,
                 imageHeight: 300,
             })
-            return 
+            throw error
         } else if(res.status != 200) {
             throw error
         }
@@ -110,8 +110,9 @@ form.addEventListener('submit', (e) => {
             imageUrl: '../assest/rick-roll-rick-ashley.gif',
             imageWidth: 400,
             imageHeight: 500,
-        }) 
-        self.location.href = `/product/details?id=${res.productId}`
+        }).then(() => {
+            self.location.href = `/product/details?id=${res.productId}`
+        })
     })
     .catch((err) => {
         console.log(err)
