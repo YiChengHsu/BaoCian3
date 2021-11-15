@@ -6,8 +6,6 @@ const ejs = require('ejs');
 const server = http.createServer(app);
 const { Server } = require('socket.io');
 const io = new Server(server);
-const { getTimeRemaining } = require('./util/util');
-const Product = require('./server/models/product_model')
 const { setBidRecord } = require('./server/controllers/bid_controller')
 require('dotenv').config()
 
@@ -22,7 +20,7 @@ app.engine("ejs", ejs.renderFile);
 // Use JSON parser for all non-webhook routes
 app.use((req, res, next) => {
     console.log(req.originalUrl)
-    if (req.originalUrl == '/api/1.0/order/webhook') {
+    if (req.originalUrl === '/api/1.0/order/webhook') {
       next();
     } else {
       express.json()(req, res, next);
