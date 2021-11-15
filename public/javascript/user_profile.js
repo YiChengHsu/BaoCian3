@@ -2,7 +2,6 @@ const url = "/api/1.0/user/profile";
 
 let params = location.search;
 
-console.log(params)
 
 if (!user || !user.user) {
   Swal.fire({icon: "warning", title: "請登入", text: "使用個人管理功能請先登入"}).then(() => {
@@ -30,6 +29,17 @@ $(".avatar").attr("src", user.user.picture);
 $(".user-id").text(user.user.user_id);
 $(".user-name").text(user.user.name);
 $(".user-email").text(user.user.email);
+
+//Set the active tab of order
+const activeTab = params.split('=')[2]
+
+if (activeTab) {
+  document.querySelector(`#tab-${activeTab}`).classList.add('active')
+} else if (params.split('=')[1] == 'sell') {
+  document.querySelector('#tab-sell').classList.add('active')
+} else {
+  document.querySelector('#tab').classList.add('active')
+}
 
 
 fetch(url + params, {
@@ -77,30 +87,30 @@ fetch(url + params, {
 
     $(document).ready(function () {
       $("<div/>", {
-          class: `row align-middle mb-3 text-center border border-1 rounded justify-content-end`,
+          class: `row align-middle justify-content-center text-center list-container my-3`,
           id: `my-row-${id}`
         }).appendTo(".my-list-container");
-
+        
         $("<a/>", {
-          class: `col-md-2 me-4 my-img-div`,
+          class: `col-2 my-img-div rounded`,
           href: `http://localhost:3000/product/details?id=${id}`,
           id: `my-img-link-${id}`
         }).appendTo(`#my-row-${id}`);
 
         $("<div/>", {
-          class: `col-md-2 p-2 my-img-div my-img-div`,
+          class: `w-100 my-img-div my-img-div rounded rounded-3`,
           id: `my-img-${id}`
         }).appendTo(`my-img-link-${id}`);
         $(`#my-img-link-${id}`).css("background-image", `url('${imgUrl}')`);
 
         $("<div/>", {
-          class: "col-2 align-middle my-auto",
+          class: "col-2 p-2 align-middle my-auto",
           id: `my-title-${id}`
         }).appendTo(`#my-row-${id}`);
         $("<h6/>").text(e.title).appendTo(`#my-title-${id}`);
 
         $("<div/>", {
-          class: "col-2 align-middle my-auto",
+          class: "col-1 p-2 align-middle my-auto",
           id: `my-price-${id}`
         }).appendTo(`#my-row-${id}`);
         $("<h6/>").text(e.total).appendTo(`#my-price-${id}`);
@@ -108,23 +118,34 @@ fetch(url + params, {
         const endTime = tranTimestamp(e.end_time)
 
         $("<div/>", {
-          class: "col-2 align-middle my-auto text-center",
+          class: "col-2 p-2 align-middle my-auto text-center",
           id: `my-endTime-${id}`
         }).appendTo(`#my-row-${id}`);
-        $("<h6/>").html(`${endTime.year}<br>${endTime.month}/${endTime.date}<br>${endTime.hours}:${endTime.minutes}`).appendTo(`#my-endTime-${id}`);
+        $("<h6/>").html(`${endTime.year}/${endTime.month}/${endTime.date}<br>${endTime.hours}:${endTime.minutes}`).appendTo(`#my-endTime-${id}`);
 
         $("<div/>", {
-          class: "col-2 align-middle my-auto",
+          class: "col-2 p-2 align-middle my-auto",
           id: `my-status-${id}`
         }).appendTo(`#my-row-${id}`);
 
         $("<div/>", {
-          class: "col-2 align-middle my-auto",
+          class: "col-2 p-2 align-middle my-auto",
           id: `my-button-div-${id}`
         }).appendTo(`#my-row-${id}`);
+        
 
         switch (e.status) {
           case 0:
+
+            const payDeadline = tranTimestamp(e.pay_deadline)
+
+            $("<h6/>").text("待付款").appendTo(`#my-status-${id}`);
+            $("<h6/>").text("付款期限").appendTo(`#my-status-${id}`);
+            $("<h6/>").html(`<span class='fw-bold text-danger'>${payDeadline.year}/${payDeadline.month}/${payDeadline.date}<br>${payDeadline.hours}:${payDeadline.minutes}</span>`).appendTo(`#my-status-${id}`);
+
+            if (e.seller_id == userId) {
+              return
+            }
 
             Swal.fire({
               title:"付款提醒",
@@ -133,19 +154,10 @@ fetch(url + params, {
               confirmButtonText: '知道了'
             })
 
-            const payDeadline = tranTimestamp(e.pay_deadline)
-
-            $("<h6/>").text("待付款").appendTo(`#my-status-${id}`);
-            $("<h6/>").html(`付款期限:<br><b>${payDeadline.year}<br>${payDeadline.month}/${payDeadline.date}<br>${payDeadline.hours}:${payDeadline.minutes}</b>`).appendTo(`#my-status-${id}`);
-
-            if (e.seller_id == userId) {
-              return
-            }
-
             $("<button/>", {
-              class: "btn btn-block btn-primary mb-2",
+              class: "btn btn-block btn-primary mb-2 w-75 py-1",
               id: `my-pay-button-${id}`,
-              text: "付款",
+              text: "信用卡付款",
               type: "button"
             }).appendTo(`#my-button-div-${id}`);
 
@@ -180,7 +192,7 @@ fetch(url + params, {
             }
 
             $("<button/>", {
-              class: "btn btn-block btn-info mb-2",
+              class: "btn btn-block btn-info mb-2 w-75 py-1",
               id: `deliverInfo-button-${id}`,
               text: "寄送資訊",
             }).appendTo(`#my-button-div-${id}`);
@@ -213,9 +225,9 @@ fetch(url + params, {
             })
 
             $("<button/>", {
-              class: "btn btn-block btn-success mb-2",
+              class: "btn btn-block btn-success mb-2 w-75 py-1",
               id: `deliver-button-${id}`,
-              text: "寄送",
+              text: "寄 送",
             }).appendTo(`#my-button-div-${id}`);
 
             $(`#deliver-button-${id}`).click( async () => {
@@ -224,26 +236,30 @@ fetch(url + params, {
                 input: 'text',
                 inputLabel: '寄件編號',
                 showCancelButton: true,
+                confirmButtonText: '送出',
+                cancelButtonText: '再等等',
                 inputValidator: (value) => {
                   if (!value) {
                     return '若無寄件編號無法確認出貨!'
                   }
                 }
               })
-
-              fetch("/api/1.0/order/update", {
-                method: "PATCH",
-                headers: {
-                  Authorization: "Bearer " + user.access_token,
-                  "content-type": "application/json"
-                },
-                body: JSON.stringify(
-                  {orderId: e.order_id, status: e.status, delivery: delivery}
-                )
-              }).then((res) => {
-                Swal.fire({icon: "success", title: "寄送成功", text: "請等候買家確認訂單！"});
-                $(`#deliver-button-${id}`).attr('disabled', true).text('已寄送')
-              })
+              
+              if (delivery) {
+                fetch("/api/1.0/order/update", {
+                  method: "PATCH",
+                  headers: {
+                    Authorization: "Bearer " + user.access_token,
+                    "content-type": "application/json"
+                  },
+                  body: JSON.stringify(
+                    {orderId: e.order_id, status: e.status, delivery: delivery}
+                  )
+                }).then((res) => {
+                  Swal.fire({icon: "success", title: "寄送成功", text: "請等候買家確認訂單！"});
+                  $(`#deliver-button-${id}`).attr('disabled', true).text('已寄送')
+                })
+              }
             }); 
             break;
           case 2:
@@ -255,7 +271,7 @@ fetch(url + params, {
             }
 
             $("<button/>", {
-              class: "btn btn-block btn-success mb-2",
+              class: "btn btn-block btn-success mb-2 w-75 py-1",
               id: `confirm-button-${id}`,
               text: "確認商品",
               type: "button"
@@ -282,9 +298,9 @@ fetch(url + params, {
             $("<h6/>").text("確認收貨").appendTo(`#my-status-${id}`);
 
             $("<button/>", {
-              class: "btn btn-block btn-warning",
+              class: "btn btn-block btn-warning w-75 py-1",
               id: `my-rate-button-${id}`,
-              text: "評分",
+              text: "評 分",
               'data-bs-toggle': "modal",
               'data-bs-target': "#exampleModal",
               'data-bs-whatever': "@mdo"
@@ -323,16 +339,18 @@ fetch(url + params, {
               })
 						})
 						break;
-    				default : 
-              $("<a/>", {
-                id: `my-watch-product-${id}`,
-                href: `/product/details?id=${id}`
-              }).appendTo(`#my-button-div-${id}`);
+          case 4:
+
+            $("<h6/>").text("評分完成").appendTo(`#my-status-${id}`);
 
             $("<button/>", {
-              class: "btn btn-block btn-primary",
-              text: "去看看"
-            }).appendTo(`#my-watch-product-${id}`);
+              class: "btn btn-block btn-warning w-75 py-1",
+              id: `my-rate-button-${id}`,
+              text: "已評分",
+              disabled: 'true'
+            }).appendTo(`#my-button-div-${id}`);
+            break;
+    				default : 
           }
         });});}).catch((err) => {console.log(err);
         // self.location.href = "/user/signin";
@@ -438,4 +456,10 @@ const tranTimestamp = (timestamp) => {
     minutes = `0${minutes}`;
   }
   return { year, month, date, hours, minutes}
+}
+
+const toCurrency = (num) => {
+  const parts = num.toString().split('.');
+  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  return parts.join('.');
 }

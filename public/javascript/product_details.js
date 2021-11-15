@@ -32,6 +32,7 @@ fetch(detailsUrl, {
     .then((res) => {
 
         const data = res.data
+        console.log(data)
         watchList = res.user
         
         if (data == null) {
@@ -73,24 +74,21 @@ fetch(detailsUrl, {
             bidInput.readOnly = true;
             bidButton.className.remove = 'btn-primary'
             bidButton.className.add = 'btn-secondary'
-            bidButton.textContent = "競標結束";
+            bidButton.textContent = "競標結束"
 
-            if (data.highest_user_id == userId) {
+                    
+            if ( data.highest_user_id == userId) {
                 $('<div>', {
-                    class: "col-12 alert alert-primary text-center my-alert" ,
+                    class: "alert alert-danger text-center" ,
                     role:"alert",
-                    html: '您已成功得標，請前往<a href="/user/profile?type=order&status=0" class="alert-link">個人頁面</a>進行付款'
-                }).prependTo('.main-row')
+                    html: '恭喜！您已成功得標，請前往<a href="/user/profile?type=order&status=0" class="alert-link">個人頁面</a>進行付款'
+                }).prependTo('.highest-bid-div')
             }
-
 
         } else {
             setCountDownTimer(endTime) 
-
-            if (data.highest_user_id == userId) {
-                $('.highest-bid-header').css('display', 'block')
-            }
         }
+    
 
         const currentNumber = document.querySelector('.highest-bid')
         currentNumber.textContent = `$${toCurrency(data.highest_bid)}`
@@ -122,9 +120,9 @@ fetch(detailsUrl, {
         $('.seller-img').attr('src', data.sellerInfo.picture)
         $('.seller-name').text(data.sellerInfo.name)
 
-        if (data.sellerInfo.rating != null) { 
-            $('#star').raty({score: data.user.rating, readOnly: true});
-            $("#user-rating").text(`平均評分：${data.user.rating.toFixed(2)}`);
+        if (data.sellerInfo.rating) { 
+            $('#star').raty({score: data.sellerInfo.rating, readOnly: true});
+            $("#user-rating").text(`平均評分：${data.sellerInfo.rating.toFixed(2)}`);
         } else {
             $('#star').raty({score: 0, readOnly: true});
             $("#user-rating").text("尚未評分");
@@ -398,7 +396,6 @@ socket.on('bidSuccess', bidRecord => {
 //Output bid message to DOM
 const renderBidRecord = (record) => {
     const bidTime = transMilToDate(record.bid_time + 8*60*60*1000)
-    const timeLeft = transMilToDate(record.time_left)
 
     let recordLi = document.createElement('li')
     recordLi.className = "list-group-item d-flex justify-content-between align-items-start record-message"
@@ -411,7 +408,9 @@ const renderBidRecord = (record) => {
     subDiv.className = 'fw-bold fs-6'
     subDiv.textContent = `${record.user_id}號買家舉起了號碼牌`
 
-    if (record.user_id == userId) {
+    console.log(record)
+
+    if ( Date.now() < endTime && record.user_id == userId) {
         $('.highest-bid-header').css('display', 'block')
     } else {
         $('.highest-bid-header').css('display', 'none')

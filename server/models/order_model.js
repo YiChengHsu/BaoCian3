@@ -36,7 +36,9 @@ const getUserOrders = async (pageSize, paging, status, userId) => {
 
     console.log(status)
 
-    if (status != null) {
+    if (status != null && status == 3) {
+        condition.sql = 'AND status in (3,4) '
+    } else if (statua != null) {
         condition.sql = 'AND status = ? '
         condition.binding = [status]
     }
@@ -71,29 +73,24 @@ const getUserOrders = async (pageSize, paging, status, userId) => {
 
 }
 
-const getSellOrders = async (pageSize, paging, status, userId) => {
-    const condition = {sql: '', binding: []}
+const getSellOrders = async (pageSize, paging, userId) => {
+
+
     const userBinding = [userId]
 
-    console.log(status)
-
-    if (status != null) {
-        condition.sql = 'AND status = ? '
-        condition.binding = [status]
-    }
 
     const limit = {
         sql: 'LIMIT ?, ?',
         binding: [pageSize * paging, pageSize]
     };
 
-    const orderQuery = 'SELECT *,o.id AS order_id FROM project.order o JOIN product p on o.product_id = p.id WHERE o.seller_id = ? ' + condition.sql + limit.sql;
-    const orderBindings = userBinding.concat(condition.binding).concat(limit.binding)
+    const orderQuery = 'SELECT *,o.id AS order_id FROM project.order o JOIN product p on o.product_id = p.id WHERE o.seller_id = ? ' + limit.sql;
+    const orderBindings = userBinding.concat(limit.binding)
 
-    const orderCountQuery = 'SELECT COUNT(*) as count FROM project.order o JOIN product p on o.product_id = p.id WHERE o.seller_id = ? ' + condition.sql + limit.sql;
-    const orderCountBindings = userBinding.concat(condition.binding).concat(limit.binding)
+    const orderCountQuery = 'SELECT COUNT(*) as count FROM project.order o JOIN product p on o.product_id = p.id WHERE o.seller_id = ? '+ limit.sql;
+    const orderCountBindings = userBinding.concat(limit.binding)
 
-    console.log(orderQuery)
+    console.log(orderBindings)
 
     try {
         const [orders] = await pool.query(orderQuery, orderBindings)
@@ -114,6 +111,8 @@ const getSellOrders = async (pageSize, paging, status, userId) => {
 
 const updateOrder = async (userId, orderId, status, delivery) => {
     const conn = await pool.getConnection();
+
+    if (delivery)
 
     try {
         await conn.query('START TRANSACTION')

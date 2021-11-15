@@ -15,7 +15,7 @@ require('dotenv').config();
 const signUp = async (req ,res) => {
     console.log(req.file)
     let body = req.body;
-    let avatar;
+    let avatar = req.file ? req.file.key: 'sorry-my-wallet/user_default.png' 
 
     if (req.file) {
         avatar = req.file.key
@@ -122,19 +122,19 @@ const getUserProfile = async (req, res) => {
 
     const userId = req.user.id
     const query = req.query
+    console.log(query)
     const paging = parseInt(query.paging) || 0;
     const listType = query.type;
     const status = query.status || null;
 
     const user = await User.getUserProfileWithDetails(userId)
-    const rating = await getRatings(userId)
 
     const findDataList = async (listType) => {
 
         if (listType && listType == 'order') {
             return await Order.getUserOrders(pageSize, paging, status, userId)      
         } else if (listType && listType == 'sell') {
-            return await Order.getSellOrders(pageSize, paging, status, userId)   
+            return await Order.getSellOrders(pageSize, paging, userId)   
         } else  {
             return await User.getUserWatchList(pageSize, paging, userId)
         }
@@ -294,13 +294,20 @@ const createRating = async (req, res) => {
     try {
         const result = await User.createRating(rateId, ratedId, orderId, rating)
 
+        console.log(result)
+
         if ( result <= 1 ) {
             res.status(400).send({error: 'Bad Request'})
             return
         }
+
+        const result2 = await Order.updateOrder(rateId, orderId, 3, null)
+
+        console.log(result2)
     
         res.status(200).send({result})
     } catch (err) {
+        console.log(err)
 
         res.status(500).send({error: 'Datebase error'})
         return

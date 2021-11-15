@@ -174,6 +174,7 @@ const verifyImgFile = (file) => {
                 imageWidth: 300,
                 imageHeight: 200,
                 imageAlt: 'I can not accept!',
+                confirmButtonText:'知道了'
             })
             file.value = "";
             return false;
@@ -194,9 +195,10 @@ const verifyImgSize = (file) => {
                 title: '你的很大',
                 text: '圖片大小請不要超過2MB',
                 imageUrl: 'https://s3.ap-northeast-1.amazonaws.com/node.js-image-bucket/myicon/over-size.jpg',
-                imageWidth: 500,
+                imageWidth: 400,
                 imageHeight: 300,
                 imageAlt: 'Too big',
+                confirmButtonText:'我有其他的 size free style!'
             })
             file.value = "";
             return false;

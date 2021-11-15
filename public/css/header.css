@@ -59,3 +59,11 @@ a{
 .swal2-shown {
     padding: 0px !important;    
 }
+
+.sell-btn {
+    width: 120px;
+}
+
+.search-div {
+    width: 690px;
+}

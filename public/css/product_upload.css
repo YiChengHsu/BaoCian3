@@ -29,3 +29,8 @@
 .my-input-group{
     height: 58px;
 }
+
+.town, .city, .my-bank-select {
+    background-color: #e9ecef;
+    color: #333;
+}

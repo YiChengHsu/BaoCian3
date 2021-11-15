@@ -7,7 +7,7 @@ require('dotenv').config();
 let sortedTimeArr;
 
 
-const creatPayment = async (req, res) => {
+const createPayment = async (req, res) => {
 
 	const userId = req.user.id
   const data = req.body
@@ -152,7 +152,7 @@ setOrderPayExpiredBanner();
 
 
 module.exports = {
-	creatPayment,
+	createPayment,
 	confirmPayment,
 	updateOrder,
 };

@@ -276,7 +276,6 @@ fetch('/api/1.0' + params + query, {
         }, 2000)
 
         const highestBid = document.querySelector(`#highest-bid-${bidRecord.product_id}`)
-        highestBid.animate({backgroundColor: 'red'})
         highestBid.textContent = `$${toCurrency(bidRecord.bid_amount)}`
 
         const bidTimesDiv = document.querySelector(`#bid-times-${bidRecord.product_id}`)
