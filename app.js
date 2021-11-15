@@ -21,6 +21,7 @@ app.engine("ejs", ejs.renderFile);
 app.use((req, res, next) => {
     console.log(req.originalUrl)
     if (req.originalUrl === '/api/1.0/order/webhook') {
+        console.log(req.originalUrl === '/api/1.0/order/webhook')
       next();
     } else {
       express.json()(req, res, next);
