@@ -31,8 +31,7 @@ app.engine("ejs", ejs.renderFile);
 
 app.use(express.json({
     verify: function (req, res, buf) {
-      var url = req.originalUrl;
-      if (url.startsWith('/stripe')) {
+      if (req.originalUrl == '/api/1.0/order/webhook') {
          req.rawBody = buf.toString();
       }
     }
