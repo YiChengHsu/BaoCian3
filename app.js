@@ -21,7 +21,7 @@ app.engine("ejs", ejs.renderFile);
 
 // Use JSON parser for all non-webhook routes
 app.use((req, res, next) => {
-    if (req.originalUrl === '/api/1.0/order/webhook') {
+    if (req.originalUrl == 'https://www.baocian3.fun/api/1.0/order/webhook') {
       next();
     } else {
       express.json()(req, res, next);
