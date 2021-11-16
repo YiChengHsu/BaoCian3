@@ -76,7 +76,7 @@ fetch(url + params, {
   console.log(data.user)
 
   if (data.user.address == null || data.user.address == '' ) {
-    Swal.fire({icon: "warning", title: "缺少收件資訊", text: "可能得標後許處理，請盡速處理！"})
+    Swal.fire({icon: "warning", title: "缺少收件資訊", text: "可能得標後續處理，請盡速填寫！"})
   }
 
   list.map((e) => {

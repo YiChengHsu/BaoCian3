@@ -384,7 +384,9 @@ socket.on(`refresh_${productId}`, bidRecord => {
 
 socket.on('bidFail', (message) => {
     Swal.fire({
-        icon: 'error',
+        imageUrl: '../assest/banner.gif',
+        imageWidth: 400,
+        imageHeight: 300,
         title: '出價失敗',
         text: message,
         confirmButtonText: '知道了'
