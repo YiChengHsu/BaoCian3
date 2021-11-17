@@ -10,14 +10,14 @@
           <div class="mb-3 pt-3">
             <div class="input-group mb-3">
               <label class="input-group-text" for="inputGroupFile01">封面照片</label>
-              <input type="file" class="form-control rounded" id="inputGroupFile01" name="main_image" onchange="showImg(this)" required/>
+              <input type="file" class="form-control rounded required-input" id="inputGroupFile01" name="main_image" onchange="showImg(this)" required/>
               <img src="../assest/file-image.svg" class="p-3 img-thumbnail my-img rounded border border-2" alt="" id="img"  accept="image/png image/jpg">
             </div>
           </div>        
           <div class="mb-3 justify-content-between">
             <div class="col input-group px-0 justify-content-between">
               <label for="inputGroupFile02" class="input-group-text">其他照片：</label>
-              <input class="form-control rounded" type="file" id="inputGroupFile02" name="other_images" onchange="showOtherImg(this)" multiple required/>
+              <input class="form-control rounded required-input" type="file" id="inputGroupFile02" name="other_images" onchange="showOtherImg(this)" multiple required/>
             </div>
             <div>
               <div width="440px">
@@ -33,12 +33,12 @@
         <div class="col-5">
           <div class="row my-option-row px-0">
             <div class="form-floating mb-3 col-12 fs-5">
-              <input type="text" class="form-control" id="floatingInput" name="title" placeholder="請輸入酷東西名稱" required/>
+              <input type="text" class="form-control required-input" id="floatingInput" name="title" placeholder="請輸入酷東西名稱" required/>
               <label class="px-4" for="floatingInput">酷東西名稱</label>
             </div>
             <div class="col-4">
-              <select class="form-select mb-3 me-5 w-100" aria-label=".form-select-lg " onchange="changeSubCategory(this.value)" name="category" required>
-                <option selected>分類</option>
+              <select class="form-select mb-3 me-5 w-100 required-input" aria-label=".form-select-lg " onchange="changeSubCategory(this.value)" name="category" required>
+                <option value=null selected>分類</option>
                 <option value="men" >男性</option>
                 <option value="women" >女性</option>
                 <option value="luxury">名牌</option>
@@ -47,8 +47,8 @@
               </select>           
             </div>
             <div class="col-8">
-              <select class="form-select mb-3 my-sub-category w-100" aria-label=".form-select-lg" name="sub_category" required>
-                <option selected>請選擇分類</option>
+              <select class="form-select mb-3 my-sub-category w-100 required-input" aria-label=".form-select-lg" name="sub_category" required>
+                <option value=null selected>請選擇分類</option>
               </select>
             </div>
           </div>
@@ -59,16 +59,16 @@
           <div class="row">
             <div class="input-group mb-3 my-input col">
               <span class="input-group-text fs-6">起標價格NT$</span>
-              <input type="text" class="form-control fs-6 my-input-group my-number" placeholder="設定價格" aria-label="Dollar amount (with dot and two decimal places)" name="price" min='0' required>
+              <input type="text" class="form-control fs-6 my-input-group my-number required-input" placeholder="設定價格" aria-label="Dollar amount (with dot and two decimal places)" name="price" min='0' required>
             </div>
             <div class="input-group mb-3 my-input col">
               <span class="input-group-text fs-6">最低增額 NT$</span>
-              <input type="text" class="form-control fs-6 my-input-group" id='' placeholder="設定價格" aria-label="Dollar amount (with dot and two decimal places)" name="bid_incr" min='0' required>
+              <input type="text" class="form-control fs-6 my-input-group required-input" id='' placeholder="設定價格" aria-label="Dollar amount (with dot and two decimal places)" name="bid_incr" min='0' required>
             </div>
           </div>
           <h5 >結標時間<span class="fs-6 text-danger">(最短一小時，最長一週)</span></h5>
           <div class="input-group mb-3 my-input">
-            <input type="datetime-local" class="form-control fs-6" placeholder="設定時間" name="end_time" id="my-time-input" required>
+            <input type="datetime-local required-input" class="form-control fs-6" placeholder="設定時間" name="end_time" id="my-time-input" required>
           </div>
           <h5 class="fw-bold">
             關於酷東西 <span class="fs-6 text-primary">(必填)</span>
@@ -97,7 +97,7 @@
             </div>
           </div>
           <div class="mb-3">
-            <textarea class="form-control" id="exampleFormControlTextarea1" rows="4" placeholder="描述您所想賣的酷東西，並包含買家可能感興趣的任何細節，用戶們喜歡有故事的酷東西！" name='description' required></textarea>
+            <textarea class="form-control 沒有已比對的通知" id="exampleFormControlTextarea1" rows="4" placeholder="描述您所想賣的酷東西，並包含買家可能感興趣的任何細節，用戶們喜歡有故事的酷東西！" name='description' required></textarea>
           </div>
           <h5 class="fw-bold">
             選填資訊

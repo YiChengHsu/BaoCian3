@@ -2,6 +2,19 @@ const button = document.querySelector('.upload')
 const form = document.querySelector('.product-upload')
 const selectList = document.querySelector('.my-category-select');
 
+if (!user || !user.user) {
+    Swal.fire({
+      imageUrl: '../assest/more.jpg',
+      imageWidth: 400,
+      imageHeight: 300,
+      title: '下標前請登入',
+      text: '登入以享受更多競標的樂趣！',
+      confirmButtonText: '知道了'
+    }).then(() => {
+      window.location.href = "/user/signin";
+    });
+}
+
 //Input category with relevant sub category
 const changeSubCategory = (value) => {
 
@@ -59,6 +72,17 @@ form.addEventListener('submit', (e) => {
             title: 'HAIYAAA!!!',
             text: '數字不能為0或是負值',
             imageUrl: 'https://imgur.dcard.tw/BBYi0Wch.jpg',
+            imageWidth: 400,
+            imageHeight: 300,
+        })
+        return
+    }
+    
+    if ($('.required-input').val() == undefined) {
+        Swal.fire({
+            title: 'HAIYAAA!!!',
+            text: '數字不能為0或是負值',
+            imageUrl: '../assest/oop.png',
             imageWidth: 400,
             imageHeight: 300,
         })

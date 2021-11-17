@@ -4,7 +4,14 @@ let params = location.search;
 
 
 if (!user || !user.user) {
-  Swal.fire({icon: "warning", title: "請登入", text: "使用個人管理功能請先登入"}).then(() => {
+  Swal.fire({
+    imageUrl: '../assest/more.jpg',
+    imageWidth: 400,
+    imageHeight: 300,
+    title: '下標前請登入',
+    text: '登入以享受更多競標的樂趣！',
+    confirmButtonText: '知道了'
+  }).then(() => {
     window.location.href = "/user/signin";
   });
 }
