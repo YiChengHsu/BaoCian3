@@ -61,36 +61,79 @@ const changeSubCategory = (value) => {
 }
 
 
-
 form.addEventListener('submit', (e) => {
     e.preventDefault();
     const formData = new FormData(form);
     const user = JSON.parse(localStorage.getItem("user"));
 
+    const requiredInputs = document.querySelectorAll('.required-input')
+
+    for (let i = 0; i < requiredInputs.length; i ++) {
+        if (requiredInputs[i].value == '') {
+            Swal.fire({
+                title: '出錯了!',
+                text: '你有東西忘記填了唷!',
+                imageUrl: '../assest/oop.png',
+                imageWidth: 400,
+                imageHeight: 300,
+            })
+            requiredInputs[i].style.backgroundColor = '#f9c6cf'
+            $("html, body").animate({
+                scrollTop: $(requiredInputs[i]).offset().top }, {duration: 500,easing: "swing"});
+            return false;
+        }   
+        requiredInputs[i].style.backgroundColor = 'white'
+    }
+
+
     if ($('.my-number').val() <= 0) {
         Swal.fire({
-            title: 'HAIYAAA!!!',
-            text: '數字不能為0或是負值',
-            imageUrl: 'https://imgur.dcard.tw/BBYi0Wch.jpg',
+            title: '太少啦~',
+            text: '起標價格與增額不能為0或是負值',
+            imageUrl: '../assest/tiny.gif',
             imageWidth: 400,
             imageHeight: 300,
         })
+        $('.my-number').val() = ''
         return
     }
-    
-    if ($('.required-input').val() == undefined) {
+
+    if ($('.my-number').val() >= 1000000000) {
         Swal.fire({
-            title: 'HAIYAAA!!!',
-            text: '數字不能為0或是負值',
+            title: '太多啦~',
+            text: '合理的價格可以提高成交率唷!',
+            imageUrl: '../assest/toomuch.png',
+            imageWidth: 400,
+            imageHeight: 300,
+        })
+        $('.my-number').val() = ''
+        return
+    }
+
+    if ($('#name-input').length >= 30) {
+        Swal.fire({
+            title: '名稱過長',
+            text: '請不要超過中文15字，英文30字!',
+            imageUrl: '../assest/long.png',
+            imageWidth: 400,
+            imageHeight: 300,
+        })
+        $('#name-input').val() = ''
+        return
+    }
+
+    //Check if the condition radio is checked
+
+    if ($('input:radio[name="condition"]:checked').val() == null) {
+        Swal.fire({
+            title: '出錯了!',
+            text: '酷東西的狀況忘記填了唷!',
             imageUrl: '../assest/oop.png',
             imageWidth: 400,
             imageHeight: 300,
         })
         return
     }
-
-    console.log(user)
-    console.log(formData)
 
     let timerInterval
     Swal.fire({
@@ -113,15 +156,15 @@ form.addEventListener('submit', (e) => {
     .then((res)=> {
         if (res.status == 400) {
             Swal.fire({
-                title: 'HAIYAAA!!!',
+                title: '出錯了!',
                 text: '上傳資料不符合格式唷!',
                 imageUrl: 'https://imgur.dcard.tw/BBYi0Wch.jpg',
                 imageWidth: 400,
                 imageHeight: 300,
             })
-            throw error
+            throw new Error
         } else if(res.status != 200) {
-            throw error
+            throw new Error
         }
         
         return res.json();
@@ -152,8 +195,12 @@ form.addEventListener('submit', (e) => {
 
 const showImg = (obj) => {
 
-    const trueFile = verifyImgFile(obj)
-    const trueSize = verifyImgSize(obj)
+    // if (obj.value = "") {
+    //     $('#img').attr('src', '../assest/file-image.svg')
+    // }
+
+    verifyImgFile(obj)
+    verifyImgSize(obj)
 
     const file=$(obj)[0].files[0];    //獲取文件信息
 
@@ -167,26 +214,35 @@ const showImg = (obj) => {
                 height: 600
             })  //將img標簽的src綁定為DataURL
         };
+    } else {
+        $('#img').attr('src', '../assest/file-image.svg')
     }
 }
 
 const showOtherImg = (obj) => {
 
-    const file = $(obj)[0].files[0];
     const files = $(obj)[0].files;
 
-    if (files) {
+    verifyImgFile(obj)
+    verifyImgSize(obj)
 
-        for (let i = 0 ; i < files.length ; i++) {
-            const otherFile = $(obj)[0].files[i];
-            const reader = new FileReader();
-            reader.readAsDataURL(otherFile)
-            reader.onload=function(evt){   //讀取操作完成時觸發。
-                console.log(evt)
-                $(`#img-${i}`).attr('src',evt.target.result)  //將img標簽的src綁定為DataURL
-            } 
-        };
-    }
+    if (files) {
+        for (let i = 0 ; i < 3 ; i++) {
+
+            if (files[i]) {
+                const otherFile = $(obj)[0].files[i];
+                const reader = new FileReader();
+                reader.readAsDataURL(otherFile)
+                reader.onload=function(evt){   //讀取操作完成時觸發。
+                    console.log(evt)
+                    $(`#img-${i}`).attr('src',evt.target.result)  //將img標簽的src綁定為DataURL
+                }   
+            } else {
+                $(`#img-${i}`).attr('src', '../assest/card-image.svg') 
+            }
+            
+        }
+    } 
 }
 
 const verifyImgFile = (file) => {
@@ -195,7 +251,7 @@ const verifyImgFile = (file) => {
     if(filePath){
         let isNext = false;
         const fileEnd = filePath.substring(filePath.indexOf("."));
-        for (var i = 0; i < fileTypes.length; i++) {
+        for (let i = 0; i < fileTypes.length; i++) {
             if (fileTypes[i] == fileEnd) {
                 isNext = true;
                 break;
@@ -205,7 +261,7 @@ const verifyImgFile = (file) => {
             Swal.fire({
                 title: '我不能接受',
                 text: '圖片僅支援JPG與PNG檔',
-                imageUrl: 'https://s3.ap-northeast-1.amazonaws.com/node.js-image-bucket/myicon/non-accept.png',
+                imageUrl: '../assest/non-accept.png',
                 imageWidth: 300,
                 imageHeight: 200,
                 imageAlt: 'I can not accept!',
@@ -220,26 +276,25 @@ const verifyImgFile = (file) => {
 }
 
 const verifyImgSize = (file) => {
-    let fileSize = 0;
     const fileMaxSize = 2000000; //2M
     const filePath = file.value;
     if(filePath){
-        fileSize = file.files[0].size;
-        if (fileSize > fileMaxSize) {
-            Swal.fire({
-                title: '你的很大',
-                text: '圖片大小請不要超過2MB',
-                imageUrl: 'https://s3.ap-northeast-1.amazonaws.com/node.js-image-bucket/myicon/over-size.jpg',
-                imageWidth: 400,
-                imageHeight: 300,
-                imageAlt: 'Too big',
-                confirmButtonText:'我有其他的 file style!'
-            })
-            file.value = "";
-            return false;
+
+        for (let i = 0; i < file.files.length; i++) {
+            if (file.files[i].size > fileMaxSize) {
+                Swal.fire({
+                    title: '你的很大',
+                    text: '圖片大小請不要超過2MB',
+                    imageUrl: '../assest/over-size.jpg',
+                    imageWidth: 400,
+                    imageHeight: 300,
+                    imageAlt: 'Too big',
+                    confirmButtonText:'我有其他的 file style!'
+                })
+                file.value = "";
+                return false;
+            } 
         }
-    } else{
-        return false;
     }
 }
 
@@ -259,15 +314,34 @@ const transTimeToDate = (timestamp) => {
 //Set the default and minimum time of auction end time
 const timeInput = document.querySelector('#my-time-input')
 // const timestamp = new Date(Date.now() + 60*60*1000);
-const minTimestamp = new Date(Date.now());
+const minTimestamp = new Date(Date.now() + 60*60*1000);
 const maxTimestamp = new Date(Date.now() + 7*24*60*60*1000);
 const minTime = transTimeToDate(minTimestamp)
 const maxTime = transTimeToDate(maxTimestamp)
 
-console.log(minTime)
-console.log(maxTime)
-
-
 timeInput.value = minTime
 timeInput.min = minTime
 timeInput.max = maxTime
+
+//Limit the length of name with 2 time length of chinese input
+const checkNameLength = (input, maxLength) => {
+    let length = 0;
+    for(let i=0 ; i<input.value.length; i++) {
+        if (/[\u4e00-\u9fa5]/.test(input.value[i])) {
+            length+=2;
+        } else {
+            length++;
+        }
+        if (length > maxLength) {
+            input.value = input.value.substr(0,i);
+            Swal.fire({
+                title: '名稱過長',
+                text: `請不要超過${maxLength/2}中文字，英文${maxLength}字!`,
+                imageUrl: '../assest/long.png',
+                imageWidth: 400,
+                imageHeight: 300,
+            })
+            break;
+        }
+    }
+};

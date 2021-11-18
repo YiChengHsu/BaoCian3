@@ -24,7 +24,11 @@ a{
     width: 100px;
 }
 
-#logout-button, #like-button{
+.my-button-lg {
+    width: 125px;
+}
+
+#logout-button, #like-button, #bade-button{
     display: none;
 }
 

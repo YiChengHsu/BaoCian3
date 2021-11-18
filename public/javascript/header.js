@@ -25,6 +25,7 @@ if (user && user.user.picture) {
     $('#signup-button').css('display', 'none')
     $('#logout-button').css('display', 'inline')
     $('#like-button').css('display', 'inline')
+    $('#bade-button').css('display', 'inline')
 }
 
 $('#logout-button').click(() => {

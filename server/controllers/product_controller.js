@@ -25,11 +25,24 @@ const createProduct = async(req, res) => {
         with_papers: body.with_papers || '資訊未提供',
         place: body.place || '資訊未提供',
         seller_id: user,
-        end_time: Date.parse(body.end_time) - 8*60*60*1000,
+        end_time: Date.parse(body.end_time), //要記得減 8*60*60*1000
         highest_bid: body.price,
     }
 
-    if (product.price <= 0 || product.bid_incr <= 0 || product.end_time <= Date.now()) {
+    console.log(body.end_time)
+
+    console.log(product)
+
+    const productsKeys = Object.keys(product)
+    productsKeys.map((e) => {
+        if (!product[e]) {
+            res.status(400).send({error :'Bad Requset'})
+            return 
+        }
+    })
+
+    // if (product.price <= 0 || product.bid_incr <= 0 || product.end_time <= Date.now()) {
+    if (product.price <= 0 || product.bid_incr <= 0) {
         res.status(400).send({error :'Bad Requset'}) 
         return
     }
@@ -78,7 +91,7 @@ const getProducts =  async (req, res) => {
         
         switch (category) {
             case 'all':
-                return await Product.getProducts(pageSize, paging, {price, order});
+                return await Product.getProducts(pageSize, paging, {order});
             case 'men': case 'women': case 'accessories': case 'electronics': case 'other':
                 return await Product.getProducts(pageSize, paging, {category, price, order});
             case 'search': 

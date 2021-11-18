@@ -31,7 +31,7 @@ fetch('/api/1.0' + params + query, {
 
     console.log(res)
 
-    if (data.length <= 0) {
+    if (!data || data.length <= 0) {
       Swal.fire({
         imageUrl: '../assest/nothing.png',
         imageWidth: 400,
@@ -77,7 +77,7 @@ fetch('/api/1.0' + params + query, {
       productImage.className = 'card-img rounded-2 product-image w-100 text-end p-2 pt-3'
       productImage.style.backgroundImage = `url(${e.main_image})`;
 
-      if (e.highest_user_id == userId) {
+      if (e.highest_user_id !=null && e.highest_user_id == userId) {
         $('<span>').addClass('p-2 btn-danger disabled rounded rounded-pill').text('得標中').appendTo(productImage)
       }
 

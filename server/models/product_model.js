@@ -22,7 +22,8 @@ const createProduct = async (product, other_images) => {
 
 const getProducts = async (pageSize, paging, requirement = {}) => {
     const condition = {sql: '', binding: []};
-    const order = {sql: ''};
+    const productList = {sql: '', binding: []};
+    const order = {sql: '', binding: []};
 
     if (requirement.category) {
         condition.sql = 'WHERE auction_end = 0 AND category = ?';
@@ -38,6 +39,11 @@ const getProducts = async (pageSize, paging, requirement = {}) => {
         condition.binding = [requirement.id];
     } else {
         condition.sql = 'WHERE auction_end = 0 '
+    }
+
+    if (requirement.productList) {
+        productList.sql = 'AND id IN (?) '
+        productList.binding = [requirement.productList]
     }
 
     if (requirement.order == 'hot') {
@@ -58,13 +64,14 @@ const getProducts = async (pageSize, paging, requirement = {}) => {
         binding: [pageSize * paging, pageSize]
     };
 
-    const productQueryRaw = 'SELECT * FROM product ' + condition.sql + order.sql + limit.sql;
-    const productQuery = productQueryRaw.replace("product AND", "product WHERE")
-    const productBindings = condition.binding.concat(limit.binding);
+    const productQuery = 'SELECT * FROM product ' + condition.sql + productList.sql + order.sql + limit.sql;
+    const productBindings = condition.binding.concat(productList.binding).concat(limit.binding);
 
-    const productCountQueryRaw = 'SELECT COUNT(*) as count FROM product ' + condition.sql + order.sql;
-    const productCountQuery = productCountQueryRaw.replace("product AND", "product WHERE")
-    const productCountBindings = condition.binding;
+    const productCountQuery = 'SELECT COUNT(*) as count FROM product ' + condition.sql + productList.sql + order.sql;
+    const productCountBindings = condition.binding.concat(productList.binding);
+
+    console.log(productQuery)
+    console.log(productBindings)
 
     try {
         const [products] = await pool.query(productQuery, productBindings);

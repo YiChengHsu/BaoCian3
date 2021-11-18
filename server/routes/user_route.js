@@ -35,7 +35,7 @@ router.route('/user/account')
 router.route('/user/rating')
     .post(authentication(), createRating)
 
-router.route('/user/like')
+router.route('/user/:records')
     .get(authentication(), getUserWatchList)
 
 module.exports = router;

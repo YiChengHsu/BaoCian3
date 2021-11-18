@@ -37,13 +37,13 @@ const setBidRecord = async (userBid) => {
     return isBidSuccess
 }
 
-const getUserBidRecords = async (req, res) => {
-    const productId = req.body.productId
-    const userId = req.body.userId
-    const [userBidRecords] = await Bid.getUserBidRecords(productId, userId)
-    console.log(userBidRecords)
-    res.status(200).json({data: userBidRecords})
-}
+// const getUserBidRecords = async (req, res) => {
+//     const productId = req.body.productId
+//     const userId = req.body.userId
+//     const [userBidRecords] = await Bid.getUserBidRecords(productId, userId)
+//     console.log(userBidRecords)
+//     res.status(200).json({data: userBidRecords})
+// }
 
 const setBidFinisher = async() => {
     
@@ -117,7 +117,7 @@ setBidFinisher();
 module.exports = {
     setBidRecord,
     getBidRecords,
-    getUserBidRecords,
+    // getUserBidRecords,
     setNewProductToFinisher,
 };
 

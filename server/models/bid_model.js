@@ -46,9 +46,20 @@ const getBidRecords = async (productIds) => {
     }
 }
 
-const getUserBidRecords = async (productId, userId) => {
-    const [userBidRecords] = await pool.query('SELECT * FROM bid_record WHERE product_id = ? AND user_id = ?', [productId, userId])
-    return userBidRecords; 
+// const getUserBidRecords = async (productId, userId) => {
+//     const [userBidRecords] = await pool.query('SELECT * FROM bid_record WHERE product_id = ? AND user_id = ?', [productId, userId])
+//     return userBidRecords; 
+// }
+
+const getUserBadeProducts = async (userId) => {
+    try {
+        const queryStr = 'SELECT DISTINCT product_id FROM bid_record WHERE user_id = ?'
+        const bindings = [userId] 
+        const [productIds] = await pool.query(queryStr, bindings)
+        return productIds
+    } catch (error) {
+        console.log(error)
+    }
 }
 
 const getHotProducts = async () => {
@@ -63,6 +74,7 @@ const getHotProducts = async () => {
 module.exports = {
     setBidRecord,
     getBidRecords,
-    getUserBidRecords,
+    // getUserBidRecords,
     getHotProducts,
+    getUserBadeProducts,
 };

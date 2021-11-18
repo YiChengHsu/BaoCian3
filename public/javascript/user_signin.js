@@ -31,13 +31,32 @@ form.addEventListener("submit", (e) => {
 			const data = res.data;
 			localStorage.setItem("user", JSON.stringify(data));
 			Swal.fire({
-				title: '登入成功',
-				text: '你可以隨便逛逛，或是跳舞',
-				imageUrl: '../assest/rick-roll-rick-ashley.gif',
+				title: '你是誰',
+				text: '可以開始到處逛逛與競標了唷!',
+				imageUrl: '../assest/youare.png',
 				imageWidth: 400,
-				imageHeight: 500,
+				imageHeight: 400,
+				confirmButtonText: '皮卡丘'
 			})
-			.then(() => {self.location.href = "/user/profile"})
+			// .then(() => {self.location.href = "/user/profile"})
+
+			$('.swal2-image').css({
+				'background-color': 'black',
+				'background-position': '50% 75%',
+				'background-size': 'cover'
+			})
+
+			$('.swal2-confirm').attr('disabled', true)
+
+			setTimeout(() => {
+				$('.swal2-image').css({
+					'background-image':`url(${data.user.picture})`,
+					'background-position': '50% 75%',
+					'background-size': 'cover'
+				})
+				$('#swal2-title').text(data.user.name)
+				$('.swal2-confirm').attr('disabled', false)
+			}, 1500)
 		})
 		.catch((err) => {
 			console.log(err);

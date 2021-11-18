@@ -21,6 +21,11 @@ router.route('/user/like')
         res.render('product_index')
     })
 
+router.route('/user/bade')
+    .get((req, res) => {
+        res.render('product_index')
+    })
+
 router.route('/user/upload')
     .get((req, res) => {
         res.render('product_upload')

@@ -2,6 +2,8 @@ const config = require('../../util/config');
 const validator = require('validator');
 const User = require('../models/user_model')
 const Order = require('../models/order_model');
+const Bid = require('../models/bid_model')
+const Product = require('../models/product_model')
 const { orderBy } = require('lodash');
 const { pool } = require('../models/mysqlcon');
 const pageSize = 20;
@@ -9,7 +11,7 @@ const {
     getProductSellerInfo,
     getProductsImages,
     getProductWatchTimes,
-} = require('../controllers/product_controller')
+} = require('../controllers/product_controller');
 require('dotenv').config();
 
 const signUp = async (req ,res) => {
@@ -165,15 +167,34 @@ const getUserWatchList = async (req, res) => {
 
     const pageSize = 12
 
+    const records = req.params.records
+
     const userId = req.user.id
-    const paging = parseInt(req.query.paging) || 0
+    const paging = parseInt(req.query.paging) || 0;
+    const order = req.query.order || null;
+    let productList;
 
     let watchList = await User.getUserWatchProductIds(userId)
-    watchList = Object.values(watchList).map(e => e.product_id)
+    watchList = Object.values(watchList).map(e => e.product_id);
 
-    const {products, productCount} = await User.getUserWatchList(pageSize, paging, userId)
+    switch (records){
+        case 'like':
+            productList = watchList;
+            break;
+        case 'bade':
+            productList = await Bid.getUserBadeProducts(userId)
+            productList = Object.values(productList).map(e => e.product_id); 
+            console.log("Bade: " + productList)
+            break;
+        default:
+            res.status(200).json({data: [], page: 0, total_page: 1, user: watchList})
+            return;         
+    }
 
-    if (products.length == 0) {
+
+    const {products, productCount} = await Product.getProducts(pageSize, paging, {productList, order})
+
+    if (products && products.length == 0) {
         res.status(200).json({data: [], page: 0, total_page: 1, user: watchList})
         return;
     }
@@ -191,6 +212,16 @@ const getUserWatchList = async (req, res) => {
     const result = { data: productsWithDetails, page: paging, total_page: totalPage, user: watchList}
 
     res.status(200).json(result)
+
+}
+
+const getUserBiddenProduct = async (req ,res) => {
+    const pageSize = 12
+
+    const userId = req.user.id
+    const paging = parseInt(req.query.paging) || 0;
+    const order = req.query.order || null;
+
 
 }
 

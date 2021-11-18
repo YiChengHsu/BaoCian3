@@ -49,6 +49,12 @@ app.use('/',
 // app.use('/', pageRouter)
 // // app.use('/api/1.0', bidRouter)
 
+//Page not found
+app.use(function(req, res, next) {
+    res.status(404).render('404');
+});
+
+
 app.use(function(err, req, res, next) {
     console.log(err);
     res.status(500).send('Internal Server Error');

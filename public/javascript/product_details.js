@@ -83,6 +83,8 @@ fetch(detailsUrl, {
                     role:"alert",
                     html: '恭喜！您已成功得標，請前往<a href="/user/profile?type=order&status=0" class="alert-link">個人頁面</a>進行付款'
                 }).prependTo('.highest-bid-div')
+            } else {
+                $('#end-bid-header').css('display', 'block')
             }
 
         } else {
@@ -333,6 +335,8 @@ form.addEventListener('submit', (e) => {
         return
     }
 
+    
+
     const currentAmount = highestBid.textContent
     const userBidAmount = Number(highestBid.textContent.replace('$',"").replace(',','')) + userBidIncr
 
@@ -480,11 +484,8 @@ const renderImagesSlide = (otherImages) => {
 
 const setCountDownTimer = () => {
     setInterval(() => {
-        let start = Date.now();
-        //Convert to timestamp
-        let totalMilSec = (endTime) - Date.now();
 
-        if (totalMilSec <= 0) {
+        if (endTime <= Date.now()) {
             countDown.textContent = "完結"
             const bidButton = document.querySelector('.my-bid-button')
             const bidInput = document.querySelector('.my-bid-input')
@@ -492,6 +493,8 @@ const setCountDownTimer = () => {
             bidInput.readOnly = true;
             bidButton.className = ''
             bidButton.textContent = "競標結束";
+            $('#end-bid-header').css('display', 'block')
+            clearInterval()
             return
         }
 

@@ -2,33 +2,36 @@
     <div class="row justify-content-center my-row">
       <div class="col-3 my-row">
         <div class="align-middle">
-          <div>
-            <h1 class="h3 mb-3 fw-normal text-center">註冊</h1>
+          <div class="row justify-content-between">
+            <h3 class="text-center my-3">註冊</h3>
+            <div class="col justify-content-between text-center mb-3">
+              <img src="../assest/user_default.png" class="rounded rounded-circle" id='img' width="150px" height="150px" alt="">
+            </div>
           </div>
           <form id='signup-form'>
-            <div class="form-floating rounded-top">
-              <input type="text" class="form-control my-name" id="floatingInput-1" placeholder="姓名" name="name" required>
+            <div class="form-floating rounded-top mb-3">
+              <input type="text" class="form-control my-name" id="floatingInput-1" placeholder="姓名" name="name" onkeyup="checkNameLength(this, 10)" required>
               <label for="floatingInput-1">請輸入名字</label>
             </div>
-            <div class="form-floating rounded-top">
+            <div class="form-floating rounded-top mb-3">
               <input type="email" class="form-control my-email" id="floatingInput-2" placeholder="name@example.com" name="email" required>
               <label for="floatingInput-2">請輸入Email</label>
             </div>
             <div>
             </div>
-            <div class="form-floating rounded-bottom">
+            <div class="form-floating rounded-bottom mb-3">
               <input type="password" class="form-control my-password" id="floatingPassword-3" placeholder="Password" name='password' required>
               <label for="floatingPassword-3">請輸入6-16位密碼</label>
             </div>
             <div class="mb-3">
               <label for="formFile" class="form-label">個人形象照片(選填)：</label>
-              <input class="form-control" type="file" id="formFile" name='avatar'>
+              <input class="form-control" type="file" id="formFile" name='avatar' onchange="showImg(this)">
             </div>
             <button class="w-100 btn btn-lg btn-warning my-button mt-3" type="submit">Sign Up</button>
           </form>
           <ul class="nav justify-content-center">
             <li class="nav-item">
-              <a class="nav-link active fs-5" aria-current="page" href="/user/signup.html">已經有是會員嗎?</a>
+              <a class="nav-link active fs-5" aria-current="page" href="/user/signup.html">已經是會員嗎?</a>
             </li>
           </ul>
         </div>
