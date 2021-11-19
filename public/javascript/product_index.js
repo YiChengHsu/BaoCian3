@@ -81,7 +81,11 @@ fetch('/api/1.0' + params + query, {
         $('<span>').addClass('p-2 btn-danger disabled rounded rounded-pill').text('得標中').appendTo(productImage)
       }
 
-      if (e.seller_id == userId) {
+      if (e.seller_id == userId && e.end_time < Date.now() && e.highest_user_id == null) {
+        $('<span>').addClass('p-2 btn-secondary disabled rounded rounded-pill').text('沒人要QQ').appendTo(productImage)
+      } else if (e.seller_id == userId && e.end_time < Date.now()) {
+        $('<span>').addClass('p-2 btn-info disabled rounded rounded-pill').text('賣出了').appendTo(productImage)
+      } else if (e.seller_id == userId) {
         $('<span>').addClass('p-2 btn-success disabled rounded rounded-pill').text('自己的').appendTo(productImage)
       }
 
@@ -307,6 +311,12 @@ fetch('/api/1.0' + params + query, {
     const currentPage = res.page
     const totalPage = res.total_page
 
+    if (totalPage == 1) {
+      $('.previous-page').hide()
+      $('.next-page').hide()
+      return
+    }
+
     if (currentPage == 0) {
       $('.previous-page').hide()
     } else {
@@ -318,15 +328,6 @@ fetch('/api/1.0' + params + query, {
     } else {
       $('.next-page-link').attr('href', `?paging=${currentPage + 1}`)
     }
-
-    // let startPage
-    // if (totalPage > 5 && currentPage > 4) {
-    //   startPage = currentPage -2
-    // } else {
-    //   startPage = 0
-    // }
-
-    // const presentPage = Math.min((totalPage - currentPage), 5)
 
     for (let i = 0; i < totalPage; i++) {
       if ( i == currentPage) {
@@ -360,8 +361,15 @@ const setCountDownTimer = (id, endTime) => {
       }
 
       let time = transMilToDate(totalMilSec)
+      
+      if (time.days == 00) {
 
-      countDown.textContent = `${time.days}天${time.hours}時${time.min}分${time.sec}秒 `
+      }
+      if (time.days == 0) {
+        countDown.textContent = `${time.hours}時${time.min}分${time.sec}秒 `
+      } else {
+        countDown.textContent = `${time.days}天${time.hours}時${time.min}分${time.sec}秒 `
+      }
   },500)   
   return intervalId;
 }
@@ -375,8 +383,15 @@ const transMilToDate = (totalMilSec) => {
   let milSec = totalMilSec % 1000
   let sec = fixTime(Math.floor((totalMilSec/1000) % 60))
   let min = fixTime(Math.floor((totalMilSec/1000/60) % 60))
-  let hours = fixTime(Math.floor((totalMilSec/(1000*60*60)) % 24))
   let days = Math.floor(totalMilSec/(1000*60*60*24));
+  let hours;
+
+  if (days == '00') {
+    hours = Math.floor((totalMilSec/(1000*60*60)) % 24);
+    days = 0;
+  } else {
+    hours = fixTime(Math.floor((totalMilSec/(1000*60*60)) % 24))
+  }
 
   return { milSec, sec, min, hours, days}
 }

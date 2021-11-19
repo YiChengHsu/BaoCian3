@@ -59,15 +59,26 @@ a{
     width:850px !important;
 }
 
-
 .swal2-shown {
     padding: 0px !important;    
 }
 
-.sell-btn {
-    width: 120px;
-}
+@media (max-width: 1300px) {
+    .productItem {
+      margin-left: 0px !important;
+      margin-right: 0px !important;
+    }
+  
+    .products-container {
+      padding-left: 70px !important;
+    }
 
-.search-div {
-    width: 690px;
-}
+    .my-button{
+        width: 80px !important;
+    }
+
+    .header-nav{
+        margin-right: 0px !important;
+        width: 100px !important;
+    }
+    

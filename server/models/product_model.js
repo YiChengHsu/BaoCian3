@@ -37,6 +37,10 @@ const getProducts = async (pageSize, paging, requirement = {}) => {
     } else if (requirement.id != null) {
         condition.sql = 'WHERE id = ?';
         condition.binding = [requirement.id];
+    } else if (requirement.userId) {
+        condition.sql = 'WHERE seller_id = ? '
+        condition.binding = [requirement.userId]
+        requirement.order = requirement.order || 'latest'
     } else {
         condition.sql = 'WHERE auction_end = 0 '
     }

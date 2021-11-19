@@ -144,7 +144,7 @@ const getProducts =  async (req, res) => {
     }
 
     const totalPage = Math.ceil(productCount/pageSize)
-    const  result = { data: productsWithDetails, page: paging, total_page: totalPage, user: watchList}
+    const result = { data: productsWithDetails, page: paging, total_page: totalPage, user: watchList}
 
     res.status(200).json(result)
 

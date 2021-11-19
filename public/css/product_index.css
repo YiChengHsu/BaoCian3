@@ -1,6 +1,3 @@
-body, .container {
-    /* background: #e6e6e6; */
-}
 .product-image {
     border:0;
     margin:0;
@@ -61,3 +58,14 @@ body, .container {
     -o-animation: yellow-fade 1s ease-in-out 0s;
     animation: yellow-fade 1s ease-in-out 0s;
   }
+
+@media (max-width: 1300px) {
+  .productItem {
+    margin-left: 0px !important;
+    margin-right: 0px !important;
+  }
+
+  .products-container {
+    padding-left: 70px !important;
+  }
+} 

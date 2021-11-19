@@ -1,6 +1,5 @@
 const user = JSON.parse(localStorage.getItem("user"));
 const imgUrl ='https://s3.ap-northeast-1.amazonaws.com/node.js-image-bucket/'
-console.log(user)
 let accessToken = null;
 let userId = null;
 let userName = null;
@@ -23,9 +22,7 @@ if (user && user.access_token && user.user) {
 if (user && user.user.picture) {
     $('#signin-button').css('display', 'none')
     $('#signup-button').css('display', 'none')
-    $('#logout-button').css('display', 'inline')
-    $('#like-button').css('display', 'inline')
-    $('#bade-button').css('display', 'inline')
+    $('.hide-button').css('display', 'inline')
 }
 
 $('#logout-button').click(() => {
@@ -49,7 +46,7 @@ $('#logout-button').click(() => {
     })
 })
 
-$('.search-button').click( async () => {
-    const keyword = await $('#search-input').val()
+$('#search-form').submit((e) => {
+    const keyword =$('#search-input').val()
     window.location.href=`/product/search?keyword=${keyword}`
 })

@@ -1,15 +1,30 @@
 <%- include('header') %>
     <script src="../util/lib/jquery.raty.js"></script>
-    <div class="container mt-5 mb-5" id='main-container'>
+    <div class="container-xxl mt-5 mb-5" id='main-container'>
         <div class="row m-4 mb-2 main-row">
             <div class="col-12 highest-bid-div">
-                <div class="alert alert-danger text-center highest-bid-header" role="alert" style="display:none">
+                <div class="alert alert-danger text-center hide-header" id='highest-header' role="alert">
                     您目前是最高出價者
                 </div>
             </div>
             <div class="col-12 highest-bid-div">
-                <div class="alert alert-dark text-center" id='end-bid-header' role="alert" style="display:none">
+                <div class="alert alert-dark text-center hide-header" id='end-bid-header' role="alert">
                     你慢了！這場商品競標已經結束
+                </div>
+            </div>
+            <div class="col-12 highest-bid-div">
+                <div class="alert alert-dark text-center hide-header" id='non-buyer-header' role="alert">
+                    很可惜，這次沒有找到伯樂，下一段感情會更好！
+                </div>
+            </div>
+            <div class="col-12 highest-bid-div">
+                <div class="alert alert-danger text-center hide-header" id='win-header' role="alert">
+                    恭喜！您已成功得標，請前往<a href="/user/profile?type=order&status=0" class="alert-link">個人頁面</a>進行付款
+                </div>
+            </div>
+            <div class="col-12 highest-bid-div">
+                <div class="alert alert-success text-center hide-header" id='sold-header' role="alert">
+                    恭喜！您的商品以成功售出，請前往<a href="http://localhost:3000/user/profile?type=sell" class="alert-link">賣家清單</a>進行後續處理
                 </div>
             </div>
             <div class="col-12">
@@ -29,8 +44,8 @@
                         <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
                     </div>
                     <div class="carousel-inner">
-                        <div class="carousel-item active">
-                        <img src="..." class="d-block w-100 main-image rounded img-thumbnail" alt="...">
+                        <div class="carousel-item active zoom">
+                            <img src="..." class="d-block w-100 main-image rounded img-thumbnail zoom-image" alt="...">
                         </div>
                     </div>
                     <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">

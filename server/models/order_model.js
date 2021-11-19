@@ -37,7 +37,7 @@ const getUserOrders = async (pageSize, paging, status, userId) => {
     console.log(status)
 
     if (status != null && status == 3) {
-        condition.sql = 'AND status in (3,4) '
+        condition.sql = 'AND status in (3,4,5) '
     } else if (status != null) {
         condition.sql = 'AND status = ? '
         condition.binding = [status]
@@ -60,9 +60,11 @@ const getUserOrders = async (pageSize, paging, status, userId) => {
         const [orders] = await pool.query(orderQuery, orderBindings)
         const [orderCounts] = await pool.query(orderCountQuery, orderCountBindings)
 
+        console.log(orders)
+
         const data = {
             dataList: orders, 
-            dataListCounts: orderCounts
+            dataListCounts: orderCounts[0].count
         }
 
         return data
@@ -87,8 +89,8 @@ const getSellOrders = async (pageSize, paging, userId) => {
     const orderQuery = 'SELECT *,o.id AS order_id FROM project.order o JOIN product p on o.product_id = p.id WHERE o.seller_id = ? ' + limit.sql;
     const orderBindings = userBinding.concat(limit.binding)
 
-    const orderCountQuery = 'SELECT COUNT(*) as count FROM project.order o JOIN product p on o.product_id = p.id WHERE o.seller_id = ? '+ limit.sql;
-    const orderCountBindings = userBinding.concat(limit.binding)
+    const orderCountQuery = 'SELECT COUNT(*) as count FROM project.order o JOIN product p on o.product_id = p.id WHERE o.seller_id = ? ';
+    const orderCountBindings = userBinding
 
     console.log(orderBindings)
 
@@ -98,7 +100,7 @@ const getSellOrders = async (pageSize, paging, userId) => {
 
         const data = {
             dataList: orders, 
-            dataListCounts: orderCounts
+            dataListCounts: orderCounts[0].count
         }
 
         return data

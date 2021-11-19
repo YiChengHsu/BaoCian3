@@ -135,7 +135,6 @@ form.addEventListener('submit', (e) => {
         return
     }
 
-    let timerInterval
     Swal.fire({
         title: 'Loading',
         imageUrl: '../assest/loading-cat.gif',
@@ -276,7 +275,7 @@ const verifyImgFile = (file) => {
 }
 
 const verifyImgSize = (file) => {
-    const fileMaxSize = 2000000; //2M
+    const fileMaxSize = 1048576; //1MB
     const filePath = file.value;
     if(filePath){
 

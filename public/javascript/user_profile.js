@@ -2,6 +2,11 @@ const url = "/api/1.0/user/profile";
 
 let params = location.search;
 
+if (params.length == 0) {
+  params = '?type=order'
+}
+
+
 
 if (!user || !user.user) {
   Swal.fire({
@@ -38,11 +43,11 @@ $(".user-name").text(user.user.name);
 $(".user-email").text(user.user.email);
 
 //Set the active tab of order
-const activeTab = params.split('=')[2]
+const activeTab = params.split('&paging=')[0].split('=')[2]
 
 if (activeTab) {
   document.querySelector(`#tab-${activeTab}`).classList.add('active')
-} else if (params.split('=')[1] == 'sell') {
+} else if (params.split('&paging=')[0].split('=')[1] == 'sell') {
   document.querySelector('#tab-sell').classList.add('active')
 } else {
   document.querySelector('#tab').classList.add('active')
@@ -55,38 +60,53 @@ fetch(url + params, {
     Authorization: "Bearer " + user.access_token
   }
 }).then((res) => res.json()).then((res) => {
-  console.log(res);
 
 	const data = res.data
-  const list = res.data.list;
+  const user = res.user
 
-  if (res.data.user.rating != null) { 
-		$('#star').raty({score: data.user.rating, readOnly: true});
-    $("#user-rating").text(`平均評分：${data.user.rating.toFixed(2)}`);
+  if (res.user.rating != null) { 
+		$('#star').raty({score: res.user.rating, readOnly: true});
+    $("#user-rating").text(`平均評分：${res.user.rating.toFixed(2)}`);
   } else {
     $("#user-rating").text("尚未評分");
   }
 
   $("#twzipcode").twzipcode("set", {
-    county: data.user.city,
-    district: data.user.town,
-    zipcode: Number(data.user.zipcode)
+    county: user.city,
+    district: user.town,
+    zipcode: Number(user.zipcode)
   });
   
-  $(".address").val(data.user.address);
-  $(".receiver").val(data.user.receiver);
-  $(".phone").val(data.user.phone);
-  $(".bank-account").val(data.user.bank_code).trigger("change");
-  $(".bank-account").val(data.user.bank_account);
-  $(".account-name").val(data.user.account_name);
+  $(".address").val(user.address);
+  $(".receiver").val(user.receiver);
+  $(".phone").val(user.phone);
+  $(".bank-account").val(user.bank_code).trigger("change");
+  $(".bank-account").val(user.bank_account);
+  $(".account-name").val(user.account_name);
 
-  console.log(data.user)
-
-  if (data.user.address == null || data.user.address == '' ) {
-    Swal.fire({icon: "warning", title: "缺少收件資訊", text: "可能得標後續處理，請盡速填寫！"})
+  if (user.address == null || user.address == '' ) {
+    Swal.fire({
+      title: "缺少收件資訊",
+      text: "可能影響得標後續處理，請盡速填寫！",
+      imageUrl: "../assest/wrong.jfif",
+      imageWidth: 400,
+      imageHeight: 300
+    })
   }
 
-  list.map((e) => {
+  if (params.split('=')[1] == 'sell' && (user.account_name == null || user.bank_account == null || user.bank_code == '000')) {
+    Swal.fire({
+      title: "缺少轉帳資訊",
+      text: "可能影響賣家後續處理，請盡速填寫！",
+      imageUrl: "../assest/wrong.jfif",
+      imageWidth: 400,
+      imageHeight: 300
+    })
+  }
+
+  console.log(data)
+
+  data.map((e) => {
     const id = e.id;
     const imgUrl = `https://s3.ap-northeast-1.amazonaws.com/node.js-image-bucket/${
       e.main_image
@@ -151,6 +171,12 @@ fetch(url + params, {
             $("<h6/>").html(`<span class='fw-bold text-danger'>${payDeadline.year}/${payDeadline.month}/${payDeadline.date}<br>${payDeadline.hours}:${payDeadline.minutes}</span>`).appendTo(`#my-status-${id}`);
 
             if (e.seller_id == userId) {
+              $("<button/>", {
+                class: "btn btn-block btn-success mb-2 w-75 py-1",
+                id: `deliver-button-${id}`,
+                text: "等待賣家付款",
+                disabled: true,
+              }).appendTo(`#my-button-div-${id}`);
               return
             }
 
@@ -181,7 +207,7 @@ fetch(url + params, {
                     price: e.price,
                     orderId: e.order_id,
                     image: imgUrl,
-                    customerEmail: user.user.email
+                    customerEmail: user.email
                   }
                 )
               }).then((res) => res.json()).then((res) => {
@@ -212,8 +238,7 @@ fetch(url + params, {
                 }
               }).then(res => res.json())
               .then((res) => { 
-                const data = res.data
-                if (data.address == null || data.receiver == null ) {
+                if (user.city == null || user.town == null || user.address == null || user.receiver == null ) {
                   Swal.fire({
                     title: '缺少資料',
                     icon: 'warning',
@@ -225,7 +250,7 @@ fetch(url + params, {
 
                 Swal.fire({
                   title: '寄送地址',
-                  html:`<b>${data.zipcode}  ${data.city} ${data.town} <br> ${data.address} <br> ${data.receiver}  ${data.phone}</b> `,
+                  html:`<b>${user.zipcode}  ${user.city} ${user.town} <br> ${user.address} <br> ${user.receiver}  ${user.phone}</b> `,
                   confirmButtonText: '知道了'
                 })
               })
@@ -302,6 +327,17 @@ fetch(url + params, {
             break;
           case 3:
 
+           if (e.seller_id == userId) {
+              $("<h6/>").text("確認收貨").appendTo(`#my-status-${id}`);
+              $("<button/>", {
+                class: "btn btn-block btn-warning w-75 py-1",
+                id: `my-rate-button-${id}`,
+                text: "等待賣家評分",
+                disabled: true,
+              }).appendTo(`#my-button-div-${id}`);
+              return;
+            } 
+
             $("<h6/>").text("確認收貨").appendTo(`#my-status-${id}`);
 
             $("<button/>", {
@@ -322,13 +358,6 @@ fetch(url + params, {
               }
             }).appendTo('#star-form')
 
-            let ratedId
-            if (e.seller_id == userId) {
-              ratedId = e.buyer_id
-            } else {
-              ratedId = e.seller_id 
-            }
-
             $('#send-button').click( async () => {
 
               fetch("/api/1.0/user/rating", {
@@ -338,7 +367,7 @@ fetch(url + params, {
                   "content-type": "application/json"
                 },
                 body: JSON.stringify(
-                  {ratedId: ratedId, orderId: e.order_id, rating: rating}
+                  {ratedId: e.seller_id, orderId: e.order_id, rating: rating, status: e.status}
                 )
               }).then((res) => {
 								if(res.status == 400) {
@@ -353,20 +382,125 @@ fetch(url + params, {
 						break;
           case 4:
 
-            $("<h6/>").text("評分完成").appendTo(`#my-status-${id}`);
+            if (e.buyer_id == userId) {
+              $("<h6/>").text("訂單已完成").appendTo(`#my-status-${id}`);
+
+              $("<button/>", {
+                class: "btn btn-block btn-warning w-75 py-1",
+                id: `my-rate-button-${id}`,
+                text: "已評分",
+                disabled: 'true'
+              }).appendTo(`#my-button-div-${id}`);
+              return
+            }
+
+            $("<h6/>").text("買家評分完成").appendTo(`#my-status-${id}`);            
 
             $("<button/>", {
               class: "btn btn-block btn-warning w-75 py-1",
               id: `my-rate-button-${id}`,
-              text: "已評分",
-              disabled: 'true'
+              text: "評 分",
+              'data-bs-toggle': "modal",
+              'data-bs-target': "#exampleModal",
+              'data-bs-whatever': "@mdo"
             }).appendTo(`#my-button-div-${id}`);
+
+            $(`#my-rate-button-${id}`).click(() => {
+              $('.modal-footer').html('')
+              $('#star-form').html('')
+
+              $('<div/>', {
+                id: `start-${id}`,
+              }).raty({
+                click: function (score) {
+                  rating = score || null
+                }
+              }).appendTo('#star-form')
+
+              $('<button/>', {
+                type: 'button',
+                class: 'btn btn-secondary',
+                'data-bs-dismiss': 'modal',
+                text: '讓我再想想...'
+              }).appendTo('.modal-footer')
+
+              $('<button/>', {
+                type: 'button',
+                class: 'btn btn-warning',
+                id: `send-button-${id}`,
+                'data-bs-dismiss': 'modal',
+                text: '送出評分'
+              }).appendTo('.modal-footer')
+
+              $(`#send-button-${id}`).click( async() => {
+
+                if (rating == null) {
+                  Swal.fire({icon: "error", title: "未評分", text: "分數忘了填了唷！"})
+                }
+  
+                fetch("/api/1.0/user/rating", {
+                  method: "post",
+                  headers: {
+                    Authorization: "Bearer " + user.access_token,
+                    "content-type": "application/json"
+                  },
+                  body: JSON.stringify(
+                    {ratedId: e.buyer_id, orderId: e.order_id, rating: rating, status: e.status}
+                  )
+                }).then((res) => {
+                  if(res.status == 400) {
+                    Swal.fire({icon: "error", title: "重複評分", text: "已經評分過了唷~"})
+                    $(`#my-rate-button-${id}`).attr('disabled', true).text('已評分');
+                    return
+                  }
+                  Swal.fire({icon: "success", title: "評分成功", text: "感謝您的回饋！"});
+                  $(`#my-rate-button-${id}`).attr('disabled', true).text('已評分');
+                })
+              })
+
+            })
             break;
+          case 5:
+            $("<h6/>").text("訂單已完成").appendTo(`#my-status-${id}`);    
     				default : 
           }
-        });});}).catch((err) => {console.log(err);
-        // self.location.href = "/user/signin";
+        });
       });
+      const currentPage = res.page
+      const totalPage = res.total_page
+
+      if (totalPage <= 1) {
+        $('.previous-page').hide()
+        $('.next-page').hide()
+        return
+      }
+  
+      if (currentPage == 0) {
+        $('.previous-page').hide()
+      } else {
+        $('.previous-page-link').attr('href', `${params.split('&')[0]}&paging=${currentPage - 1}`)
+      }
+  
+      if (currentPage == (totalPage - 1 )) {
+        $('.next-page').hide()
+      } else {
+        $('.next-page-link').attr('href', `${params.split('&')[0]}&paging=${currentPage + 1}`)
+      }
+
+      for (let i = 0; i < totalPage; i++) {
+        if ( i == currentPage) {
+          $(`<li class="page-item disabled"><a class="page-link" href="${params.split('&')[0]}&paging=${i}">${i+1}</a></li>`).insertBefore('.next-page')
+        } else {
+          $(`<li class="page-item"><a class="page-link" href="${params.split('&')[0]}&paging=${i}">${i+1}</a></li>`).insertBefore('.next-page')
+        }
+      }
+
+    })
+    .catch((err) => {
+      console.log(err);
+        // self.location.href = "/user/signin";
+    })
+  ;
 
 $('.my-address-button').click(() => {
 	$(".address-input").attr("disabled", false);

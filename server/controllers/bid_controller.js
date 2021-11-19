@@ -32,7 +32,7 @@ const setBidRecord = async (userBid) => {
 
     const bidIndexInArr = sortedEndTimeArr.array.findIndex(e => e.id == Number(userBid.product_id));
 
-    // sortedEndTimeArr.array[bidIndexInArr].end_time += 30000;
+    sortedEndTimeArr.array[bidIndexInArr].end_time += 30000;
 
     return isBidSuccess
 }

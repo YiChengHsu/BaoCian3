@@ -1,4 +1,5 @@
 <%- include('header') %>
+  <div class="container">
     <div class="row justify-content-center my-row">
       <div class="col-3 my-row">
         <div class="align-middle">
@@ -19,7 +20,7 @@
             </div>
             <div>
             </div>
-            <div class="form-floating rounded-bottom mb-3">
+            <div class="form-floating rounded-bottom mb-1">
               <input type="password" class="form-control my-password" id="floatingPassword-3" placeholder="Password" name='password' required>
               <label for="floatingPassword-3">請輸入6-16位密碼</label>
             </div>
@@ -27,18 +28,17 @@
               <label for="formFile" class="form-label">個人形象照片(選填)：</label>
               <input class="form-control" type="file" id="formFile" name='avatar' onchange="showImg(this)">
             </div>
-            <button class="w-100 btn btn-lg btn-warning my-button mt-3" type="submit">Sign Up</button>
+            <button class="w-100 btn btn-lg btn-warning mt-1" type="submit">Sign Up</button>
           </form>
           <ul class="nav justify-content-center">
             <li class="nav-item">
-              <a class="nav-link active fs-5" aria-current="page" href="/user/signup.html">已經是會員嗎?</a>
+              <a class="nav-link active fs-5" aria-current="page" href="/user/signin">已經是會員嗎?</a>
             </li>
           </ul>
         </div>
       </div>
     </div>
   </div>
-    
   <script src='../javascript/user_signup.js'></script>
   <link rel=stylesheet type="text/css" href="../css/user_signin.css">
 <%- include('footer') %>

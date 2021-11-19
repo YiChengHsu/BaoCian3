@@ -16,15 +16,15 @@ router.route('/product/:params')
         res.render('product_index')
 });
 
-router.route('/user/like')
-    .get((req, res) => {
-        res.render('product_index')
-    })
+// router.route('/user/like')
+//     .get((req, res) => {
+//         res.render('product_index')
+//     })
 
-router.route('/user/bade')
-    .get((req, res) => {
-        res.render('product_index')
-    })
+// router.route('/user/bade')
+//     .get((req, res) => {
+//         res.render('product_index')
+//     })
 
 router.route('/user/upload')
     .get((req, res) => {
@@ -44,6 +44,11 @@ router.route('/user/signup')
 router.route('/user/profile')
     .get((req, res) => {
     res.render('user_profile')
+})
+
+router.route('/user/:records')
+    .get((req, res) => {
+    res.render('product_index')  
 })
 
 router.route('/order/success')

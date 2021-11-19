@@ -6,7 +6,7 @@ const Bid = require('../models/bid_model')
 const Product = require('../models/product_model')
 const { orderBy } = require('lodash');
 const { pool } = require('../models/mysqlcon');
-const pageSize = 20;
+const pageSize = 5;
 const {
     getProductSellerInfo,
     getProductsImages,
@@ -70,6 +70,7 @@ const signUp = async (req ,res) => {
 const signIn = async (req, res) => {
     const body = req.body;
     console.log(body)
+    console.log('hey')
 
     let result;
 
@@ -124,10 +125,12 @@ const getUserProfile = async (req, res) => {
 
     const userId = req.user.id
     const query = req.query
-    console.log(query)
     const paging = parseInt(query.paging) || 0;
     const listType = query.type;
     const status = query.status || null;
+
+    console.log(listType)
+    console.log(paging)
 
     const user = await User.getUserProfileWithDetails(userId)
 
@@ -137,28 +140,23 @@ const getUserProfile = async (req, res) => {
             return await Order.getUserOrders(pageSize, paging, status, userId)      
         } else if (listType && listType == 'sell') {
             return await Order.getSellOrders(pageSize, paging, userId)   
-        } else  {
-            return await User.getUserWatchList(pageSize, paging, userId)
+        } else {
+            res.status(200).send({data: []})
         }
     }
 
 
     const {dataList, dataListCounts} = await findDataList(listType)
 
+    console.log(dataList)
+
     const rating = await getRatings(userId)
     user.rating = rating ? rating : null;
 
-    let data = {}
-    data.user = user
+    const totalPage = Math.ceil(dataListCounts/pageSize)
+    const result = { data: dataList, page: paging, total_page: totalPage, user: user}
 
-    if (dataListCounts > (paging + 1) * pageSize) {
-        data.list = dataList
-        data.next_paging =  paging +1
-    } else {
-        data.list = dataList
-    }
-
-    res.status(200).send({data})
+    res.status(200).send(result)
     return 
 }
 
@@ -177,22 +175,26 @@ const getUserWatchList = async (req, res) => {
     let watchList = await User.getUserWatchProductIds(userId)
     watchList = Object.values(watchList).map(e => e.product_id);
 
-    switch (records){
-        case 'like':
-            productList = watchList;
-            break;
-        case 'bade':
-            productList = await Bid.getUserBadeProducts(userId)
-            productList = Object.values(productList).map(e => e.product_id); 
-            console.log("Bade: " + productList)
-            break;
-        default:
-            res.status(200).json({data: [], page: 0, total_page: 1, user: watchList})
-            return;         
+    const findUserProduct = async (records) => {
+
+        switch (records){
+            case 'like':
+                productList = watchList
+                return await Product.getProducts(pageSize, paging, {productList, order})
+            case 'bade':
+                productList = await Bid.getUserBadeProducts(userId)
+                productList = Object.values(productList).map(e => e.product_id); 
+                return await Product.getProducts(pageSize, paging, {productList, order})
+            case 'selling':
+                return await Product.getProducts(pageSize, paging, {userId, order})
+            default:
+                return ({});   
+        }
+
     }
-
-
-    const {products, productCount} = await Product.getProducts(pageSize, paging, {productList, order})
+    
+    const {products, productCount} = await findUserProduct(records);
+    console.log(products)
 
     if (products && products.length == 0) {
         res.status(200).json({data: [], page: 0, total_page: 1, user: watchList})
@@ -320,6 +322,7 @@ const createRating = async (req, res) => {
     const ratedId = body.ratedId
     const orderId = body.orderId
     const rating = body.rating
+    const status = body.status
 
     try {
         const result = await User.createRating(rateId, ratedId, orderId, rating)
@@ -331,14 +334,7 @@ const createRating = async (req, res) => {
             return
         }
 
-        const result2 = await Order.updateOrder(rateId, orderId, 3, null)
-
-        if ( result <= 1 ) {
-            res.status(400).send({error: 'Bad Request'})
-            return
-        }
-
-        console.log(result2)
+        await Order.updateOrder(rateId, orderId, status, null)
     
         res.status(200).send({result})
     } catch (err) {

@@ -6,8 +6,8 @@
 }
 
 .my-other-img {
-    width: 144.25px;
-    height: 145px;
+    max-width: 32.5%;
+    height: 100%;
     padding: 0px;
     margin: 0px;
     background-position: center center;
