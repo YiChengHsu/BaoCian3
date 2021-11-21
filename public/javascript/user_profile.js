@@ -204,7 +204,7 @@ fetch(url + params, {
                 body: JSON.stringify(
                   {
                     title: e.title,
-                    price: e.price,
+                    price: e.highest_bid,
                     orderId: e.order_id,
                     image: imgUrl,
                     customerEmail: user.email

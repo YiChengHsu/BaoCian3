@@ -12,7 +12,7 @@ const createPayment = async (req, res) => {
 	const userId = req.user.id
   const data = req.body
 
-  console.log(data.image)
+
 
 	const session = await stripe.checkout.sessions.create({
 		payment_method_types: ["card"],
