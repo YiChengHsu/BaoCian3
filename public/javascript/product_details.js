@@ -98,7 +98,7 @@ fetch(detailsUrl, {
       $('#end-bid-header').css('display', 'block')
     }
   } else if (data.highest_user_id == userId) {
-    $('#highest-bid-header').css('display', 'block')
+    $('#highest-header').css('display', 'block')
     setCountDownTimer(endTime)
   } else {
     setCountDownTimer(endTime)
