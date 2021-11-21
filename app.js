@@ -113,7 +113,7 @@ io.on('connection', socket => {
                     socket.emit('bidSuccess', bidRecord)
                     break;
                 case -1:
-                    socket.emit('bidFail', message = '您有訂單尚未付款，無法參競標')
+                    socket.emit('bidFail', message = '您有先前得標商品尚未付款，無法參競標')
                     break;
                 case 0:
                     socket.emit('bidFail', message = '手速慢了，有人已經出價了唷!')
