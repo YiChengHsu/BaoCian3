@@ -38,7 +38,7 @@ const upload = multer({
             cb(null, 'sorry-my-wallet/' + Date.now() + customFileName + '.' + fileExtension)
         }
     }),
-    limits: { fileSize: 3000000 } // 3 Mb 
+    limits: { fileSize: 3145728 } // 3 Mb 
 })
 
 const  getTimeRemaining = (endTime) => {
