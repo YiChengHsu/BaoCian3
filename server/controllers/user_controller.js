@@ -215,16 +215,6 @@ const getUserWatchList = async (req, res) => {
 
 }
 
-const getUserBiddenProduct = async (req ,res) => {
-    const pageSize = 12
-
-    const userId = req.user.id
-    const paging = parseInt(req.query.paging) || 0;
-    const order = req.query.order || null;
-
-
-}
-
 const getUserOrders = async (req, res) => {
 
     const query = req.query

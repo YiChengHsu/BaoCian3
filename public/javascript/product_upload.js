@@ -283,7 +283,7 @@ const verifyImgSize = (file) => {
             if (file.files[i].size > fileMaxSize) {
                 Swal.fire({
                     title: '你的很大',
-                    text: '圖片大小請不要超過2MB',
+                    text: '圖片大小請不要超過1MB',
                     imageUrl: '../assest/over-size.jpg',
                     imageWidth: 400,
                     imageHeight: 300,
