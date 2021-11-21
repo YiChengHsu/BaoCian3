@@ -6,11 +6,15 @@ const { setNewProductToFinisher } = require('./bid_controller')
 const User = require('../models/user_model');
 require('dotenv').config();
 const imagePath = process.env.IMAGE_PATH
+const transTimeZone = process.env.TRANS_TIME_ZONE
 
 
 const createProduct = async(req, res) => {
     const user = req.user.id
     const body = req.body;
+
+    console.log(body.end_time)
+    console.log(transTimeZone)
 
     const product = {
         category: body.category,
@@ -25,7 +29,7 @@ const createProduct = async(req, res) => {
         with_papers: body.with_papers || '資訊未提供',
         place: body.place || '資訊未提供',
         seller_id: user,
-        end_time: Date.parse(body.end_time), //要記得減 8*60*60*1000
+        end_time: Date.parse(body.end_time) - Number(process.env.TRANS_TIME_ZONE), //要記得減 8*60*60*1000
         highest_bid: body.price,
     }
 
@@ -268,6 +272,31 @@ const delWatchList = async (req, res) => {
     res.status(200).send("Delete success")
 }
 
+const reportProduct = async (req, res) => {
+
+    const body = req.body
+    const userId = req.user.id
+
+    const result = await Product.reportProduct ({
+        user_id: userId,
+        product_id: body.productId,
+        cause: body.cause,
+        reason: body.reason,
+        isConfirmed: 0
+    })
+
+    if (result == 0) {
+        res.status(400).send({error: 'Already report other product but unconfirmed'})
+        return
+    } else if (result < 0) {
+        res.status(500).send({error: 'Database Error'})
+        return
+    }
+
+    res.status(200).send("Report success")
+
+}
+
 
 module.exports = {
     createProduct,
@@ -277,4 +306,5 @@ module.exports = {
     getProductSellerInfo,
     getProductsImages,
     getProductWatchTimes,
+    reportProduct,
 }

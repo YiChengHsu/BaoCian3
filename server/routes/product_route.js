@@ -2,7 +2,8 @@ const router = require('express').Router();
 const { 
     upload, 
     authentication, 
-    authenticationPass } = require('../../util/util')
+    authenticationPass,
+} = require('../../util/util')
 
 const cpUpload = upload.fields([
     {name: 'main_image', maxCount:1},
@@ -14,6 +15,7 @@ const {
     getProducts,
     setWatchList,
     delWatchList,
+    reportProduct, 
 } = require('../controllers/product_controller');
 
 router.route('/product/upload')
@@ -25,8 +27,12 @@ router.route('/product/watchList/set')
 router.route('/product/watchList/del')
     .post(authentication(), delWatchList);
 
+router.route('/product/report')
+    .post(authentication(), reportProduct)    
+
 router.route('/product/:category')
     .get(authenticationPass(), getProducts);
+
 
 
 module.exports = router;

@@ -27,6 +27,11 @@
                     恭喜！您的商品以成功售出，請前往<a href="http://localhost:3000/user/profile?type=sell" class="alert-link">賣家清單</a>進行後續處理
                 </div>
             </div>
+            <div class="col-12 highest-bid-div">
+                <div class="alert alert-danger text-center hide-header" id='report-header' role="alert">
+                    您的商品因收到多位會員的檢舉，我們正在進行審核，結果會以Email進行通知，請您耐心等候
+                </div>
+            </div>
             <div class="col-12">
                 <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
                     <ol class="breadcrumb px-2 fs-5">
@@ -126,18 +131,26 @@
                         <div id="user-rating"></div>
                     </div>
                 </div>
+                <div class="row justify-content-center mt-1">
+                    <div class="col-5"></div>
+                    <div class="col-6">
+                        <button type="button" id ='report-button' class="btn btn-danger">
+                            檢舉商品
+                        </button>
+                    </div>
+                </div>
             </div>
             <div class="col-4">
                 <div class="p-2 mb-2 bg-secondary text-white rounded text-center fs-5">商 品 資 訊</div>
                 <div class="row px-2">
-                    <div class="col-3 fs-6">
+                    <div class="col-md-5 col-xxl-3 fs-6">
                         <div class="mt-1">商品狀況：</div>
                         <div class="mt-1">商品材質：</div>
                         <div class="mt-1">相關證明：</div>
                         <div class="mt-1">所在地點：</div>
                         <div class="mt-1">包裝外盒：</div>
                     </div>
-                    <div class="col-9">
+                    <div class="col-md-6 col-xxl-9">
                         <div class="mt-1" id='condition'></div>
                         <div class="mt-1" id="texture"></div>
                         <div class="mt-1" id="with-papers">123</div>
@@ -153,7 +166,6 @@
         </div>
     </div>
     </div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qs/6.10.1/qs.js" integrity="sha512-DkxSbrm2xe6jcerSwLA4vS8WV7UarP44UjrS+Yp2MRFE2md2qPLpZVTyoxHrM2mvZ2Ft2zhPUMplV20zNFXriQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <link rel="stylesheet" href="../css/flipdown.css" />
     <script src="../javascript/flipdown.js"></script>
     <script src="/socket.io/socket.io.js"></script>

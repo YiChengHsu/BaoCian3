@@ -64,7 +64,19 @@ fetch(detailsUrl, {
     console.log('時間結束')
   });
 
-  if (endTime < Date.now()) {
+  if (data.auction_end == 2) {
+    $('#count-down-number').text('商品審核中')
+    const bidButton = document.querySelector('.my-bid-button')
+    const bidInput = document.querySelector('.my-bid-input')
+    $('.my-bid-button').attr('disabled', true)
+    bidButton.disable = true;
+    bidInput.readOnly = true;
+    bidButton.className.remove = 'btn-primary'
+    bidButton.className.add = 'btn-secondary'
+    bidButton.textContent = "審核中"
+    $('#report-header').css('display', 'block')
+  
+  } else if (endTime < Date.now()) {
     $('#count-down-number').text('完結')
     const bidButton = document.querySelector('.my-bid-button')
     const bidInput = document.querySelector('.my-bid-input')
@@ -85,7 +97,6 @@ fetch(detailsUrl, {
     } else {
       $('#end-bid-header').css('display', 'block')
     }
-
   } else if (data.highest_user_id == userId) {
     $('#highest-bid-header').css('display', 'block')
     setCountDownTimer(endTime)
@@ -386,14 +397,34 @@ socket.on(`refresh_${productId}`, bidRecord => {
 })
 
 socket.on('bidFail', (message) => {
-  Swal.fire({
-    imageUrl: '../assest/banner.gif',
-    imageWidth: 400,
-    imageHeight: 300,
-    title: '出價失敗',
-    text: message,
-    confirmButtonText: '知道了'
-  })
+
+  if (message == '您有訂單尚未付款，無法參競標') {
+    Swal.fire({
+      imageUrl: '../assest/banner.gif',
+      imageWidth: 400,
+      imageHeight: 300,
+      title: '出價失敗',
+      text: message,
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText:'欠錢還錢',
+      cancelButtonText:'家有老小',
+    }).then((result => {
+      if (result.isConfirmed) {
+        self.location.href="/user/profile?type=order&status=0"
+      }
+    }))
+  } else {
+    Swal.fire({
+      imageUrl: '../assest/banner.gif',
+      imageWidth: 400,
+      imageHeight: 300,
+      title: '出價失敗',
+      text: message,
+      confirmButtonText: '知道了',
+    })
+  }
 })
 
 socket.on('bidSuccess', bidRecord => {
@@ -408,6 +439,97 @@ socket.on('bidSuccess', bidRecord => {
   })
 })
 
+//Report the product 
+$('#report-button').click( async ()=> {
+
+  if (!userId) {
+    Swal.fire({
+      imageUrl: '../assest/report.png',
+      imageWidth: 400,
+      imageHeight: 250,
+      title: '檢舉前請登入',
+      text: '登入後能有好大的官威！'
+    }).then(() => {
+      self.location.href = "/user/signin"
+    })
+    return
+  }
+
+  const { value: reportObj  } = await Swal.fire({
+    title: '檢舉這個商品',
+    html:
+      `<select name="cause" class='swal2-select' id='cause'>
+        <option value="" selected disabled>檢舉商品原因</option>
+        <option value="1">違法商品</option>
+        <option value="2">活體、保育類動物及其製品</option>
+        <option value="3">重複刊登/複製他人商品圖文</option>
+        <option value="4">令人感到不適或違反善良風俗</option>
+        <option value="5">其他</option>
+      </select>`,
+    input: 'textarea',
+    inputPlaceholder: '請詳細敘述檢舉商品的理由，上面100字',
+    inputAttributes: {
+      'aria-label': 'Type your message here'
+    },
+    showCancelButton: true,
+    confirmButtonText: '不忍直視',
+    cancelButtonText: '放他一條生路',
+    preConfirm: (value)=> {
+      return {
+        cause: $('#cause').val(),
+        reason: value
+      }
+    }
+
+  })
+
+  if (!reportObj) {
+    return
+  } else if (!reportObj.cause || !reportObj.reason) {
+    Swal.fire({
+      title: '出錯了!',
+      text: '檢舉理由的狀況忘記填了唷!',
+      imageUrl: '../assest/oop.png',
+      imageWidth: 400,
+      imageHeight: 300,
+    })
+    return
+  }
+
+  const body = {productId, cause: reportObj.cause,reason: reportObj.reason}
+  console.log(body)
+
+  fetch('/api/1.0/product/report', {
+    method: 'post',
+    headers: {
+      'Authorization': "Bearer " + accessToken,
+      'content-type': 'application/json'
+    },
+    body: JSON.stringify(body)
+  }).then((res) => {
+    if (res.status == 200) {
+      
+    } else {
+      Swal.fire({
+        title: '重複檢舉',
+        text: '在上一份檢舉確認完前沒辦法繼續檢舉相同或是其他商品唷!',
+        imageUrl: '../assest/oop.png',
+        imageWidth: 400,
+        imageHeight: 300,
+      })
+    }
+  }).catch((err) => {
+    console.log(err)
+    Swal.fire({
+      title: '出錯了',
+      text: '請稍後再次一次!',
+      imageUrl: '../assest/oop.png',
+      imageWidth: 400,
+      imageHeight: 300,
+    })
+  })
+
+})
 
 // Output bid message to DOM
 const renderBidRecord = (record) => {

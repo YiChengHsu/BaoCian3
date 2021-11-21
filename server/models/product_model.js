@@ -179,8 +179,6 @@ const delWatchList = async (userId, productId) => {
 
         const result =  await conn.query('DELETE FROM watch_list WHERE id = ?', [watchListId[0].id])
 
-        console.log(result)
-
         await conn.query('COMMIT'); 
         return 1;
     } catch (error) {
@@ -200,6 +198,42 @@ const getWatchTimes = async (products) => {
     return watchTimes 
 }
 
+const reportProduct = async (reportObj) => {
+    const conn = await pool.getConnection();
+    try {
+        await conn.query('START TRANSACTION');
+
+        //One user can only report one product before admin confirmed
+        const [search] = await conn.query('SELECT * FROM report_product WHERE user_id = ? AND isConfirmed = 0 ', [reportObj.user_id])
+
+        if (search.length > 0) {
+            await conn.query('COMMIT');
+            return 0;
+        }
+
+        const insertId = await conn.query('INSERT INTO report_product SET?', reportObj)
+
+        //If product was reported 5 times, discontinue it. 
+        const [reportTimes] = await conn.query('SELECT COUNT(*) as count FROM report_product WHERE product_id = ? AND isConfirmed = 0', [reportObj.product_id])
+
+        console.log(reportTimes)
+
+        if (reportTimes[0].count > 5) {
+            await conn.query('UPDATE product SET auction_end = 2 WHERE id = ?', [reportObj.product_id])
+        }
+    
+        await conn.query('COMMIT'); 
+        return insertId;
+    } catch (error) {
+        await conn.query('ROLLBACK');
+        console.log(error)
+        return -1;
+    } finally {
+        await conn.release();
+    }
+
+}
+
 
 module.exports = {
     createProduct,
@@ -212,4 +246,5 @@ module.exports = {
     setWatchList,
     delWatchList,
     getWatchTimes,
+    reportProduct,
 }

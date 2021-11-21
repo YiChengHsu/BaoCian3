@@ -81,7 +81,9 @@ fetch('/api/1.0' + params + query, {
         $('<span>').addClass('p-2 btn-danger disabled rounded rounded-pill').text('得標中').appendTo(productImage)
       }
 
-      if (e.seller_id == userId && e.end_time < Date.now() && e.highest_user_id == null) {
+      if (e.auction_end == 2) {
+        $('<span>').addClass('p-2 btn-primary disabled rounded rounded-pill').text('審核中').appendTo(productImage)
+      } else if (e.seller_id == userId && e.end_time < Date.now() && e.highest_user_id == null) {
         $('<span>').addClass('p-2 btn-secondary disabled rounded rounded-pill').text('沒人要QQ').appendTo(productImage)
       } else if (e.seller_id == userId && e.end_time < Date.now()) {
         $('<span>').addClass('p-2 btn-info disabled rounded rounded-pill').text('賣出了').appendTo(productImage)

@@ -148,8 +148,6 @@ const getUserProfile = async (req, res) => {
 
     const {dataList, dataListCounts} = await findDataList(listType)
 
-    console.log(dataList)
-
     const rating = await getRatings(userId)
     user.rating = rating ? rating : null;
 
@@ -349,9 +347,7 @@ const createRating = async (req, res) => {
 const getRatings = async (userId) => {
 
     let rating = null
-
     let ratings = await User.getRatings(userId)
-
     ratings = ratings.map(e => e.rating)
 
     // rating = Object.values(rating)
