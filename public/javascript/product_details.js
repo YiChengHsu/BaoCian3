@@ -508,7 +508,13 @@ $('#report-button').click( async ()=> {
     body: JSON.stringify(body)
   }).then((res) => {
     if (res.status == 200) {
-      
+      Swal.fire({
+        imageUrl: '../assest/report.jpg',
+        imageWidth: 400,
+        imageHeight: 300,
+        title: '檢舉成功',
+        text: '我們收到您的意見了，會非常嚴格的審查，應該吧'
+      })
     } else {
       Swal.fire({
         title: '重複檢舉',
