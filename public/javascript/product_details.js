@@ -397,7 +397,7 @@ socket.on(`refresh_${productId}`, bidRecord => {
 
 socket.on('bidFail', (message) => {
 
-  if (message == '您有訂單尚未付款，無法參競標') {
+  if (message == '您有得標商品尚未付款，無法參競標') {
     Swal.fire({
       imageUrl: '../assest/banner.gif',
       imageWidth: 400,
