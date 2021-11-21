@@ -383,10 +383,9 @@ socket.on(`refresh_${productId}`, bidRecord => {
 
   if (bidRecord.user_id == userId) {
     $('#highest-header').css('display', 'block');
+  } else {
+    $('#highest-header').css('display', 'none');
   }
-  // } else {
-  //     $('#hightest-bid-header').hide();
-  // }
 
   const rightDiv = document.querySelector('.my-right')
   rightDiv.classList.add('fade-it')

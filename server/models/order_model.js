@@ -86,7 +86,7 @@ const getSellOrders = async (pageSize, paging, userId) => {
         binding: [pageSize * paging, pageSize]
     };
 
-    const orderQuery = 'SELECT *,o.id AS order_id FROM project.order o JOIN product p on o.product_id = p.id WHERE o.seller_id = ? ' + limit.sql;
+    const orderQuery = 'SELECT *,o.id AS order_id FROM project.order o JOIN product p on o.product_id = p.id WHERE o.seller_id = ? ORDER BY o.pay_deadline DESC ' + limit.sql;
     const orderBindings = userBinding.concat(limit.binding)
 
     const orderCountQuery = 'SELECT COUNT(*) as count FROM project.order o JOIN product p on o.product_id = p.id WHERE o.seller_id = ? ';
