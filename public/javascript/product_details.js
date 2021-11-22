@@ -9,12 +9,11 @@ let endTime;
 let bidTimes;
 let sellerId;
 let roomUsers;
-let watchList = []
+let watchList = [];
 
 // Fetch the product details
 
 socket.on('roomUsers', (data) => {
-  console.log(data)
   roomUsers = data[productId] ? data[productId].length : 0;
   const roomUserDiv = document.querySelector('#room-user')
   roomUserDiv.textContent = `在線人數： ${roomUsers}`
@@ -30,7 +29,6 @@ fetch(detailsUrl, {
 }).then(res => res.json()).then((res) => {
 
   const data = res.data
-  console.log(data)
   watchList = res.user
 
   if (data == null) {
@@ -182,9 +180,7 @@ fetch(detailsUrl, {
   $('#watch-btn').click(() => {
     if (userId == null) {
       Swal.fire({
-        imageUrl: '../assest/more.jpg',
-        imageWidth: 400,
-        imageHeight: 300,
+        icon: 'warning',
         title: '下標前請登入',
         text: '登入以享受更多競標的樂趣！',
         confirmButtonText: '左轉登入',
@@ -227,11 +223,16 @@ fetch(detailsUrl, {
   $('#unwatch-btn').click(() => {
     if (userId == null) {
       Swal.fire({
-        imageUrl: '../assest/more.jpg',
-        imageWidth: 400,
-        imageHeight: 300,
+        icon: 'warning',
         title: '下標前請登入',
-        text: '登入以享受更多競標的樂趣！'
+        text: '登入以享受更多競標的樂趣！',
+        confirmButtonText: '左轉登入',
+        showCancelButton: true,
+        cancelButtonText: '先不用'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          self.location.href = '/user/signin'
+        }
       })
       return
     }
@@ -282,46 +283,46 @@ form.addEventListener('submit', (e) => {
     return
   }
 
-  if (!userId) {
+  if (userId == null) {
     Swal.fire({
-      imageUrl: '../assest/more.jpg',
-      imageWidth: 400,
-      imageHeight: 300,
+      icon: 'warning',
       title: '下標前請登入',
-      text: '登入以享受更多競標的樂趣！'
-    }).then(() => {
-      self.location.href = "/user/signin"
+      text: '登入以享受更多競標的樂趣！',
+      confirmButtonText: '左轉登入',
+      showCancelButton: true,
+      cancelButtonText: '先不用'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        self.location.href = '/user/signin'
+      }
     })
     return
   }
 
   if (userId == sellerId) {
     Swal.fire({
-      imageUrl: '../assest/self.jpg',
-      imageWidth: 400,
-      imageHeight: 250,
+      icon: 'warning',
       title: '請勿自行下標',
-      text: '自己的轎不能自己抬唷！'
+      text: '自己的轎不能自己抬唷！',
+      confirmButtonText: '知道了',
     })
     return
   }
 
   if (userBidIncr < leastBid) {
     Swal.fire({
-      imageUrl: '../assest/tiny.gif',
-      imageWidth: 400,
-      imageHeight: 330,
+      icon:'error',
       title: '無效出價',
-      text: '請不要小於最低出價增額'
+      text: '請不要小於最低出價增額',
+      confirmButtonText: '知道了',
     })
     return
   } else if (userBidIncr > leastBid * 100) {
     Swal.fire({
-      imageUrl: '../assest/toomuch.png',
-      imageWidth: 400,
-      imageHeight: 300,
+      icon:'error',
       title: '太多啦~',
-      text: '珍惜荷包，請不要大於出價增額的一百倍'
+      text: '珍惜荷包，請不要大於出價增額的一百倍',
+      confirmButtonText: '知道了',
     })
     return
   }
@@ -340,8 +341,8 @@ form.addEventListener('submit', (e) => {
     icon: "warning",
     showCancelButton: true,
     confirmButtonColor: "#e95420",
-    confirmButtonText: "我跟他拚了！",
-    cancelButtonText: "怕.jpg"
+    confirmButtonText: "確認出價",
+    cancelButtonText: "再想想"
   }).then((result) => {
     if (result.isConfirmed) {
       socket.emit('bid', {
@@ -399,16 +400,13 @@ socket.on('bidFail', (message) => {
 
   if (message == '您有得標商品尚未付款，無法參競標') {
     Swal.fire({
-      imageUrl: '../assest/banner.gif',
-      imageWidth: 400,
-      imageHeight: 300,
+      icon: 'error',
       title: '出價失敗',
       text: message,
       showCancelButton: true,
-      confirmButtonColor: '#3085d6',
       cancelButtonColor: '#d33',
-      confirmButtonText:'欠錢還錢',
-      cancelButtonText:'家有老小',
+      confirmButtonText:'馬上付款',
+      cancelButtonText:'再緩緩',
     }).then((result => {
       if (result.isConfirmed) {
         self.location.href="/user/profile?type=order&status=0"
@@ -416,9 +414,7 @@ socket.on('bidFail', (message) => {
     }))
   } else {
     Swal.fire({
-      imageUrl: '../assest/banner.gif',
-      imageWidth: 400,
-      imageHeight: 300,
+      icon: 'error',
       title: '出價失敗',
       text: message,
       confirmButtonText: '知道了',
@@ -428,11 +424,10 @@ socket.on('bidFail', (message) => {
 
 socket.on('bidSuccess', bidRecord => {
   Swal.fire({
-    imageUrl: '../assest/best.png',
-    imageWidth: 400,
-    imageHeight: 300,
+    icon: 'success',
     title: '出價成功',
-    text: '您目前是最高出價者'
+    text: '您目前是最高出價者',
+    confirmButtonText: '太好了',
   }).then(() => {
     input.value = ''
   })
@@ -441,15 +436,18 @@ socket.on('bidSuccess', bidRecord => {
 //Report the product 
 $('#report-button').click( async ()=> {
 
-  if (!userId) {
+  if (userId == null) {
     Swal.fire({
-      imageUrl: '../assest/report.png',
-      imageWidth: 400,
-      imageHeight: 250,
-      title: '檢舉前請登入',
-      text: '登入後能有好大的官威！'
-    }).then(() => {
-      self.location.href = "/user/signin"
+      icon: 'warning',
+      title: '下標前請登入',
+      text: '登入以後才能檢舉商品唷！',
+      confirmButtonText: '左轉登入',
+      showCancelButton: true,
+      cancelButtonText: '先不用'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        self.location.href = '/user/signin'
+      }
     })
     return
   }
@@ -471,8 +469,8 @@ $('#report-button').click( async ()=> {
       'aria-label': 'Type your message here'
     },
     showCancelButton: true,
-    confirmButtonText: '不忍直視',
-    cancelButtonText: '放他一條生路',
+    confirmButtonText: '確認送出',
+    cancelButtonText: '再想想',
     preConfirm: (value)=> {
       return {
         cause: $('#cause').val(),
@@ -488,9 +486,7 @@ $('#report-button').click( async ()=> {
     Swal.fire({
       title: '出錯了!',
       text: '檢舉理由的狀況忘記填了唷!',
-      imageUrl: '../assest/oop.png',
-      imageWidth: 400,
-      imageHeight: 300,
+      icon: 'warning',
     })
     return
   }
@@ -508,19 +504,15 @@ $('#report-button').click( async ()=> {
   }).then((res) => {
     if (res.status == 200) {
       Swal.fire({
-        imageUrl: '../assest/report.jpg',
-        imageWidth: 400,
-        imageHeight: 300,
+        icon: 'success',
         title: '檢舉成功',
-        text: '我們收到您的意見了，會非常嚴格的審查，應該吧'
+        text: '我們收到您的意見了，會進行相關審核'
       })
     } else {
       Swal.fire({
         title: '重複檢舉',
         text: '在上一份檢舉確認完前沒辦法繼續檢舉相同或是其他商品唷!',
-        imageUrl: '../assest/oop.png',
-        imageWidth: 400,
-        imageHeight: 300,
+        icon: 'warning'
       })
     }
   }).catch((err) => {
@@ -528,9 +520,7 @@ $('#report-button').click( async ()=> {
     Swal.fire({
       title: '出錯了',
       text: '請稍後再次一次!',
-      imageUrl: '../assest/oop.png',
-      imageWidth: 400,
-      imageHeight: 300,
+      icon: 'error',
     })
   })
 

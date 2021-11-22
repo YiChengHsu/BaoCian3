@@ -10,11 +10,9 @@ if (params.length == 0) {
 
 if (!user || !user.user) {
   Swal.fire({
-    imageUrl: '../assest/more.jpg',
-    imageWidth: 400,
-    imageHeight: 300,
-    title: '下標前請登入',
-    text: '登入以享受更多競標的樂趣！',
+    icon:'warning',
+    title: '請登入',
+    text: '登入之後才能查看個人頁面唷！',
     confirmButtonText: '知道了'
   }).then(() => {
     window.location.href = "/user/signin";
@@ -88,9 +86,8 @@ fetch(url + params, {
     Swal.fire({
       title: "缺少收件資訊",
       text: "可能影響得標後續處理，請盡速填寫！",
-      imageUrl: "../assest/wrong.jfif",
-      imageWidth: 400,
-      imageHeight: 300
+      icon: 'warning',
+      confirmButtonText: '知道了'
     })
   }
 
@@ -98,9 +95,8 @@ fetch(url + params, {
     Swal.fire({
       title: "缺少轉帳資訊",
       text: "可能影響賣家後續處理，請盡速填寫！",
-      imageUrl: "../assest/wrong.jfif",
-      imageWidth: 400,
-      imageHeight: 300
+      icon: 'warning',
+      confirmButtonText: '知道了'
     })
   }
 

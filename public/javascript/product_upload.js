@@ -4,15 +4,14 @@ const selectList = document.querySelector('.my-category-select');
 
 if (!user || !user.user) {
     Swal.fire({
-      imageUrl: '../assest/more.jpg',
-      imageWidth: 400,
-      imageHeight: 300,
-      title: '下標前請登入',
-      text: '登入以享受更多競標的樂趣！',
-      confirmButtonText: '知道了'
+        icon: 'warning',
+        title: '請登入',
+        text: '登入以享受更多競標的樂趣！',
+        showCancelButton: true,
     }).then(() => {
-      window.location.href = "/user/signin";
-    });
+        self.location.href='/user/signin'
+    })
+
 }
 
 //Input category with relevant sub category
@@ -171,11 +170,9 @@ form.addEventListener('submit', (e) => {
     .then((res) => {
         console.log(res)
         Swal.fire({
+            icon: 'success',
             title: '上傳成功',
-            text: 'Rick為你高興到開始跳舞',
-            imageUrl: '../assest/rick-roll-rick-ashley.gif',
-            imageWidth: 400,
-            imageHeight: 500,
+            text: '即將轉跳到商品頁面',
         }).then(() => {
             self.location.href = `/product/details?id=${res.productId}`
         })
@@ -282,13 +279,13 @@ const verifyImgSize = (file) => {
         for (let i = 0; i < file.files.length; i++) {
             if (file.files[i].size > fileMaxSize) {
                 Swal.fire({
-                    title: '你的很大',
+                    title: '圖檔過大',
                     text: '圖片大小請不要超過1MB',
-                    imageUrl: '../assest/over-size.jpg',
-                    imageWidth: 400,
-                    imageHeight: 300,
+                    imageUrl: '../assest/non-accept.png',
+                    imageWidth: 300,
+                    imageHeight: 200,
                     imageAlt: 'Too big',
-                    confirmButtonText:'我有其他的 file style!'
+                    confirmButtonText:'知道了'
                 })
                 file.value = "";
                 return false;

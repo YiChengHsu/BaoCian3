@@ -38,7 +38,7 @@ fetch('/api/1.0' + params + query, {
         imageHeight: 300,
         title: '這裡有..',
         text: '目前沒有任何東西唷！',
-        confirmButtonText: '回溫泉'
+        confirmButtonText: '回首頁'
       }).then(() => {
         self.location.href = '/'
         return
@@ -48,6 +48,8 @@ fetch('/api/1.0' + params + query, {
     const products = document.querySelector('.products-container')
     data.map((e) => {
 
+      const id = e.id
+
       const productItem = document.createElement('div');
       productItem.className = 'card rounded rounded-3 col-2 productItem mx-3 mb-3'
       productItem.style="width: 18rem;"
@@ -56,19 +58,18 @@ fetch('/api/1.0' + params + query, {
       productHeader.className = 'row mx-2 mb-1 fs-6'
 
       const sellerImg = document.createElement('img')
-      sellerImg.className = 'col-4 rounded-circle seller-img p-0'
+      sellerImg.className = 'col-2 rounded-circle seller-img p-0'
       sellerImg.src = e.sellerInfo.picture
       productHeader.appendChild(sellerImg)
 
       const sellerRating = e.sellerInfo.rating ? e.sellerInfo.rating.toFixed(2): '尚未評分' 
 
       const sellerName = document.createElement('div')
-      sellerName.className = 'col-8 align-center py-auto'
+      sellerName.className = 'col-10 align-center py-auto'
       sellerName.innerHTML = `${e.sellerInfo.name}  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="36" fill="#EF873E" class="bi bi-star-fill" viewBox="0 3 16 16">
-      <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/></svg>  ${sellerRating}`
+      <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/></svg><span id='seller-rating-${id}'>${sellerRating} </span>`
       productHeader.appendChild(sellerName)
 
-      const id = e.id
 
       const productLink = document.createElement('a');
       productLink.href = '/product/details?id=' + id
@@ -164,9 +165,7 @@ fetch('/api/1.0' + params + query, {
       watchBtn.addEventListener('click', (e) => {
         if(userId == null) {
           Swal.fire({
-            imageUrl: '../assest/more.jpg',
-            imageWidth: 400,
-            imageHeight: 300,
+            icon: 'warning',
             title: '請登入',
             text: '登入以享受更多競標的樂趣！',
             confirmButtonText:'左轉登入',
@@ -224,13 +223,16 @@ fetch('/api/1.0' + params + query, {
       watchedBtn.addEventListener('click', (e) => {
         if(userId == null) {
           Swal.fire({
-            imageUrl: '../assest/more.jpg',
-            imageWidth: 400,
-            imageHeight: 300,
-            title: '下標前請登入',
+            icon: 'warning',
+            title: '請登入',
             text: '登入以享受更多競標的樂趣！',
-            footer: '<a href="/user/signin">左轉登入頁面</a>',
-            confirmButtonText:'知道了!'
+            confirmButtonText:'左轉登入',
+            showCancelButton: true,
+            cancelButtonText:'先不用'
+          }).then((result) => {
+            if (result.isConfirmed){
+              self.location.href='/user/signin'
+            }
           })
           return
         }

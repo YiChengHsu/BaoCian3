@@ -47,9 +47,7 @@ form.addEventListener("submit", (e) => {
     Swal.fire({
       title: "註冊成功",
       text: "歡迎加入Rick Roll的行列",
-      imageUrl: "../assest/rick-roll-rick-ashley.gif",
-      imageWidth: 400,
-      imageHeight: 500
+      icon: 'success'
     }).then(() => {
       self.location.href = "/user/profile";
     });
@@ -106,19 +104,19 @@ const verifyImgFile = (file) => {
 };
 
 const verifyImgSize = (file) => {
-  const fileMaxSize = 2000000; // 2M
+  const fileMaxSize = 1000000; // 2M
   const filePath = file.value;
   if (filePath) {
     for (let i = 0; i < file.files.length; i++) {
       if (file.files[i].size > fileMaxSize) {
         Swal.fire({
-          title: "你的很大",
-          text: "圖片大小請不要超過2MB",
-          imageUrl: "../assest/over-size.jpg",
-          imageWidth: 400,
-          imageHeight: 300,
+          title: "圖檔過大",
+          text: "圖片大小請不要超過1MB",
+          imageUrl: "../assest/non-accept.png",
+          imageWidth: 300,
+          imageHeight: 200,
           imageAlt: "Too big",
-          confirmButtonText: "我有其他的 file style!"
+          confirmButtonText: "知道了"
         });
         file.value = "";
         return false;
