@@ -1,7 +1,11 @@
 // Get product id from query
 const query = location.search
 const productId = query.split('=')[1]
-const socket = io();
+const socket = io({
+  extraHeaders: {
+    Authorization: "Bearer " + accessToken
+  }
+});
 
 let leastBid;
 let highestBidTimes;
@@ -421,6 +425,7 @@ socket.on('bidFail', (message) => {
     })
   }
 })
+
 
 socket.on('bidSuccess', bidRecord => {
   Swal.fire({
