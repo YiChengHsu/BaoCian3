@@ -211,7 +211,13 @@ fetch(detailsUrl, {
       }
       $('#unwatch-btn').show();
       $('#watch-btn').hide();
-      Swal.fire({icon: 'success', title: '加入成功', text: '可於關注頁面的進行查看!'})
+      Swal.fire({
+        title: '加入成功',
+        text: '我就知道你最喜歡Rick Roll了!',
+        imageUrl: '../assest/rick-roll-rick-ashley.gif',
+        imageWidth: 400,
+        imageHeight: 500,
+    })
 
     }).catch((error) => {
       console.log(error)
