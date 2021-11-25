@@ -149,7 +149,7 @@ const confirmPayment = async (paymentIntent, payment) => {
   const conn = await pool.getConnection();
   try {
     await conn.query('START TRANSACTION')
-    const [search] = await conn.query('SELECT p.id, p.order_id, o.buyer_id as FROM payment p INNER JOIN project.order o ON p.order_id = o.id  WHERE p.payment_intent = ? ', paymentIntent)
+    const [search] = await conn.query('SELECT p.id, p.order_id, o.buyer_id FROM payment p INNER JOIN project.order o ON p.order_id = o.id  WHERE p.payment_intent = ? ', paymentIntent)
 
     if (search.length <= 0) {
       await conn.query('COMMIT')
