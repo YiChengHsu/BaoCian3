@@ -1,55 +1,95 @@
-const { setBidRecord }  = require('./server/controllers/bid_controller')
+const _ = require('lodash')
+const { setBidRecord }  = require('../controllers/bid_controller')
+const { getUserByToken } = require('../../util/util')
 const roomUsers = {}
 const roomUsersCount = {}
 
 const socketConn = (io) => {
 
+  io.use( async (socket,next) => {
+    let accessToken = socket.handshake.auth.authorization
+    if (!accessToken) {
+      socket.user = null;
+      next();
+      return
+    }
+
+    accessToken = accessToken.replace("Bearer ", "");
+    if (accessToken == "null") {
+        socket.user = null;
+        next();
+        return
+    }
+
+    try {
+        let userProfile = await getUserByToken(socket, accessToken)
+
+        if (userProfile) {
+          socket.user.id = userProfile.user.id;
+          socket.user.role_id = userProfile.user.role_id;
+        } else {
+          socket.user = null;
+        }
+
+        next();
+    } catch (error) {
+        console.log(error)
+        socket.user = null;
+        return;
+    }
+
+  })
+
   io.on('connection', socket => {
 
-    // if (socket.handshake.headers.authorization) {
-    //   console.log(socket.handshake.headers.authorization)
-    // } else {
-    //   console.log(socket.id)
-    // }
-
-    //Send the room user count to new user
     socket.emit('roomUsers', roomUsersCount)
   
-    socket.on('join', async ([productId, userId]) => {
+    socket.on('join', async (productId) => {
       socket.join(productId)
 
-      roomId = userId || socket.id
-  
-      if (roomUsers[productId]) {
-        roomUsers[productId].push(roomId)
+      userId = socket.user? socket.user.id: socket.id
+
+      if (!roomUsers[productId]) {
+        roomUsers[productId] = [userId]
       } else {
-        roomUsers[productId] = [roomId]
+        roomUsers[productId].push(userId)
       }
 
-      roomUsersCount = Object.keys(roomUsers).map((e) => {
+      Object.keys(roomUsers).map((e) => {
         roomUsersCount[e] = _.uniq(roomUsers[e]).length
       })
-
-      console.log(roomUsersCount)
   
-      io.emit('roomUsers', roomUsers)
+      io.emit('roomUsers', roomUsersCount)
   
   
       // Listen for bid
       socket.on('bid', async (userBid) => {
+        console.log(userBid)
+
+        //Can not bid without access token
+        if (socket.user == null) {
+          socket.emit('bidFail', message = '競標前請先登入')
+        }
   
         const bidTime = Date.now()
         const timeLeft = userBid.endTime - bidTime
         const bidRecord = {
           product_id: userBid.productId,
-          user_id: userBid.userId,
+          user_id: socket.user.id,
           bid_amount: userBid.userBidAmount,
           bid_time: bidTime,
           time_left: timeLeft,
-          user_name: userBid.userName
+          user_name: socket.user.name
+        }
+
+        let result
+
+        try {
+          result = await setBidRecord(bidRecord);
+        } catch(err) {
+          console.log(err)
         }
   
-        const result = await setBidRecord(bidRecord);
   
         switch (result.status) {
           case 1: bidRecord.end_time = userBid.endTime + 30000
@@ -74,14 +114,18 @@ const socketConn = (io) => {
       socket.on('disconnect', (userId) => {
   
         roomUsers[productId].map((e, index) => {
-          if (e == socket.id) {
+          if (e == userId) {
             roomUsers[productId].splice(index, 1)
           }
         })
   
-        io.emit('roomUsers', roomUsers)
+        io.emit('roomUsers', roomUsersCount)
       })
     })
   })
 }
+
+module.exports = {
+  socketConn, 
+};
 

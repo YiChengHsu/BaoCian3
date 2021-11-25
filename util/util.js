@@ -83,11 +83,8 @@ const authentication = () => {
         }
 
         try {
-            const user = jwt.verify(accessToken, config.token.accessToken)
-            user.picture = process.env.IMAGE_PATH + user.picture
-            req.user = user;
 
-            let userProfile = await User.getUserProfile (user.email)
+            let userProfile = await getUserByToken(req, accessToken)
 
             if (!userProfile) {
                 res.status(403).send({ error: 'Forbidden'})
@@ -105,7 +102,7 @@ const authentication = () => {
     }
 }
 
-const authenticationPass = () => {
+const getUserIdByToken = () => {
     return async function (req, res, next) {
         let accessToken = req.get('Authorization');
         if (!accessToken) {
@@ -121,64 +118,34 @@ const authenticationPass = () => {
             return
         }
 
+        const user = jwt.verify(accessToken, config.token.accessToken)
+        req.user = user;
+
         try {
-            const user = jwt.verify(accessToken, config.token.accessToken)
-            req.user = user;
-
-            let userProfile = await User.getUserProfile (user.email)
-
-            if (!userProfile) {
-                res.status(403).send({ error: 'Forbidden'})
+            let userProfile = await getUserByToken(req, accessToken)
+    
+            if (userProfile) {
+              req.user.id = userProfile.user.id;
+              req.user.role_id = userProfile.user.role_id;
             } else {
-                req.user.id = userProfile.user.id;
-                req.user.role_id = userProfile.user.role_id;
-                next();
+                req.user = null;
             }
-            return;
+    
+            next();
         } catch (error) {
             console.log(error)
-            res.status(403).send({ error: 'Forbidden'});
+            req.user = null;
             return;
         }
     }
 }
 
-const socketAuthentication = () => {
-    return async function (socket, next) {
-        let accessToken = req.get('Authorization');
-        if (!accessToken) {
-            req.user = null;
-            next();
-            return
-        }
-
-        accessToken = accessToken.replace("Bearer ", "");
-        if (accessToken == "null") {
-            req.user = null;
-            next();
-            return
-        }
-
-        try {
-            const user = jwt.verify(accessToken, config.token.accessToken)
-            req.user = user;
-
-            let userProfile = await User.getUserProfile (user.email)
-
-            if (!userProfile) {
-                res.status(403).send({ error: 'Forbidden'})
-            } else {
-                req.user.id = userProfile.user.id;
-                req.user.role_id = userProfile.user.role_id;
-                next();
-            }
-            return;
-        } catch (error) {
-            console.log(error)
-            res.status(403).send({ error: 'Forbidden'});
-            return;
-        }
-    }
+const getUserByToken = async (reqType, accessToken) => {
+    const user = jwt.verify(accessToken, config.token.accessToken)
+    reqType.picture = process.env.IMAGE_PATH + user.picture
+    reqType.user = user;
+    
+    return await User.getUserProfile (user.email)
 }
 
 module.exports = {
@@ -186,6 +153,6 @@ module.exports = {
     getTimeRemaining,
     wrapAsync,
     authentication,
-    authenticationPass,
-    socketAuthentication
+    getUserByToken,
+    getUserIdByToken,
 };

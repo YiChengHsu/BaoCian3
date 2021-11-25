@@ -6,8 +6,7 @@ const ejs = require('ejs');
 const server = http.createServer(app);
 const {Server} = require('socket.io');
 const io = new Server(server);
-const {setBidRecord} = require('./server/controllers/bid_controller')
-const _ = require('lodash');
+const { socketConn } = require('./server/controllers/socket_controller');
 require('dotenv').config()
 
 
@@ -29,106 +28,30 @@ app.use((req, res, next) => {
 
 
 // API routes
-app.use('/api/1.0', [require('./server/routes/bid_route'), require('./server/routes/product_route'), require('./server/routes/user_route'), require('./server/routes/order_route'),]);
+app.use('/api/1.0', [
+  require('./server/routes/product_route'), 
+  require('./server/routes/user_route'), 
+  require('./server/routes/order_route'),
+]);
 
-app.use('/', [require('./server/routes/page_route'),])
+//Render page routes with ejs
+app.use('/', require('./server/routes/page_route'))
 
 // Page not found
 app.use(function (req, res, next) {
   res.status(404).render('404');
 });
 
-
+//Error handling
 app.use(function (err, req, res, next) {
   console.log(err);
   res.status(500).send('Internal Server Error');
 });
 
+socketConn(io);
 
 // Broadcast when a bidder connects
 
 server.listen(3000, () => {
   console.log('listen on 3000');
 });
-
-const roomUsers = {}
-const roomUsersCount = {}
-
-
-io.on('connection', socket => {
-
-  if (socket.handshake.headers.authorization) {
-    console.log(socket.handshake.headers.authorization)
-  } else {
-    console.log(socket.id)
-  }
-
-  socket.emit('roomUsers', roomUsers)
-
-  socket.on('join', async ([productId, userId]) => {
-    socket.join(productId)
-
-
-    if (roomUsers[productId]) {
-      roomUsers[productId].push(socket.id)
-    } else {
-      roomUsers[productId] = [socket.id]
-    } 
-
-    Object.keys(roomUsers).map((e) => {
-        roomUsersCount[e] = _.uniq(roomUsers[e]).length
-    })
-
-    console.log(roomUsersCount)
-    
-    io.emit('roomUsers', roomUsers)
-
-
-    // Listen for bid
-    socket.on('bid', async (userBid) => {
-
-      const bidTime = Date.now()
-      const timeLeft = userBid.endTime - bidTime
-      const bidRecord = {
-        product_id: userBid.productId,
-        user_id: userBid.userId,
-        bid_amount: userBid.userBidAmount,
-        bid_time: bidTime,
-        time_left: timeLeft,
-        user_name: userBid.userName
-      }
-
-      const result = await setBidRecord(bidRecord);
-
-      switch (result.status) {
-        case 1: bidRecord.end_time = userBid.endTime + 30000
-          bidRecord.highest_bid_times = userBid.highestBidTimes + 1
-          bidRecord.roomUsers = roomUsers.productId ? roomUsers.productId.length : 0;
-          io.emit(`refresh_${
-            userBid.productId
-          }`, bidRecord)
-          socket.emit('bidSuccess', bidRecord)
-          break;
-        case - 1:
-          socket.emit('bidFail', message = '您有得標商品尚未付款，無法參競標')
-          break;
-        case 0:
-          socket.emit('bidFail', message = '手速慢了，有人已經出價了唷!')
-          break;
-        default:
-          socket.emit('bidFail', message = '請稍後再試')
-      }
-    })
-
-    socket.on('disconnect', (userId) => {
-
-      roomUsers[productId].map((e, index) => {
-        if (e == socket.id) {
-          roomUsers[productId].splice(index, 1)
-        }
-      })
-
-      io.emit('roomUsers', roomUsers)
-    })
-  })
-})

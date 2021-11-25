@@ -1,8 +1,8 @@
 const router = require('express').Router();
 const { 
     upload, 
-    authentication, 
-    authenticationPass,
+    authentication,
+    getUserIdByToken, 
 } = require('../../util/util')
 
 const cpUpload = upload.fields([
@@ -31,7 +31,7 @@ router.route('/product/report')
     .post(authentication(), reportProduct)    
 
 router.route('/product/:category')
-    .get(authenticationPass(), getProducts);
+    .get(getUserIdByToken(),getProducts);
 
 
 

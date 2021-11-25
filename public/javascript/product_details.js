@@ -2,8 +2,8 @@
 const query = location.search
 const productId = query.split('=')[1]
 const socket = io({
-  extraHeaders: {
-    Authorization: "Bearer " + accessToken
+  auth: {
+    authorization: "Bearer " + accessToken
   }
 });
 
@@ -18,7 +18,8 @@ let watchList = [];
 // Fetch the product details
 
 socket.on('roomUsers', (data) => {
-  roomUsers = data[productId] ? data[productId].length : 0;
+  console.log(data)
+  roomUsers = data[productId] || 0;
   const roomUserDiv = document.querySelector('#room-user')
   roomUserDiv.textContent = `在線人數： ${roomUsers}`
 })
@@ -62,9 +63,7 @@ fetch(detailsUrl, {
 
   const flipdown = new FlipDown(endTime / 1000);
   flipdown.start();
-  flipdown.ifEnded(() => {
-    console.log('時間結束')
-  });
+  flipdown.ifEnded();
 
   if (data.auction_end == 2) {
     $('#count-down-number').text('商品審核中')
@@ -208,7 +207,6 @@ fetch(detailsUrl, {
         {'productId': data.id}
       )
     }).then((res) => {
-      console.log(res.status)
       if (res.status != 200) {
         Swal.fire({icon: 'error', title: '加入失敗', text: '請再試一次!'})
         return
@@ -251,7 +249,6 @@ fetch(detailsUrl, {
         {'productId': data.id}
       )
     }).then((res) => {
-      console.log(res.status)
       if (res.status != 200) {
         return error
       }
@@ -269,7 +266,7 @@ fetch(detailsUrl, {
 // Get user information by token
 
 // Join product id room with socket.io handshake
-socket.emit('join', [productId, userId])
+socket.emit('join', productId)
 
 // Send bid message to socket.io server
 const form = document.querySelector('#bid-form')
@@ -281,7 +278,6 @@ form.addEventListener('submit', (e) => {
   e.preventDefault();
 
   const userBidIncr = Number(input.value)
-  console.log(userBidIncr)
   if (! userBidIncr) {
     Swal.fire({icon: 'error', title: '無效出價', text: '出價欄位不得為空或包含無效字元'})
     return
@@ -335,8 +331,6 @@ form.addEventListener('submit', (e) => {
   const currentAmount = highestBid.textContent
   const userBidAmount = Number(highestBid.textContent.replace('$', "").replace(',', '')) + userBidIncr
 
-  console.log(userName)
-
   Swal.fire({
     title: "確認出價",
     html: `<p>目前出價：<b>${currentAmount}</b></p><p>你的出價：<b>$${
@@ -366,8 +360,6 @@ form.addEventListener('submit', (e) => {
 // Get message from server
 socket.on(`refresh_${productId}`, bidRecord => {
 
-  console.log(bidRecord)
-
   const highestBid = document.querySelector('.highest-bid')
   highestBid.textContent = `$${
     toCurrency(bidRecord.bid_amount)
@@ -383,8 +375,6 @@ socket.on(`refresh_${productId}`, bidRecord => {
   flipdown.start();
   resetCountDownTimer()
   renderBidRecord(bidRecord)
-
-  console.log(bidRecord.user_id == userId)
 
   if (bidRecord.user_id == userId) {
     $('#highest-header').css('display', 'block');
@@ -402,7 +392,7 @@ socket.on(`refresh_${productId}`, bidRecord => {
 
 socket.on('bidFail', (message) => {
 
-  if (message == '您有得標商品尚未付款，無法參競標') {
+  if (message == '您有得標商品尚未付款，無法參與競標') {
     Swal.fire({
       icon: 'error',
       title: '出價失敗',
@@ -497,7 +487,6 @@ $('#report-button').click( async ()=> {
   }
 
   const body = {productId, cause: reportObj.cause,reason: reportObj.reason}
-  console.log(body)
 
   fetch('/api/1.0/product/report', {
     method: 'post',
@@ -549,8 +538,6 @@ const renderBidRecord = (record) => {
   subDiv.innerHTML = `好朋友 <b>${
     record.user_name
   }</b> 舉起了號碼牌`
-
-  console.log(record)
 
   if (Date.now() < endTime && record.user_id == userId) {
     $('.highest-bid-header').css('display', 'block')
