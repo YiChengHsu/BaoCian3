@@ -83,7 +83,9 @@ const confirmPayment = async (req ,res) => {
 		amount: (paymentIntent.amount_captured / 100), //Convert cent to NTD dollars
 		create_time: paymentIntent.created,
 		payment_method: paymentIntent.payment_method,
-		payment_method_details: paymentIntent.payment_method_details,
+		card_brand: paymentIntent.payment_method_details.card.brand,
+		exp_month: paymentIntent.payment_method_details.card.exp_month,
+		exp_year: paymentIntent.payment_method_details.card.exp_year,
 		payment_card_last4: paymentIntent.payment_method_details.card.last4,
 		receipt_url: paymentIntent.receipt_url,
 		pay_status: 1,
