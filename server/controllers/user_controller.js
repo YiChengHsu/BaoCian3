@@ -11,28 +11,25 @@ const {getProductSellerInfo, getProductsImages, getProductWatchTimes} = require(
 require('dotenv').config();
 
 const signUp = async (req, res) => {
-  console.log(req.file)
-  let body = req.body;
-  let avatar = req.file ? req.file.key : 'sorry-my-wallet/user_default.png'
 
-  if (req.file) {
-    avatar = req.file.key
-  }
+  let body = req.body;
+  let picture = req.file ? req.file.key : 'sorry-my-wallet/user_default.png'
 
   if (! body.name || ! body.email || ! body.password) {
-    res.status(400).send({error: 'Request Error: Name, email, or password can not be empty'})
-    console.log("Wrong email")
+    res.status(400).send({error: 'Bad Request: Name, email, or password is empty'})
     return
   }
 
-  if (! validator.isEmail(body.email)) { // User validator to test the email form
-    res.status(400).send({error: 'Request Error: Invalid email format'})
+  // User validator test is email
+  if (! validator.isEmail(body.email)) { 
+    res.status(400).send({error: 'Bad Request: Invalid email format'})
     console.log("Wrong email")
   }
 
-  body.name = validator.escape(body.name); // replace symbol with HTML entities.
+  //Replace <, >, &, ', " and / with HTML entities.
+  body.name = validator.escape(body.name);
 
-  const result = await User.nativeSignUp(body.name, body.email, body.password, avatar);
+  const result = await User.nativeSignUp(body.name, body.email, body.password, picture);
   if (result.error) {
     console.log(result.error)
     res.status(403).send({error: result.error})
@@ -44,8 +41,6 @@ const signUp = async (req, res) => {
     res.status(500).send({error: "Database error"});
     return;
   }
-
-  console.log(user)
 
   res.status(200).send({
     data: {
@@ -72,7 +67,7 @@ const signIn = async (req, res) => {
     case 'native': result = await User.nativeSignIn(body.email, body.password);
       break;
     default:
-      res.status(403).send({error: "Request Error: Wrong Request"})
+      res.status(400).send({error: "Bad Request"})
   }
 
   const user = result.user;
@@ -98,48 +93,44 @@ const signIn = async (req, res) => {
   });
 }
 
-const nativeSignIn = async (email, password) => {
-  if (!email || !password) {
-    return res.send(400).send({error: "Request Error: email and password are required"})
-  }
-
-  try {
-    const result = User.nativeSignIn(email, password);
-    return result;
-  } catch (error) {
-    return {error};
-  }
-}
-
 const getUserProfile = async (req, res) => {
 
   const userId = req.user.id
   const query = req.query
   const paging = parseInt(query.paging) || 0;
   const listType = query.type;
-  const status = query.status || null;
+  let status = query.status || null;
 
-  console.log(listType)
-  console.log(paging)
-
-  const user = await User.getUserProfileWithDetails(userId)
+  const user = await User.getUserDetails(userId)
 
   const findDataList = async (listType) => {
 
-    if (listType && listType == 'order') {
-      return await Order.getUserOrders(pageSize, paging, status, userId)
-    } else if (listType && listType == 'sell') {
-      return await Order.getSellOrders(pageSize, paging, userId)
-    } else {
-      res.status(200).send({data: []})
+    switch(listType){
+      case 'order':
+        return await Order.getUserOrders(pageSize, paging, status, userId);
+      case 'sell':
+        return await Order.getUserOrders(pageSize, paging, 'sell', userId)
+      default:
+        res.status(200).send({data: []})
+        
     }
   }
+
+  //   if (listType && listType == 'order') {
+  //     return await Order.getUserOrders(pageSize, paging, status, userId)
+  //   } else if (listType && listType == 'sell') {
+  //     status = 'sell'
+  //     return await Order.getUserOrders(pageSize, paging, status,userId)
+  //   } else {
+  //     res.status(200).send({data: []})
+  //   }
+  // }
 
 
   const {dataList, dataListCounts} = await findDataList(listType)
 
-  const rating = await getRatings(userId)
-  user.rating = rating ? rating : null;
+  let rating = await User.getAvgRatings(userId)
+  user.rating = rating ? rating[0].avgRating : null;
 
   const totalPage = Math.ceil(dataListCounts / pageSize)
   const result = {
@@ -154,7 +145,7 @@ const getUserProfile = async (req, res) => {
 }
 
 
-const getUserWatchList = async (req, res) => {
+const getUserList = async (req, res) => {
 
   const pageSize = 12
 
@@ -336,33 +327,15 @@ const createRating = async (req, res) => {
 
 }
 
-const getRatings = async (userId) => {
-
-  let rating = null
-  let ratings = await User.getRatings(userId)
-  ratings = ratings.map(e => e.rating)
-
-  // rating = Object.values(rating)
-
-  if (ratings.length > 0) {
-    let ratingSum = ratings.reduce((previous, current) => current += previous);
-    rating = ratingSum / ratings.length;
-  }
-
-  return rating
-}
-
-
 module.exports =
   {
   signIn,
   signUp,
   getUserProfile,
-  getUserWatchList,
+  getUserList,
   getUserOrders,
   getUserAddress,
   updateUserAddress,
   updateUserAccount,
   createRating,
-  getRatings
 }

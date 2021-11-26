@@ -2,18 +2,18 @@ const Bid = require('../models/bid_model');
 const Product = require('../models/product_model')
 const SortedArray = require("collections/sorted-array");
 const Order = require('../models/order_model')
-let productSortedArrWithEndTime;
+let productsSortByEndTime;
 
 const setBidRecord = async (userBid) => {
 
-  const isBidSuccess = await Bid.setBidRecord(userBid)
-  if (isBidSuccess.status <= 0) {
-    return isBidSuccess
+  const result = await Bid.setBidRecord(userBid)
+  if (result.error) {
+    return result.error
   }
 
-  const bidIndexInArr = productSortedArrWithEndTime.array.findIndex(e => e.id == Number(userBid.product_id)) 
-  productSortedArrWithEndTime.array[bidIndexInArr].end_time += 30000;
-  return isBidSuccess
+  const bidIndexInArr = productsSortByEndTime.array.findIndex(e => e.id == Number(userBid.product_id)) 
+  productsSortByEndTime.array[bidIndexInArr].end_time += 30000;
+  return result.msg
 }
 
 const getBidRecords = async (req, res) => {
@@ -22,13 +22,13 @@ const getBidRecords = async (req, res) => {
     const bidRecords = await Bid.getBidRecords(productId)
     res.status(200).json({data: bidRecords})
   } catch (error) {
-    res.status(400).json({error})
+    res.status(500).json({error: 'Internal Server Error'})
   }
 }
 
 const setNewProductToFinisher = (id, endTime) => {
   const newProduct = {id, endTime}
-  sortedEndTimeArr.push(newProduct)
+  productsSortByEndTime.push(newProduct)
 }
 
 const setBidFinisher = async () => {
@@ -36,18 +36,22 @@ const setBidFinisher = async () => {
   //Set the Arr when server set up
   const endTimeArr = await Product.getProductEndTime();
 
-  sortedEndTimeArr = new SortedArray(endTimeArr, function equals(x, y) {
+  productsSortByEndTime = new SortedArray(endTimeArr, function equals(x, y) {
     return Object.equals(x.end_time, y.end_time)
   }, function compare(x, y) {
     return Object.compare(x.end_time, y.end_time)
   });
 
   setInterval(async () => {
-    while (sortedEndTimeArr.array[0].end_time <= Date.now()) {
-      const endProduct = sortedEndTimeArr.shift().id;
+    while (productsSortByEndTime.array[0].end_time <= Date.now()) {
+      const endProduct = productsSortByEndTime.shift().id;
       const orderProduct = await Product.endProductsAuction(endProduct);
-      if (orderProduct.highest_user_id) {
-        createOrder(orderProduct)
+      try {
+        if (orderProduct.highest_user_id) {
+          await createOrder(orderProduct)
+        }
+      } catch(err) {
+        console.log(err)
       }
     }
   }, 1000)

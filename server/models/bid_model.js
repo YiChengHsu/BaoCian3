@@ -12,24 +12,24 @@ const setBidRecord = async (bidRecord) => {
 
     if (user_role[0].role_id == 2) {
       await conn.query('COMMIT')
-      return {status: -1};
+      return {error: 'Unpaid user'};
     }
 
     const [hightestBid] = await conn.query('SELECT highest_bid FROM product WHERE id in (?) FOR UPDATE', [bidRecord.product_id])
 
     if (bidRecord.bid_amount<= hightestBid[0].highest_bid) {
       await conn.query('COMMIT')
-      return {status: 0};
+      return {error: 'Invalid bid'};
     }
 
     await conn.query('INSERT INTO bid_record SET ?', bidRecord);
     await conn.query('UPDATE product SET highest_bid = ?, bid_times = bid_times + 1, end_time = end_time + 30000, highest_user_id = ? WHERE id = ?', [bidRecord.bid_amount, bidRecord.user_id, bidRecord.product_id])
     await conn.query('COMMIT');
-    return {status:1} ;
+    return {msg: 'Bid success'} ;
   } catch(error) {
       await conn.query('ROLLBACK');
       console.log(error)
-      return {error:"Datebase error"};
+      return {error:"Database error"};
   } finally {
     conn.release();
   }

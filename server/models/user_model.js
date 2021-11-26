@@ -105,7 +105,7 @@ const getUserProfile = async (email) => {
   }
 };
 
-const getUserProfileWithDetails = async (userId) => {
+const getUserDetails = async (userId) => {
   const [result] = await pool.query('SELECT * FROM (project.user u LEFT JOIN user_address a ON u.id = a.user_id) LEFT JOIN user_account acc ON u.id = acc.user_id  WHERE u.id = ?;', [userId])
   const user = result[0]
 
@@ -248,20 +248,20 @@ const getAvgRatings = async (userId) => {
   return avgRating
 }
 
-const banUserWithoutPay = async (userId) => {
-  const queryStr = 'UPDATE user SET role_id = 2 WHERE id = ?'
-  const bindings = userId
+const banUnpaidUser = async (userIds) => {
+  const queryStr = 'UPDATE user SET role_id = 2 WHERE id in (?)'
+  const bindings = [userIds]
 
-  await pool.query(queryStr, bindings)
+  const [banUserIds] = await pool.query(queryStr, bindings)
 
-  return userId
+  return banUserIds
 }
 
 module.exports = {
   nativeSignUp,
   nativeSignIn,
   getUserProfile,
-  getUserProfileWithDetails,
+  getUserDetails,
   getUserWatchProductIds,
   getUserWatchList,
   getUserAddress,
@@ -270,5 +270,5 @@ module.exports = {
   createRating,
   getRatings,
   getAvgRatings,
-  banUserWithoutPay
+  banUnpaidUser
 }

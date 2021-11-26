@@ -3,7 +3,7 @@ const stripe = require("stripe")(config.stripe.secretKey);
 const Order = require('../models/order_model');
 const User = require('../models/user_model');
 const SortedArray = require("collections/sorted-array");
-let sortedTimeArr;
+let ordersSortByDeadline;
 
 
 const createPayment = async (req, res) => {
@@ -25,7 +25,7 @@ const createPayment = async (req, res) => {
 					unit_amount: data.price * 100,
 				},
 				quantity: 1,
-				description: '抱歉錢錢代表賣家與網站感謝您的購買！',
+				description: '抱歉錢錢代表賣家感謝您的購買！',
 			},
 		],
 		mode: "payment",
@@ -91,9 +91,15 @@ const confirmPayment = async (req ,res) => {
 		pay_status: 1,
 	}
 
-	await Order.confirmPayment(intent, payment)
-  // Return a 200 response to acknowledge receipt of the event
-  res.status(200).send({success: true});
+	const result =	await Order.confirmPayment(intent, payment)
+
+	if (result.error) {
+		res.status(500),send(result.error)
+		return
+	}
+	// Return a 200 response to acknowledge receipt of the event
+	res.status(200).send({success: true});
+
 };
 
 
@@ -114,10 +120,10 @@ const updateOrder = async (req, res) => {
 	res.status(200).send({message:'Update success'})
 } 
 
-const setOrderPayExpiredBanner = async () => {
+const setUnpaidUserBanner = async () => {
 	
 	const endTimeArr = await Order.getExpiredOrder();
-	sortedEndTimeArr = new SortedArray(endTimeArr,
+	ordersSortByDeadline = new SortedArray(endTimeArr,
 		function equals(x,y) {
 				return Object.equals(x.pay_deadline, y.pay_deadline)
 		},
@@ -128,20 +134,27 @@ const setOrderPayExpiredBanner = async () => {
 
 	setInterval( async () => {
 
-		while (sortedEndTimeArr.array[0] && sortedEndTimeArr.array[0].pay_deadline <= Date.now()) {
-			const unpaidUser = sortedEndTimeArr.shift().buyer_id;
-			try {
-					const bannedUserId = await User.banUserWithoutPay(unpaidUser);
-					console.log('banned user: ' + bannedUserId)
-			} catch (error) {
-					console.log(error)
-			}
+		const unpaidUsers = []
+
+		while (ordersSortByDeadline.array[0] && ordersSortByDeadline.array[0].pay_deadline <= Date.now()) {
+			const unpaidOrder = ordersSortByDeadline.shift()
+			unpaidUsers.push(unpaidOrder.buyer_id)
 		}
+
+		let result;
+		try {
+			if (unpaidUsers > 0) {
+				await User.banUnpaidUser(unpaidUsers)
+			}
+		}catch(err) {
+			console.log(err)
+		}
+
 	}, 60000)
 	
 }
 
-setOrderPayExpiredBanner();
+setUnpaidUserBanner();
 
 module.exports = {
 	createPayment,

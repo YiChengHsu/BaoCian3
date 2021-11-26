@@ -5,7 +5,7 @@ const {
     signUp,
     signIn,
     getUserProfile,
-    getUserWatchList,
+    getUserList,
     getUserOrders,
     getUserAddress,
     updateUserAddress,
@@ -36,6 +36,6 @@ router.route('/user/rating')
     .post(authentication(), createRating)
 
 router.route('/user/:records')
-    .get(authentication(), getUserWatchList)
+    .get(authentication(), getUserList)
 
 module.exports = router;

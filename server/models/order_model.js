@@ -1,21 +1,12 @@
 const {pool} = require('./mysqlcon')
 
 const createOrder = async (product) => {
+  const queryStr = 'INSERT INTO project.order SET ?'
+  const bindings = [product]
 
-  const conn = await pool.getConnection();
+  const [result] = await pool.query(queryStr, bindings)
 
-  try {
-    await conn.query('START TRANSACTION')
-    const [result] = await conn.query('INSERT INTO project.order SET ?', product)
-    await conn.query('COMMIT')
-    return result.insertId
-  } catch (error) {
-    await conn.query('ROLLBACK');
-    console.log(error)
-    return -1;
-  } finally {
-    await conn.release();
-  }
+  return result.insertId
 }
 
 const getUserOrders = async (pageSize, paging, status, userId) => {
@@ -25,12 +16,12 @@ const getUserOrders = async (pageSize, paging, status, userId) => {
   }
   const userBinding = [userId]
 
-  console.log(status)
-
-  if (status != null && status == 3) {
-    condition.sql = 'AND status in (3,4,5) '
+  if (status == "sell") {
+    condition.sql= ' WHERE o.seller_id = ? '
+  }else if (status != null && status == 3) {
+    condition.sql = ' WHERE buyer_id = ? AND status in (3,4,5) '
   } else if (status != null) {
-    condition.sql = 'AND status = ? '
+    condition.sql = ' WHERE buyer_id = ? AND status = ? '
     condition.binding = [status]
   }
 
@@ -42,51 +33,13 @@ const getUserOrders = async (pageSize, paging, status, userId) => {
     ]
   };
 
-  const orderQuery = 'SELECT *,o.id AS order_id FROM project.order o JOIN product p on o.product_id = p.id WHERE buyer_id = ? ' + condition.sql + limit.sql;
+  const orderStr = ' ORDER BY o.pay_deadline DESC '
+
+  const orderQuery = 'SELECT *,o.id AS order_id FROM project.order o JOIN product p on o.product_id = p.id ' + condition.sql + orderStr + limit.sql;
   const orderBindings = userBinding.concat(condition.binding).concat(limit.binding)
 
-  const orderCountQuery = 'SELECT COUNT(*) as count FROM project.order o JOIN product p on o.product_id = p.id WHERE buyer_id = ? ' + condition.sql + limit.sql;
+  const orderCountQuery = 'SELECT COUNT(*) as count FROM project.order o JOIN product p on o.product_id = p.id ' + condition.sql + limit.sql;
   const orderCountBindings = userBinding.concat(condition.binding).concat(limit.binding)
-
-  console.log(orderQuery)
-
-  try {
-    const [orders] = await pool.query(orderQuery, orderBindings)
-    const [orderCounts] = await pool.query(orderCountQuery, orderCountBindings)
-
-    console.log(orders)
-
-    const data = {
-      dataList: orders,
-      dataListCounts: orderCounts[0].count
-    }
-
-    return data
-  } catch (error) {
-    console.log(error)
-    return {error}
-  }
-
-}
-
-const getSellOrders = async (pageSize, paging, userId) => {
-  const userBinding = [userId]
-
-  const limit = {
-    sql: 'LIMIT ?, ?',
-    binding: [
-      pageSize * paging,
-      pageSize
-    ]
-  };
-
-  const orderQuery = 'SELECT *,o.id AS order_id FROM project.order o JOIN product p on o.product_id = p.id WHERE o.seller_id = ? ORDER BY o.pay_deadline DESC ' + limit.sql;
-  const orderBindings = userBinding.concat(limit.binding)
-
-  const orderCountQuery = 'SELECT COUNT(*) as count FROM project.order o JOIN product p on o.product_id = p.id WHERE o.seller_id = ? ';
-  const orderCountBindings = userBinding
-
-  console.log(orderBindings)
 
   try {
     const [orders] = await pool.query(orderQuery, orderBindings)
@@ -153,7 +106,7 @@ const confirmPayment = async (paymentIntent, payment) => {
 
     if (search.length <= 0) {
       await conn.query('COMMIT')
-      return -1;
+      return {error: 'Payment create fail'};
     }
 
     const payId = search[0].id
@@ -166,16 +119,16 @@ const confirmPayment = async (paymentIntent, payment) => {
     const [isOtherUnpaidOrder] = await conn.query('SELECT * FROM project.order WHERE status = 0 AND buyer_id = ? AND pay_deadline < ?', [buyerId, payment.pay_time])
 
     if (isOtherUnpaidOrder.length == 0) {
-      const [result] = await conn.query('UPDATE user SET role_id = 0 WHERE id = ?', [buyerId])
+      await conn.query('UPDATE user SET role_id = 0 WHERE id = ?', [buyerId])
     }
 
     await conn.query('COMMIT')
-    return 1;
+    return payId;
 
   } catch (error) {
     await conn.query('ROLLBACK');
     console.log(error)
-    return error;
+    return {error: 'Database error'};
   } finally {
     await conn.release();
   }
@@ -190,7 +143,6 @@ const getExpiredOrder = async () => {
 module.exports = {
   createOrder,
   getUserOrders,
-  getSellOrders,
   updateOrder,
   createPayment,
   confirmPayment,
