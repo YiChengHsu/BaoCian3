@@ -54,9 +54,9 @@ const confirmPayment = async (req, res) => {
 
 	try {
 		event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret)
-	} catch (err) {
-		console.log(err)
-		res.status(400).send(`Webhook Error: ${err.message}`)
+	} catch (error) {
+		console.log(error)
+		res.status(400).send(`Webhook Error: ${error.message}`)
 		return
 	}
 
@@ -68,11 +68,8 @@ const confirmPayment = async (req, res) => {
 			paymentIntent = event.data.object
 			break
 		default:
-			console.log(`Unhandled event type ${event.type}`)
 			return
 	}
-
-	console.log(paymentIntent)
 
 	const intent = paymentIntent.payment_intent
 	const payment = {
@@ -141,8 +138,8 @@ const setUnpaidUserBanner = async () => {
 			if (unpaidUsers > 0) {
 				await User.banUnpaidUser(unpaidUsers)
 			}
-		} catch (err) {
-			console.log(err)
+		} catch (error) {
+			console.log(error)
 		}
 	}, 60000)
 }
