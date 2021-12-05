@@ -46,8 +46,6 @@ const nativeSignUp = async (name, email, password, avatar) => {
 		user.access_token = accessToken
 		user.provider = "native"
 
-		console.log(user)
-
 		const [result] = await conn.query("INSERT INTO user SET ?", user)
 		const userId = result.insertId
 		user.id = userId
@@ -172,8 +170,6 @@ const getUserWatchList = async (pageSize, paging, userId) => {
 		const [watches] = await pool.query(queryStr, bindings)
 		const [watchCounts] = await pool.query(countQueryStr, binding)
 
-		console.log(watchCounts[0])
-
 		const data = {
 			products: watches,
 			productCount: watchCounts[0].count,
@@ -191,7 +187,6 @@ const getUserAddress = async (userId) => {
 	const bindings = userId
 
 	const [address] = await pool.query(queryStr, bindings)
-
 	return address[0]
 }
 
@@ -248,6 +243,8 @@ const createRating = async (rateId, ratedId, orderId, rating) => {
 			order_id: orderId,
 			rating: rating,
 		})
+
+		await conn.query('UPDATE project.order SET status = status + 1 WHERE id = ?', [orderId])
 		await conn.query("COMMIT")
 		return result.insertId
 	} catch (error) {

@@ -70,9 +70,6 @@ class FlipDown {
 
     // Set options
     this._setOptions();
-
-    // Print Version
-    console.log(`FlipDown ${this.version} (Theme: ${this.opts.theme})`);
   }
 
   /**

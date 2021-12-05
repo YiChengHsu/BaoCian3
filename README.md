@@ -19,26 +19,34 @@ An online marketplace holding real-time auctions with complete trading mechanism
 
 ### Real-tiem Competitive Bidding System
 * Update the hightest bid and bid times on the index web page
+<img width="800" src="https://raw.githubusercontent.com/YiChengHsu/SorryMyWallet-readme-img/main/readme1.gif">
 * Update the hightest bid on the product page
     * Update the highest bid
     * Set the new bid record with bid time and bidder name
 * Highest bid reminder at both index and product web pag
+<img width="800" src="https://github.com/YiChengHsu/SorryMyWallet-readme-img/blob/main/readme2.gif?raw=true">
+
+### 4-step Trade Process After Win the Bid
+* Pay requirement - Connected to the most popular third-party API – Stripe for fast, secure, continuous support, and extensible checkout and payment
+<img width="800" src="https://github.com/YiChengHsu/SorryMyWallet-readme-img/blob/main/readme3.gif?raw=true">
+* Delivery - Seller gets the address if it existed. send the product with devliery tracking number.
+<img width="800" src="https://github.com/YiChengHsu/SorryMyWallet-readme-img/blob/main/readme4.gif?raw=true">
+* Reception confirmation - Buyer can
+<img width="800" src="https://github.com/YiChengHsu/SorryMyWallet-readme-img/blob/main/readme5.gif?raw=true">
+* Rating
+<img width="800" src="https://github.com/YiChengHsu/SorryMyWallet-readme-img/blob/main/readme6.gif?raw=true">
 
 ### Upload Page with Format Check
 * Name lese than 30  characters or 15 characters in chinese 
 * Product images size in 1 megabyte (MB)
 * Product images with `.jpg` or `.png` format
 
-### 4-step Trade Process After Win the Bid
-* Pay requirement
-* Delivery
-* Reception confirmation
-* Rating
-
 ### Block and Report Mechanism
 
 * Block bidding system to unpaid user
+<img width="800" src="https://github.com/YiChengHsu/SorryMyWallet-readme-img/blob/main/readme7.gif?raw=true">
 * Report mechanism for unsuitable products
+<img width="800" src="https://github.com/YiChengHsu/SorryMyWallet-readme-img/blob/main/readme8.gif?raw=true">
 
 ##  Technologies
 ### Architecture

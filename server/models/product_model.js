@@ -210,7 +210,7 @@ const reportProduct = async (reportObj) => {
     await conn.query('START TRANSACTION');
 
     // One user can only report one product before admin confirmed
-    const [search] = await conn.query('SELECT * FROM report_product WHERE user_id = ? AND isConfirmed = 0 ', [reportObj.user_id])
+    const [search] = await conn.query('SELECT * FROM report_product WHERE user_id = ? AND is_confirmed = 0 ', [reportObj.user_id])
 
     if (search.length > 0) {
       await conn.query('COMMIT');
@@ -220,9 +220,9 @@ const reportProduct = async (reportObj) => {
     const insertId = await conn.query('INSERT INTO report_product SET?', reportObj)
 
     // If product was reported 5 times, discontinue it.
-    const [reportTimes] = await conn.query('SELECT COUNT(*) as count FROM report_product WHERE product_id = ? AND isConfirmed = 0', [reportObj.product_id])
+    const [reportTimes] = await conn.query('SELECT COUNT(*) as count FROM report_product WHERE product_id = ? AND is_confirmed = 0', [reportObj.product_id])
 
-    if (reportTimes[0].count > 5) {
+    if (reportTimes[0].count > 9) {
       await conn.query('UPDATE product SET auction_end = 2 WHERE id = ?', [reportObj.product_id])
     }
 

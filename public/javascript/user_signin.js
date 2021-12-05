@@ -1,5 +1,10 @@
 const form = document.querySelector("#signin-form");
 
+if (location.search == '?test') {
+	$(".my-email").val('test@baocian3.fun')
+	$(".my-password").val('test123')
+}
+
 form.addEventListener("submit", (e) => {
 	e.preventDefault();
 

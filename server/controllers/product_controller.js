@@ -275,7 +275,7 @@ const reportProduct = async (req, res) => {
 		product_id: body.productId,
 		cause: body.cause,
 		reason: body.reason,
-		isConfirmed: 0,
+		is_confirmed: 0,
 	})
 
 	if (result == 0) {

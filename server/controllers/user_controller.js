@@ -235,7 +235,6 @@ const getUserOrders = async (req, res) => {
 
 const getUserAddress = async (req, res) => {
 	const userId = req.query.id
-
 	const address = await User.getUserAddress(userId)
 
 	if (address.length <= 0) {
@@ -309,7 +308,7 @@ const createRating = async (req, res) => {
 	} catch (error) {
 		console.log(error)
 
-		res.status(500).send({ error: "Datebase error" })
+		res.status(500).send({ error: "Database error" })
 		return
 	}
 }

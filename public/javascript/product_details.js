@@ -386,7 +386,7 @@ socket.on("bidFail", (error) => {
 				cancelButtonText: "再緩緩",
 			}).then((result) => {
 				if (result.isConfirmed) {
-					self.location.href = "/user/profile?type=order&status=0"
+					self.location.href = "/user/profile?type=order&status=1"
 				}
 			})
 			break

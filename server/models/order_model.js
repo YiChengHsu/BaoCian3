@@ -1,8 +1,8 @@
 const { pool } = require("./mysqlcon")
 
-const createOrder = async (product) => {
+const createOrder = async (productObj) => {
 	const queryStr = "INSERT INTO project.order SET ?"
-	const bindings = [product]
+	const bindings = [productObj]
 
 	const [result] = await pool.query(queryStr, bindings)
 
@@ -64,14 +64,20 @@ const updateOrder = async (orderId, status, delivery) => {
 		const [search] = await conn.query("SELECT status FROM project.order WHERE id in (?) ", [orderId])
 
 		console.log(search)
+		console.log(orderId)
+		console.log(status)
 
-		if (!search || search[0].status != status) {
+		if (!search[0] || search[0].status != status) {
 			await conn.query("COMMIT")
 			return -1
 		}
 
 		const newStatus = status + 1
-		await conn.query("UPDATE project.order SET status = ?, delivery = ? WHERE id = ?", [newStatus, delivery, orderId])
+		if (delivery != null) {
+			await conn.query("UPDATE project.order SET status = ?, delivery = ? WHERE id = ?", [newStatus, delivery, orderId])
+		} else {
+			await conn.query("UPDATE project.order SET status = ? WHERE id = ?", [newStatus,  orderId])
+		}
 		await conn.query("COMMIT")
 		return 1
 	} catch (error) {

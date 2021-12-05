@@ -220,7 +220,7 @@ fetch(url + params, {
 						}).appendTo(`#my-button-div-${id}`)
 
 						$(`#deliverInfo-button-${id}`).click(() => {
-							fetch(`/api/1.0/user/address?id=${e.buyer_id}}`, {
+							fetch(`/api/1.0/user/address?id=${e.buyer_id}`, {
 								method: "get",
 								headers: {
 									Authorization: "Bearer " + user.access_token,
@@ -228,7 +228,8 @@ fetch(url + params, {
 							})
 								.then((res) => res.json())
 								.then((res) => {
-									if (user.city == null || user.town == null || user.address == null || user.receiver == null) {
+									const buyer = res.data
+									if (buyer.city == null || buyer.town == null || buyer.address == null || buyer.receiver == null) {
 										Swal.fire({
 											title: "缺少資料",
 											icon: "warning",
@@ -240,7 +241,7 @@ fetch(url + params, {
 
 									Swal.fire({
 										title: "寄送地址",
-										html: `<b>${user.zipcode}  ${user.city} ${user.town} <br> ${user.address} <br> ${user.receiver}  ${user.phone}</b> `,
+										html: `<b>${buyer.zipcode}  ${buyer.city} ${buyer.town} <br> ${buyer.address} <br> ${buyer.receiver}  ${buyer.phone}</b> `,
 										confirmButtonText: "知道了",
 									})
 								})
