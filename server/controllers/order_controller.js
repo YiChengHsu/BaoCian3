@@ -84,7 +84,7 @@ const confirmPayment = async (req, res) => {
 		exp_year: paymentIntent.payment_method_details.card.exp_year,
 		payment_card_last4: paymentIntent.payment_method_details.card.last4,
 		receipt_url: paymentIntent.receipt_url,
-		pay_status: 1,
+		pay_status: 2,
 	}
 
 	const result = await Order.confirmPayment(intent, payment)
