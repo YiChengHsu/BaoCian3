@@ -111,16 +111,16 @@ const confirmPayment = async (paymentIntent, payment) => {
 		const buyerId = search[0].buyer_id
 		const orderId = search[0].order_id
 
-		await conn.query("UPDATE payment SET ?  WHERE id = ?", [payment, payId])
-		await conn.query("UPDATE project.order SET status = 1 WHERE id = ?", orderId)
+		await conn.query("UPDATE payment SET WHERE id = ?", [payment, payId])
+		await conn.query("UPDATE project.order SET status = 2 WHERE id = ?", orderId)
 
-		const [isOtherUnpaidOrder] = await conn.query("SELECT * FROM project.order WHERE status = 0 AND buyer_id = ? AND pay_deadline < ?", [
+		const [isOtherUnpaidOrder] = await conn.query("SELECT * FROM project.order WHERE status = 1 AND buyer_id = ? AND pay_deadline < ?", [
 			buyerId,
 			payment.pay_time,
 		])
 
 		if (isOtherUnpaidOrder.length == 0) {
-			await conn.query("UPDATE user SET role_id = 0 WHERE id = ?", [buyerId])
+			await conn.query("UPDATE user SET role_id = 1 WHERE id = ?", [buyerId])
 		}
 
 		await conn.query("COMMIT")
