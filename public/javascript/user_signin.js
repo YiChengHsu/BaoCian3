@@ -17,6 +17,15 @@ form.addEventListener("submit", (e) => {
 		body: JSON.stringify(user),
 	})
 	.then((res) => {
+		if (res.status == 400) {
+			Swal.fire({
+				icon: 'error',
+				title: '登入失敗',
+				text: 'Email不存在',
+			})
+			throw new Error
+		}
+
 		if (res.status == 403) {
 			Swal.fire({
 				icon: 'error',

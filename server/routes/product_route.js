@@ -21,11 +21,12 @@ const {
 router.route('/product/upload')
     .post(authentication(), cpUpload, createProduct);
 
-router.route('/product/watchList/set')
-    .post(authentication(), setWatchList);
+router.route('/product/watchList')
+    .post(authentication(), setWatchList)
+    .delete(authentication(), delWatchList);
 
-router.route('/product/watchList/del')
-    .post(authentication(), delWatchList);
+// router.route('/product/watchList/del')
+//     .delete(authentication(), delWatchList);
 
 router.route('/product/report')
     .post(authentication(), reportProduct)    

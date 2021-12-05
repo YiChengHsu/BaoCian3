@@ -3,7 +3,7 @@ const path = require('path')
 
 router.route('/')
     .get((req, res) => {
-        res.redirect('/product/all')
+        res.render('product_index')
 });
 
 router.route('/product/details')

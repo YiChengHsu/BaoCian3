@@ -3,10 +3,7 @@ const app = express();
 const path = require('path');
 const http = require('http');
 const ejs = require('ejs');
-const server = http.createServer(app);
-const {Server} = require('socket.io');
-const io = new Server(server);
-const { socketConn } = require('./server/controllers/socket_controller');
+const port = 3000;
 require('dotenv').config()
 
 
@@ -48,10 +45,18 @@ app.use(function (err, req, res, next) {
   res.status(500).send('Internal Server Error');
 });
 
+//Create socket io server with controller
+const server = http.createServer(app);
+const {Server} = require('socket.io');
+const io = new Server(server);
+const { socketConn } = require('./server/controllers/socket_controller');
 socketConn(io);
 
-// Broadcast when a bidder connects
 
-server.listen(3000, () => {
-  console.log('listen on 3000');
-});
+if (require.main === module) {
+  server.listen(port, function(){
+    console.log(`listen on ${port}`);
+  });
+}
+
+module.exports = server;
