@@ -8,7 +8,7 @@ An online marketplace holding real-time auctions with complete trading mechanism
 
 * password: test123
 
-* [One-click Login](http://localhost:3000/user/signin?test)
+* [One-click Login](https://baocian3.fun/user/signin?test)
 
 
 ## Table of Contents
