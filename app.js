@@ -39,9 +39,9 @@ app.use(function (req, res, next) {
   res.status(404).render('404');
 });
 
-//Error handling
-app.use(function (err, req, res, next) {
-  console.log(err);
+//Unexpected error handling from util errorCatcher
+app.use(function (error, req, res, next) {
+  console.log(error);
   res.status(500).send('Internal Server Error');
 });
 
@@ -55,7 +55,7 @@ socketConn(io);
 
 if (require.main === module) {
   server.listen(port, function(){
-    console.log(`listen on ${port}`);
+    console.log(`Server run on ${port}`);
   });
 }
 

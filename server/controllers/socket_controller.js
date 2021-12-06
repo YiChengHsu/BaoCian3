@@ -83,8 +83,8 @@ const socketConn = (io) => {
 				let result
 				try {
 					result = await setBidRecord(bidData)
-				} catch (err) {
-					console.log(err)
+				} catch (error) {
+					console.log(error)
 				}
 
 				if (result.error) {

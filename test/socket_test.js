@@ -71,37 +71,24 @@ describe('Bid server', () => {
     })
   })
 
-  // it('Bid success with login token', async (done) => {
-  //   const res = await chai.request(server).post('/api/1.0/user/signin').send(user);
-  //   console.log(res)
-  //   accessToken = res.access_token
+  it('Bid success with login token', async (done) => {
+    const res = await chai.request(server).post('/api/1.0/user/signin').send(user);
 
-  //   const optionsWithToken ={
-  //     transports: ['websocket'],
-  //     'force new connection': true,
-  //     auth: {
-  //       authorization: "Bearer " + accessToken,
-  //     }
-  //   };
-  //   user3.connect(socketURL, optionsWithToken)
-  //   await user3.on('roomUsers')
-  //   await user3.emit('join', 1)
-  //   await user3.emit('bid', bid)
-  //   await user3.on('bidSuccess', () => {
-  //     done();
-  //   })
-  // })
+    const optionsWithToken ={
+      transports: ['websocket'],
+      'force new connection': true,
+      auth: {
+        authorization: "Bearer " + res.body.data.access_token,
+      }
+    };
 
-  // // it('Get userCount when other user enter product page' ,(done) => {
-  // //   user1 = io.connect(socketURL, options)
-  // //   user2 = io.connect(socketURL, options)
-  // //   user1.emit('join', 1)
-  // //   user2.emit('join', 1)
-  // //   socket = io.connect(socketURL, options)
-  // //   setTimeout(() => {
-  // //     socket.on('roomUsers', (data) => {
-  // //       expect(data).to.deep.equal(data, {'1':2})
-  // //     })
-  // //   },0)
-  // // })
+    console.log(res)
+    user3 = io.connect(socketURL, optionsWithToken)
+    await user3.on('roomUsers')
+    await user3.emit('join', 1)
+    await user3.emit('bid', bid)
+    await user3.on('bidSuccess', () => {
+      done();
+    })
+  })
 })

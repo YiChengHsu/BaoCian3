@@ -72,7 +72,7 @@ form.addEventListener("submit", (e) => {
 			$('.swal2-confirm').attr('disabled', false)
 		}, 1500)
 	})
-	.catch((err) => {
-		console.log(err);
+	.catch((error) => {
+		console.log(error);
 	});
 });

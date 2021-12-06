@@ -243,8 +243,8 @@ fetch(detailsUrl, {
 					$("#watch-btn").show()
 					Swal.fire({ icon: "success", title: "刪除成功", text: "有緣再相見!" })
 				})
-				.catch((err) => {
-					console.log(err)
+				.catch((error) => {
+					console.log(error)
 					Swal.fire({ icon: "error", title: "刪除失敗", text: "請稍後再試一次!" })
 				})
 		})
@@ -406,8 +406,8 @@ socket.on("bidFail", (error) => {
 			break
 		case "Invalid bid":
 			message = "手速慢了，有人已經出價了唷!"
-		case "Database error":
-			message = "請稍後再試"
+		case "Ended auction":
+			message = "拍賣已結束!"
 		default:
 			Swal.fire({
 				icon: "error",
@@ -509,8 +509,8 @@ $("#report-button").click(async () => {
 				})
 			}
 		})
-		.catch((err) => {
-			console.log(err)
+		.catch((error) => {
+			console.log(error)
 			Swal.fire({
 				title: "出錯了",
 				text: "請稍後再次一次!",

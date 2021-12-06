@@ -12,11 +12,16 @@ const setBidRecord = async (bid) => {
 			return { error: "Unpaid user" }
 		}
 
-		const [hightestBid] = await conn.query("SELECT highest_bid FROM product WHERE id in (?) FOR UPDATE", [bid.product_id])
+		const [search] = await conn.query("SELECT highest_bid, auction_end FROM product WHERE id in (?) FOR UPDATE", [bid.product_id])
 
-		if (bid.bid_amount <= hightestBid[0].highest_bid) {
+		if (bid.bid_amount <= search[0].highest_bid) {
 			await conn.query("COMMIT")
 			return { error: "Invalid bid" }
+		}
+
+		if (search[0].auction_end != 0) {
+			await conn.query("COMMIT")
+			return { error: "Ended auction" }
 		}
 
 		const [result] = await conn.query("INSERT INTO bid_record SET product_id = ?, user_id = ?, bid_amount = ?, bid_time = ?, time_left = ?, user_name = ?", [bid.product_id, bid.user_id, bid.bid_amount, bid.bid_time, bid.time_left, bid.user_name])
