@@ -1,8 +1,7 @@
 const { closeConnection } = require("./set_test_data");
-const { chai } = require("./set_up");
-const server = require('../app')
+const { requester } = require("./set_up");
 
 after(async () => {
     await closeConnection();
-    chai.request(server).close();
+    requester.close();
 });

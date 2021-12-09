@@ -1,5 +1,4 @@
-const {expect, chai} = require('./set_up');
-const server = require('../app')
+const {expect, requester} = require('./set_up');
 const {users} = require('./test_data');
 const user1 = users[0]
 const user = {
@@ -16,12 +15,8 @@ const watchProduct = {
 
 describe('Set and del watch list product', () => {
 
-  after(() => {
-    server.close();
-  })
-
   before(async () => {
-    const res = await chai.request(server)
+    const res = await requester
       .post('/api/1.0/user/signin')
       .send(user);
     const data = res.body.data;
@@ -31,7 +26,7 @@ describe('Set and del watch list product', () => {
 
   it('Set watch list without token', async () => {
 
-    const res = await chai.request(server)
+    const res = await requester
       .post('/api/1.0/product/watchList')
       .send(watchProduct)
 
@@ -40,7 +35,7 @@ describe('Set and del watch list product', () => {
 
   it('Set product to watch list', async () => {
 
-    const res = await chai.request(server)
+    const res = await requester
       .post('/api/1.0/product/watchList')
       .set('Authorization', `Bearer ${accessToken}`)
       .send(watchProduct)
@@ -50,7 +45,7 @@ describe('Set and del watch list product', () => {
 
   it('Set product to watch list twice', async () => {
 
-    const res = await chai.request(server)
+    const res = await requester
       .post('/api/1.0/product/watchList')
       .set('Authorization', `Bearer ${accessToken}`)
       .send(watchProduct)
@@ -60,7 +55,7 @@ describe('Set and del watch list product', () => {
 
   it('Del watch list without token', async () => {
     
-    const res = await chai.request(server)
+    const res = await requester
       .delete('/api/1.0/product/watchList')
       .send(watchProduct)
 
@@ -69,7 +64,7 @@ describe('Set and del watch list product', () => {
 
   it('Del product to watch list', async () => {
 
-    const res = await chai.request(server)
+    const res = await requester
       .delete('/api/1.0/product/watchList')
       .set('Authorization', `Bearer ${accessToken}`)
       .send(watchProduct)
@@ -79,7 +74,7 @@ describe('Set and del watch list product', () => {
 
   it('Del product to watch list twice', async () => {
 
-    const res = await chai.request(server)
+    const res = await requester
       .delete('/api/1.0/product/watchList')
       .set('Authorization', `Bearer ${accessToken}`)
       .send(watchProduct)

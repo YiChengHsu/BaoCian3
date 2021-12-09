@@ -1,17 +1,12 @@
 const port = process.env.PORT_TEST
 const io = require('socket.io-client');
 const {expect} = require('./set_up')
-const server = require('../app');
-const chai = require('./set_up')
+const requester = require('./set_up')
 const user = {
   provider: 'native',
-  email: 'test1@test.com',
-  password: '111111',
+  email: 'fish@test.com',
+  password: 'kkkkkk',
 }
-
-// Start server for testing
-server.listen(port, function(){console.log(`start test server at port ${port}`)});
-
 
 const socketURL = `http://localhost:${port}`
 const options ={
@@ -72,7 +67,7 @@ describe('Bid server', () => {
   })
 
   it('Bid success with login token', async (done) => {
-    const res = await chai.request(server).post('/api/1.0/user/signin').send(user);
+    const res = await requester.post('/api/1.0/user/signin').send(user);
 
     const optionsWithToken ={
       transports: ['websocket'],
@@ -87,7 +82,8 @@ describe('Bid server', () => {
     await user3.on('roomUsers')
     await user3.emit('join', 1)
     await user3.emit('bid', bid)
-    await user3.on('bidSuccess', () => {
+    await user3.on('bidSuccess', (data) => {
+      expect(data).to.be.an('object')
       done();
     })
   })

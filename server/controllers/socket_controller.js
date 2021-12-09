@@ -40,7 +40,7 @@ const socketConn = (io) => {
 	})
 
 	io.on("connection", (socket) => {
-		socket.emit("roomUsers", roomUsersCounts)
+		socket.emit("roomUsers", roomUsersCounts)	
 
 		socket.on("join", async (productId) => {
 			socket.join(productId)
@@ -92,6 +92,7 @@ const socketConn = (io) => {
 					return
 				}
 
+				socket.io('bidSuccess', result)
 				io.emit(`updateProduct${result.product_id}`, result)
 			})
 

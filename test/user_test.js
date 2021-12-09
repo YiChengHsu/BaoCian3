@@ -1,6 +1,5 @@
 require('dotenv').config();
-const {expect, chai} = require('./set_up');
-const server = require('../app')
+const {expect, requester} = require('./set_up');
 
 describe('sign up', () => {
 
@@ -13,7 +12,7 @@ describe('sign up', () => {
       picture: null
     }
 
-    const res = await chai.request(server).post('/api/1.0/user/signup').send(user);
+    const res = await requester.post('/api/1.0/user/signup').send(user);
 
     expect(res.status).to.equal(200);
   })
@@ -26,12 +25,12 @@ describe('sign up', () => {
       picture: null
     }
 
-    const res = await chai.request(server).post('/api/1.0/user/signup').send(user);
+    const res = await requester.post('/api/1.0/user/signup').send(user);
 
     expect(res.status).to.equal(400);
   })
 
-  it('sign up with  existed email', async () => {
+  it('sign up with existed email', async () => {
     const user = {
       provider: 'native',
       name: 'Frank',
@@ -40,8 +39,20 @@ describe('sign up', () => {
       picture: null
     }
 
-    const res = await chai.request(server).post('/api/1.0/user/signup').send(user);
+    const res = await requester.post('/api/1.0/user/signup').send(user);
 
     expect(res.status).to.equal(400);
+  })
+
+  it('sign in with user 1', async() => {
+    const user = {
+      provider: 'native',
+      email: 'test2@test.com',
+      password: '111111',
+    }
+
+    const res = await requester.post('/api/1.0/user/signup').send(user);
+    expect(res.status).to.equal(200);
+    expect(res.user).to.be.an('object');
   })
 })
