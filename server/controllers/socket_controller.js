@@ -40,7 +40,7 @@ const socketConn = (io) => {
 	})
 
 	io.on("connection", (socket) => {
-		socket.emit("roomUsers", roomUsersCounts)	
+		socket.emit("roomUsers", roomUsersCounts)
 
 		socket.on("join", async (productId) => {
 			socket.join(productId)
@@ -61,7 +61,6 @@ const socketConn = (io) => {
 
 			// Listen for bid
 			socket.on("bid", async (userBid) => {
-
 				// Can not bid without access token
 				if (socket.user == null) {
 					socket.emit("bidFail", "Unauthorized")
@@ -92,14 +91,14 @@ const socketConn = (io) => {
 					return
 				}
 
-				socket.io('bidSuccess', result)
+				socket.io("bidSuccess", result)
 				io.emit(`updateProduct${result.product_id}`, result)
 			})
 
-			socket.on("disconnect", (userId) => {
+			socket.on("disconnect", () => {
 				roomUsers[productId].map((e, index) => {
 					if (e == userId) {
-						roomUsers[productId].splice(index, 1)
+						roomUsers[productId].splice(index - 1, 1), (roomUsersCounts[productId] = _.uniq(roomUsers[e]).length)
 					}
 				})
 
