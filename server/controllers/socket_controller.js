@@ -91,7 +91,7 @@ const socketConn = (io) => {
 					return
 				}
 
-				socket.io("bidSuccess", result)
+				socket.emit("bidSuccess", result)
 				io.emit(`updateProduct${result.product_id}`, result)
 			})
 
