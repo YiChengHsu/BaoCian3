@@ -54,6 +54,11 @@ An online marketplace holding real-time auctions with complete trading mechanism
 
 * **Pay requirement**
     * Pay with most popular third-party API Stripe which has fast, secure, continuous support, and extensible checkout and payment.
+    * Test card numbers:
+    
+    | Number | Brand | CVC | Date |
+    | -------- | -------- | -------- | -------- |
+    | 4242 4242 4242 4242   | Visa    | Any 3 digits   | Any future date    |
 
 * **Reception confirmation and rating for the seller**
     * Get the delivery tracking number after seller shipped the product.
