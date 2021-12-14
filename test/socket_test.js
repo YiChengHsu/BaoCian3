@@ -1,12 +1,6 @@
 const port = process.env.PORT_TEST
 const io = require('socket.io-client');
-const {expect} = require('./set_up')
-const requester = require('./set_up')
-const user = {
-  provider: 'native',
-  email: 'fish@test.com',
-  password: 'kkkkkk',
-}
+const {expect, requester} = require('./set_up')
 
 const socketURL = `http://localhost:${port}`
 const options ={
@@ -20,9 +14,8 @@ let user3
 let accessToken
 const bid = {
   productId:1,
-  userId:1,
   bidAmount:150,
-  endTime: new Date('2021-12-15'),
+  endTime: (new Date('2021-12-31')).getTime(),
   totalBidTimes: 10,
 }
 
@@ -67,6 +60,12 @@ describe('Bid server', () => {
   })
 
   it('Bid success with login token', async (done) => {
+    const user = {
+      provider: 'native',
+      email: 'test@test.com',
+      password: '111111',
+    }
+
     const res = await requester.post('/api/1.0/user/signin').send(user);
 
     const optionsWithToken ={
@@ -77,14 +76,16 @@ describe('Bid server', () => {
       }
     };
 
-    console.log(res)
+
     user3 = io.connect(socketURL, optionsWithToken)
     await user3.on('roomUsers')
     await user3.emit('join', 1)
-    await user3.emit('bid', bid)
-    await user3.on('bidSuccess', (data) => {
-      expect(data).to.be.an('object')
-      done();
+    await user3.emit('bid', (bid) => {
+      user3.on('bidSuccess', (data) => {
+        console.log(data)
+        expect(data).to.be.an('object');
+        done();
+      })
     })
   })
 })

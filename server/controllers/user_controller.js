@@ -313,6 +313,43 @@ const createRating = async (req, res) => {
 	}
 }
 
+const updateUserPicture = async (req, res) => {
+	const userId = req.user.id
+	let picture = req.file ? req.file.key : "sorry-my-wallet/user_default.png"
+
+	const result = await User.updateUserPicture(userId, picture)
+
+	if (result.error) {
+		const error = result.error
+		console.log(error)
+		res.status(error.type).send({ error: error.msg })
+		return
+	}
+
+	const user = result.user
+	if (!user) {
+		res.status(403).send({ error: "Forbidden" })
+		return
+	}
+
+	console.log(user)
+
+	res.status(200).send({
+		data: {
+			access_token: user.access_token,
+			access_expired: user.access_expired,
+			login_at: user.login_at,
+			user: {
+				id: user.id,
+				provider: user.provider,
+				name: user.name,
+				email: user.email,
+				picture: process.env.IMAGE_PATH + user.picture,
+			},
+		}
+	})
+}
+
 module.exports = {
 	signIn,
 	signUp,
@@ -323,4 +360,5 @@ module.exports = {
 	updateUserAddress,
 	updateUserAccount,
 	createRating,
+	updateUserPicture
 }

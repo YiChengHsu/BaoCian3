@@ -302,6 +302,7 @@ fetch("/api/1.0" + params + query, {
 			socket.emit("joinRoom", id)
 
 			socket.on(`updateProduct${id}`, (bid) => {
+				console.log(bid)
 				productItem.classList.add("fade-it")
 				setTimeout(() => {
 					productItem.classList.remove("fade-it")
@@ -316,14 +317,14 @@ fetch("/api/1.0" + params + query, {
 				endTime = bid.end_time
 				intervalId = resetCountDownTimer(intervalId, id, bid.end_time)
 
+				$(`#highest-tag-${id}`).remove()
+
 				if (userId && bid.user_id == userId) {
 					$("<span>", {
 						id: `highest-tag-${id}`,
 						text: '得標中',
 						class: 'p-2 btn-danger disabled rounded rounded-pill',
 					}).appendTo(productImage)
-				}else {
-					$(`#highest-tag-${id}`).remove()
 				}
 			})
 		})

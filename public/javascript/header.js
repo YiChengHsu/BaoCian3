@@ -53,6 +53,7 @@ $("#logout-button").click(() => {
 })
 
 $("#search-form").submit((e) => {
+	e.preventDefault()
 	const keyword = $("#search-input").val()
 	window.location.href = `/product/search?keyword=${keyword}`
 })

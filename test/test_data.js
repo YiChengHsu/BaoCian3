@@ -29,11 +29,11 @@ const roles = [
     name: 'user'
   },
   {
-    id: 2,
+    id: 3,
     name: 'admin'
   },
   {
-    id: 3,
+    id: 2,
     name: 'banned'
   }
 ]
@@ -45,7 +45,7 @@ const products = [
     sub_category: 'men_pants',
     title: 'product1',
     price: 100,
-    end_time: new Date('2021-12-31'),
+    end_time: new Date('2021-12-31').getTime(),
     description: 'test',
     bid_incr: 10,
     condition: '全新',
@@ -63,7 +63,7 @@ const products = [
     sub_category: 'men_pants',
     title: 'product1',
     price: 100,
-    end_time: new Date('2021-10-31'),
+    end_time: new Date('2021-10-31').getTime(),
     description: 'test',
     bid_incr: 10,
     condition: '全新',

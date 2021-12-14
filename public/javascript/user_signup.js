@@ -107,7 +107,7 @@ const verifyImgFile = (file) => {
 }
 
 const verifyImgSize = (file) => {
-	const fileMaxSize = 1000000 // 2M
+	const fileMaxSize = 1000000 // 1M
 	const filePath = file.value
 	if (filePath) {
 		for (let i = 0; i < file.files.length; i++) {

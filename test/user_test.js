@@ -34,6 +34,7 @@ describe('sign up', () => {
     const user = {
       provider: 'native',
       name: 'Frank',
+      role_id : 1,
       email: 'test@test.com',
       password: 'kkkkkk,',
       picture: null
@@ -47,12 +48,14 @@ describe('sign up', () => {
   it('sign in with user 1', async() => {
     const user = {
       provider: 'native',
-      email: 'test2@test.com',
+      email: 'test@test.com',
       password: '111111',
     }
 
-    const res = await requester.post('/api/1.0/user/signup').send(user);
+    const res = await requester.post('/api/1.0/user/signin').send(user);
     expect(res.status).to.equal(200);
-    expect(res.user).to.be.an('object');
+    expect(res.body.data).to.be.an('object');
+    expect(res.body.data.user).to.be.an('object');
+    expect(res.body.data.access_token).to.be.an('string');
   })
 })

@@ -11,6 +11,7 @@ const {
 	updateUserAddress,
 	updateUserAccount,
 	createRating,
+	updateUserPicture
 } = require("../controllers/user_controller")
 
 router.route("/user/signup").post(upload.single("avatar"), signUp)
@@ -28,5 +29,7 @@ router.route("/user/account").post(authentication(), upload.array(), updateUserA
 router.route("/user/rating").post(authentication(), createRating)
 
 router.route("/user/:records").get(authentication(), getUserList)
+
+router.route("/user/picture").post(authentication(), upload.single("avatar"), updateUserPicture)
 
 module.exports = router

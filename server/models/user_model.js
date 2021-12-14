@@ -281,6 +281,46 @@ const banUnpaidUser = async (userIds) => {
 	return banUserIds
 }
 
+const updateUserPicture = async (userId, picture) => {
+
+	const conn = await pool.getConnection()
+	try {
+		await conn.query("START TRANSACTION")
+
+		await conn.query("UPDATE user SET picture = ? WHERE id = ? ", [picture, userId])
+
+		const [result] = await conn.query("SELECT * FROM user WHERE id = ?", [userId])
+		const user = result[0]
+
+		const loginAt = new Date()
+		const accessExpire = process.env.ACCESS_TOKEN_EXPIRE
+		const accessToken = jwt.sign(
+			{
+				provider: user.provider,
+				name: user.name,
+				email: user.email,
+				picture: picture,
+			},
+			process.env.ACCESS_TOKEN_SECRET
+		)
+
+		await conn.query("UPDATE user SET access_token = ?, access_expired = ?, login_at = ? WHERE id = ?", [accessToken, accessExpire, loginAt, user.id])
+
+		await conn.query("COMMIT")
+
+		user.access_token = accessToken
+		user.login_at = loginAt
+		user.access_expired = accessExpire
+
+		return { user }
+	} catch (error) {
+		await conn.query("ROLLBACK")
+		return { error }
+	} finally {
+		await conn.release()
+	}
+}
+
 module.exports = {
 	nativeSignUp,
 	nativeSignIn,
@@ -295,4 +335,5 @@ module.exports = {
 	getRatings,
 	getAvgRatings,
 	banUnpaidUser,
+	updateUserPicture
 }

@@ -587,3 +587,100 @@ const toCurrency = (num) => {
 	parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",")
 	return parts.join(".")
 }
+
+//Change the avatar
+$("#change-avatar-button").click( async ()=> {
+	const { value: file } = await Swal.fire({
+		title: '上傳個人頭像',
+		input: 'file',
+		inputAttributes: {
+			'accept': 'image/jpeg, image/png',
+			'aria-label': 'Upload your profile picture',
+			'name': 'avatar',
+		}
+	})	
+	
+	if (file) {
+		if (file.type != 'image/jpeg' && file.type != 'image/png'){
+			Swal.fire({
+				title: "我不能接受",
+				text: "圖片僅支援JPG與PNG檔",
+				imageUrl: "../assest/non-accept.png",
+				imageWidth: 300,
+				imageHeight: 200,
+				imageAlt: "I can not accept!",
+				confirmButtonText: "知道了",
+			})
+			file.value = ""
+			return false
+		}
+
+		if (file.size > 1000000) {
+			Swal.fire({
+				title: "圖檔過大",
+				text: "圖片大小請不要超過1MB",
+				imageUrl: "../assest/non-accept.png",
+				imageWidth: 300,
+				imageHeight: 200,
+				imageAlt: "Too big",
+				confirmButtonText: "知道了",
+			})
+			file.value = ""
+			return false
+		}
+
+		const reader = new FileReader()
+		reader.onload = (e) => {
+			Swal.fire({
+				title: '更新頭像嗎?',
+				imageUrl: e.target.result,
+				imageHeight: 150,
+				imageWidth: 150,
+				imageAlt: 'The uploaded picture',
+				customClass: {
+					image: 'rounded rounded-circle'
+				},
+				showCancelButton: true,
+				confirmButtonText: '確定整形',
+				cancelButtonText: `我喜歡我現在的模樣`,
+			}).then((result) => {
+				if (result.isConfirmed) {
+					const formData = new FormData
+					formData.append('avatar', file);
+					fetch("/api/1.0/user/picture", {
+						method: "post",
+						headers: {
+							Authorization: "Bearer " + user.access_token,
+						},
+						body: formData,
+					})
+					.then((res) => {
+						if (res.status != 200) {
+							Swal.fire({
+								title: "更新失敗",
+								text: "請稍後再試",
+								imageUrl: "../assest/oop.png",
+								imageWidth: 400,
+								imageHeight: 300,
+							})
+							throw new Error()
+						}
+						return res.json()
+					})
+					.then((res) => {
+						let data = res.data
+						localStorage.setItem("user", JSON.stringify(data))
+						Swal.fire({
+							title: "整形成功",
+							text: "可以以全新的樣貌面對世人了",
+							icon: "success",
+						}).then(() => {
+							self.location.href = "/user/profile"
+						})
+					}).catch(error => console.log(error))
+				}
+			})
+		}
+		reader.readAsDataURL(file)
+	}
+})

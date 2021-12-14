@@ -79,6 +79,7 @@ const getProducts = async (pageSize, paging, requirement = {}) => {
   };
 
   const productQuery = 'SELECT * FROM product ' + condition.sql + productList.sql + order.sql + limit.sql;
+
   const productBindings = condition.binding.concat(productList.binding).concat(limit.binding);
 
   const productCountQuery = 'SELECT COUNT(*) as count FROM product ' + condition.sql + productList.sql + order.sql;
