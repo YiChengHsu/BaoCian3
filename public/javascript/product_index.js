@@ -120,7 +120,7 @@ fetch("/api/1.0" + params + query, {
 			productText.className = "card-text"
 
 			const highestBid = document.createElement("div")
-			const currencyNum = toCurrency(e.highest_bid)
+			const currencyNum = e.highest_bid ? toCurrency(e.highest_bid): toCurrency(e.price) 
 			highestBid.innerHTML = `目前最高：<b class='text-success' id='highest-bid-${id}'> $${currencyNum} </b>`
 
 			let endTime

@@ -25,7 +25,6 @@ const createProduct = async (req, res) => {
 		place: body.place || "資訊未提供",
 		seller_id: user,
 		end_time: Date.parse(body.end_time) - Number(process.env.TRANS_TIME_ZONE),
-		highest_bid: body.price,
 	}
 
 	const productsKeys = Object.keys(product)

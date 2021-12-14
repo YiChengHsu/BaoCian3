@@ -102,7 +102,12 @@ fetch(detailsUrl, {
 		}
 
 		const currentNumber = document.querySelector(".highest-bid")
-		currentNumber.textContent = `$${toCurrency(data.highest_bid)}`
+		if (!data.highest_bid) {
+			currentNumber.textContent = `$${toCurrency(data.price)}`
+			$("#non-highest").show()
+		} else {
+			currentNumber.textContent = `$${toCurrency(data.highest_bid)}`
+		}
 
 		const bidEnter = document.querySelector("#my-bid-number")
 		bidEnter.placeholder = `$${data.bid_incr}`
@@ -350,6 +355,7 @@ socket.on(`updateProduct${productId}`, (bid) => {
 	const bidTimesDiv = document.querySelector("#bid-times")
 	bidTimes = bid.total_bid_times
 	bidTimesDiv.textContent = `出價次數： ${bidTimes}`
+	$("#non-highest").hide()
 
 	endTime = bid.end_time
 	$("#flipdown").html("")
@@ -404,10 +410,10 @@ socket.on("bidFail", (error) => {
 				}
 			})
 			break
-		case "Invalid bid":
-			message = "手速慢了，有人已經出價了唷!"
 		case "Ended auction":
 			message = "拍賣已結束!"
+		case "Invalid bid":
+			message = "請高於現在最高價或是最低出價!"
 		default:
 			Swal.fire({
 				icon: "error",
