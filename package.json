@@ -35,7 +35,8 @@
     "supertest": "^6.1.6"
   },
   "scripts": {
-    "test": "set NODE_ENV=test&&mocha --exit --timeout 10000"
+    "test": "set NODE_ENV=test&&mocha --exit --timeout 10000",
+    "start": "node app.js"
   },
   "repository": {
     "type": "git",

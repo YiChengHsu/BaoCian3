@@ -253,6 +253,7 @@ fetch(detailsUrl, {
 					Swal.fire({ icon: "error", title: "刪除失敗", text: "請稍後再試一次!" })
 				})
 		})
+		$('.loader').hide();
 	})
 
 // Send bid message to socket.io server

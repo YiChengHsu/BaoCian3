@@ -365,6 +365,7 @@ fetch("/api/1.0" + params + query, {
 				).insertBefore(".next-page")
 			}
 		}
+		$('.loader').hide();
 	})
 
 const setCountDownTimer = (id, endTime) => {

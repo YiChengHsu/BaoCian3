@@ -31,6 +31,8 @@ if (user && user.user.picture) {
 	$(".hide-button").css("display", "inline")
 }
 
+$(".loader-inner").loaders();
+
 $("#logout-button").click(() => {
 	Swal.fire({
 		imageUrl: "../assest/stay.png",

@@ -81,4 +81,18 @@ a{
         margin-right: 0px !important;
         width: 100px !important;
     }
+}
+
+.loader {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(219, 219, 219, 0.8);
+    z-index: 1056;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
     
