@@ -332,6 +332,8 @@ fetch("/api/1.0" + params + query, {
 		const currentPage = res.page
 		const totalPage = res.total_page
 
+		$('.loader').hide();
+
 		if (totalPage == 1) {
 			$(".previous-page").hide()
 			$(".next-page").hide()
@@ -351,7 +353,7 @@ fetch("/api/1.0" + params + query, {
 		}
 
 		for (let i = 0; i < totalPage; i++) {
-			if (i == currentPage) {
+			if (i === currentPage) {
 				$(
 					`<li class="page-item disabled"><a class="page-link" href="?paging=${i}">${
 						i + 1
@@ -365,7 +367,6 @@ fetch("/api/1.0" + params + query, {
 				).insertBefore(".next-page")
 			}
 		}
-		$('.loader').hide();
 	})
 
 const setCountDownTimer = (id, endTime) => {

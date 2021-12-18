@@ -56,6 +56,17 @@ $("#logout-button").click(() => {
 
 $("#search-form").submit((e) => {
 	e.preventDefault()
+
 	const keyword = $("#search-input").val()
+
+	if (keyword == "") {
+		Swal.fire({
+			icon: "error",
+			title: "無法搜尋",
+			text: "請先知道自己要的是甚麼！",
+			confirmButtonText: "知道了",
+		})
+		return
+	}
 	window.location.href = `/product/search?keyword=${keyword}`
 })

@@ -449,6 +449,8 @@ fetch(url + params, {
 		const currentPage = res.page
 		const totalPage = res.total_page
 
+		$('.loader').hide();
+
 		if (totalPage <= 1) {
 			$(".previous-page").hide()
 			$(".next-page").hide()
@@ -474,7 +476,6 @@ fetch(url + params, {
 				$(`<li class="page-item"><a class="page-link" href="${params.split("&")[0]}&paging=${i}">${i + 1}</a></li>`).insertBefore(".next-page")
 			}
 		}
-		$('.loader').hide();
 	})
 	.catch((error) => {
 		console.log(error)
