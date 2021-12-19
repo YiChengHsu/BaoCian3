@@ -10,6 +10,7 @@ const {
 	getProductWatchTimes,
 } = require("../controllers/product_controller")
 require("dotenv").config()
+const imagePath = process.env.IMAGE_PATH
 
 const signUp = async (req, res) => {
 	let body = req.body
@@ -128,8 +129,12 @@ const getUserProfile = async (req, res) => {
 
 	const { dataList, dataListCounts } = await findDataList(listType)
 
+	dataList.map((e) => {
+		e.main_image = e.main_image ? imagePath + e.main_image : null
+	})
+
 	let rating = await User.getAvgRatings(userId)
-	user.rating = rating ? rating[0].avgRating : null
+	user.rating = rating ? rating[0] && rating[0].avgRating : null
 
 	const totalPage = Math.ceil(dataListCounts / pageSize)
 	const result = {
@@ -331,8 +336,6 @@ const updateUserPicture = async (req, res) => {
 		res.status(403).send({ error: "Forbidden" })
 		return
 	}
-
-	console.log(user)
 
 	res.status(200).send({
 		data: {

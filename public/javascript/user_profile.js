@@ -99,7 +99,7 @@ fetch(url + params, {
 
 		data.map((e) => {
 			const id = e.id
-			const imgUrl = `https://s3.ap-northeast-1.amazonaws.com/node.js-image-bucket/${e.main_image}`
+			const imgUrl = e.main_image
 
 			$(document).ready(function () {
 				$("<div/>", {
