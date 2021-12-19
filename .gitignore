@@ -9,3 +9,5 @@ database/
 socket_load_test/
 
 socket_load_test.js
+
+.dockerignore

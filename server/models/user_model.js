@@ -146,7 +146,7 @@ const getUserDetails = async (userId) => {
 }
 
 const getUserWatchProductIds = async (userId) => {
-	const queryStr = "SELECT product_id from watch_list WHERE user_id = ? "
+	const queryStr = "SELECT w.product_id FROM watch_list w LEFT JOIN product p on w.product_id = p.id WHERE w.user_id = ? AND p.auction_end = 0"
 	const bindings = userId
 
 	const [productIds] = await pool.query(queryStr, bindings)
@@ -264,11 +264,12 @@ const getRatings = async (userId) => {
 	return ratings
 }
 
-const getAvgRatings = async (userId) => {
-	const queryStr = "SELECT rated_id, AVG(rating) as avgRating FROM rating WHERE rated_id in (?)"
-	const bindings = [userId]
+const getAvgRatings = async (userIds) => {
+	const queryStr = "SELECT rated_id, AVG(rating) 'avgRating' FROM rating WHERE rated_id in (?) GROUP BY rated_id"
+	const bindings = [userIds]
 
 	const [avgRating] = await pool.query(queryStr, bindings)
+
 	return avgRating
 }
 
