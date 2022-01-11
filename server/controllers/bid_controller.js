@@ -5,6 +5,7 @@ const Order = require("../models/order_model")
 let productsSortByEndTime
 
 const setBidRecord = async (data) => {
+
 	const bidData = {
 		product_id: data.productId,
 		user_id: data.userId,

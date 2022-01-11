@@ -13,8 +13,15 @@ let user2
 let user3
 let accessToken
 const bid = {
-  productId:1,
-  bidAmount:150,
+  productId: 1,
+  bidAmount: 150,
+  endTime: (new Date('2021-12-31')).getTime(),
+  totalBidTimes: 10,
+}
+
+const bid2 = {
+  productId: 1,
+  bidAmount: 0,
   endTime: (new Date('2021-12-31')).getTime(),
   totalBidTimes: 10,
 }
@@ -82,8 +89,65 @@ describe('Bid server', () => {
     await user3.emit('join', 1)
     await user3.emit('bid', (bid) => {
       user3.on('bidSuccess', (data) => {
-        console.log(data)
         expect(data).to.be.an('object');
+        done();
+      })
+    })
+  })
+
+  it('Bid fail with lower bid amount', async (done) => {
+    const user = {
+      provider: 'native',
+      email: 'test@test.com',
+      password: '111111',
+    }
+
+    const res = await requester.post('/api/1.0/user/signin').send(user);
+
+    const optionsWithToken ={
+      transports: ['websocket'],
+      'force new connection': true,
+      auth: {
+        authorization: "Bearer " + res.body.data.access_token,
+      }
+    };
+
+
+    user3 = io.connect(socketURL, optionsWithToken)
+    await user3.on('roomUsers')
+    await user3.emit('join', 1)
+    await user3.emit('bid', (bid2) => {
+      user3.on('bidFail', (data) => {
+        done();
+      })
+    })
+  })
+
+  it('Bid fail with block user', async (done) => {
+    const user = {
+      provider: 'native',
+      email: 'test2@test.com',
+      password: '111111',
+    }
+
+    const res = await requester.post('/api/1.0/user/signin').send(user);
+
+    const optionsWithToken ={
+      transports: ['websocket'],
+      'force new connection': true,
+      auth: {
+        authorization: "Bearer " + res.body.data.access_token,
+      }
+    };
+
+
+    user3 = io.connect(socketURL, optionsWithToken)
+    await user3.on('roomUsers')
+    await user3.emit('join', 1)
+    await user3.emit('bid', (bid) => {
+      user3.on('bidFail', (data) => {
+        expect(data).to.be.an('string');
+        expect(data).to.equal('Unpaid user')
         done();
       })
     })

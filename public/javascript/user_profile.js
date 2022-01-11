@@ -75,9 +75,11 @@ fetch(url + params, {
 		$(".address").val(user.address)
 		$(".receiver").val(user.receiver)
 		$(".phone").val(user.phone)
-		$(".bank-account").val(user.bank_code).trigger("change")
+		$(".bank-account").val(user.bank_code).change()
 		$(".bank-account").val(user.bank_account)
 		$(".account-name").val(user.account_name)
+
+		console.log(user)
 
 		if (user.address == null || user.address == "") {
 			Swal.fire({
